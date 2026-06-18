@@ -1,0 +1,29 @@
+- CSV
+
+0a0908,faa916,fbfffe,6d676e,96031a
+
+- With #
+
+#0a0908, #faa916, #fbfffe, #6d676e, #96031a
+
+- Array
+
+["0a0908","faa916","fbfffe","6d676e","96031a"]
+
+- Object
+
+{"Black":"0a0908","Orange":"faa916","White":"fbfffe","Dim Grey":"6d676e","Deep Crimson":"96031a"}
+
+- Extended Array
+
+[{"name":"Black","hex":"0a0908","rgb":[10,9,8],"cmyk":[0,10,20,96],"hsb":[30,20,4],"hsl":[30,11,4],"lab":[3,0,0]},{"name":"Orange","hex":"faa916","rgb":[250,169,22],"cmyk":[0,32,91,2],"hsb":[39,91,98],"hsl":[39,96,53],"lab":[75,20,76]},{"name":"White","hex":"fbfffe","rgb":[251,255,254],"cmyk":[2,0,0,0],"hsb":[165,2,100],"hsl":[165,100,99],"lab":[100,-1,0]},{"name":"Dim Grey","hex":"6d676e","rgb":[109,103,110],"cmyk":[1,6,0,57],"hsb":[291,6,43],"hsl":[291,3,42],"lab":[44,4,-3]},{"name":"Deep Crimson","hex":"96031a","rgb":[150,3,26],"cmyk":[0,98,83,41],"hsb":[351,98,59],"hsl":[351,96,30],"lab":[31,54,32]}]
+
+- XML
+
+<palette>
+  <color name="Black" hex="0a0908" r="10" g="9" b="8" />
+  <color name="Orange" hex="faa916" r="250" g="169" b="22" />
+  <color name="White" hex="fbfffe" r="251" g="255" b="254" />
+  <color name="Dim Grey" hex="6d676e" r="109" g="103" b="110" />
+  <color name="Deep Crimson" hex="96031a" r="150" g="3" b="26" />
+</palette>
