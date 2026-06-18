@@ -1,0 +1,59 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model ChatSession {
+  id           String        @id @default(uuid())
+  ipHash       String        // Hashed IP to prevent PII leakage while enabling rate limiting
+  fingerprint  String        // Hashed client device fingerprint
+  userAgent    String?
+  warningCount Int           @default(0) // Count of warnings given to user
+  isBanned     Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  messages     ChatMessage[]
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    String      // "user" or "assistant"
+  content   String
+  piiFlag   Boolean     @default(false) // Flag if PII was detected in this message
+  createdAt DateTime    @default(now())
+  llmLog    LlmLog?     // Relation to optional LLM telemetry data
+}
+
+model LlmLog {
+  id               String      @id @default(uuid())
+  messageId        String      @unique
+  message          ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  model            String      // e.g. "gemini-1.5-flash"
+  promptTokens     Int
+  completionTokens Int
+  latencyMs        Int
+  estimatedCostUsd Float
+  safetyTriggered  Boolean     @default(false)
+  createdAt        DateTime    @default(now())
+}
+
+model BannedIp {
+  id        String   @id @default(uuid())
+  ipHash    String   @unique
+  reason    String
+  createdAt DateTime @default(now())
+}
+
+model BannedFingerprint {
+  id          String   @id @default(uuid())
+  fingerprint String   @unique
+  reason      String
+  createdAt   DateTime @default(now())
+}

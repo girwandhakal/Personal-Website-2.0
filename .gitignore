@@ -8,3 +8,14 @@ dist/
 .superpowers/
 coverage/
 npm-debug.log*
+
+# SQLite
+*.db
+*.db-journal
+dev.db
+dev.db-journal
+prisma/dev.db
+prisma/dev.db-journal
+
+docs/
+

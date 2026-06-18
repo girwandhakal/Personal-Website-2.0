@@ -11,18 +11,7 @@ export function ScrollField() {
 
   return (
     <div className="scroll-field" aria-hidden="true">
-      <motion.div
-        className="stage-piece stage-piece-one"
-        style={prefersReducedMotion ? undefined : { y: ySlow, rotate }}
-      />
-      <motion.div
-        className="stage-piece stage-piece-two"
-        style={prefersReducedMotion ? undefined : { y: yFast }}
-      />
-      <motion.div
-        className="stage-piece stage-piece-three"
-        style={prefersReducedMotion ? undefined : { y: ySlow }}
-      />
+
       <div className="raster-noise" />
     </div>
   );

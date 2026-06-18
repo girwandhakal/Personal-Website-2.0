@@ -5,6 +5,7 @@ import { Hero } from "@/components/sections/hero";
 import { Projects } from "@/components/sections/projects";
 import { Resume } from "@/components/sections/resume";
 import { Skills } from "@/components/sections/skills";
+import { PhoneMessenger } from "@/components/layout/phone-messenger";
 
 export default function HomePage() {
   return (
@@ -21,6 +22,8 @@ export default function HomePage() {
         <Resume />
         <Contact />
       </main>
+      <PhoneMessenger />
     </>
   );
 }
+

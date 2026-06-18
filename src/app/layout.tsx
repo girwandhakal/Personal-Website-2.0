@@ -1,13 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2 } from "next/font/google";
+import { Outfit } from "next/font/google";
 
 import { siteMetadata } from "@/lib/metadata";
 import "@/styles/globals.css";
 
-const baloo = Baloo_2({
+const outfit = Outfit({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-play"
+  variable: "--font-primary"
 });
 
 export const metadata: Metadata = siteMetadata;
@@ -19,7 +19,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={baloo.variable}>
+    <html lang="en" className={outfit.variable}>
       <body>{children}</body>
     </html>
   );

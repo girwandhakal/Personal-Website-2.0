@@ -10,10 +10,12 @@
     "test:watch": "vitest"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "latest",
     "lucide-react": "latest",
     "motion": "latest",
     "next": "latest",
+    "prisma": "^6.19.3",
     "react": "latest",
     "react-dom": "latest",
     "tailwindcss": "latest"
