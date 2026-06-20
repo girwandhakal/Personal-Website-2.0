@@ -2,8 +2,6 @@ import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/crypto";
-import { profile } from "@/content/profile";
-import { projects } from "@/content/projects";
 import { checkAndRedactSensitiveInfo } from "@/lib/safety";
 
 // Hashing Helper for Client IP addresses to maintain GDPR compliance
@@ -255,19 +253,89 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // 10. Construct Grounding Context for Persona System Prompt
+    // 10. Query Classification & Retrieval Layer
+    const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
+    let classificationResult = { category: "profile_general", extracted_tools: [], extracted_projects: [] };
+    
+    if (apiKey) {
+      try {
+        const classPrompt = `Analyze the user's message and extract parameters for a knowledge base search.
+Return ONLY a valid JSON object. Do NOT wrap it in markdown block quotes or add any extra text.
+{
+  "category": "tool_usage" | "project_deep_dive" | "skills_match" | "contact" | "work_experience" | "education" | "profile_general" | "off_topic",
+  "extracted_tools": ["tool names mentioned, e.g. Next.js, OpenAI"],
+  "extracted_projects": ["project names mentioned"]
+}
+Message: "${message}"`;
+
+        const classRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+          body: JSON.stringify({
+            model: "llama-3.1-8b-instant",
+            messages: [{ role: "user", content: classPrompt }],
+            temperature: 0,
+            response_format: { type: "json_object" }
+          })
+        });
+
+        if (classRes.ok) {
+          const classData = await classRes.json();
+          const parsed = JSON.parse(classData.choices[0].message.content);
+          classificationResult = { ...classificationResult, ...parsed };
+        }
+      } catch (e) {
+        console.error("Classification failed, falling back to general search");
+      }
+    }
+
+    const allChunks = await prisma.knowledgeChunk.findMany({ orderBy: { priority: "desc" } });
+    
+    const rankedChunks = allChunks.map(chunk => {
+      let score = chunk.priority;
+      const contentLower = chunk.content.toLowerCase();
+      const msgLower = message.toLowerCase();
+      
+      if (chunk.category === classificationResult.category) score += 20;
+
+      if (classificationResult.extracted_tools?.length > 0) {
+        classificationResult.extracted_tools.forEach((t: string) => {
+          const tl = t.toLowerCase();
+          if (chunk.tools.some((ct: string) => ct.toLowerCase().includes(tl))) score += 30;
+          if (chunk.aliases.some((ca: string) => ca.toLowerCase().includes(tl))) score += 20;
+          if (contentLower.includes(tl)) score += 10;
+        });
+      }
+
+      if (classificationResult.extracted_projects?.length > 0) {
+        classificationResult.extracted_projects.forEach((p: string) => {
+          const pl = p.toLowerCase();
+          if (chunk.projectName && chunk.projectName.toLowerCase().includes(pl)) score += 30;
+          if (chunk.aliases.some((ca: string) => ca.toLowerCase().includes(pl))) score += 20;
+          if (contentLower.includes(pl)) score += 10;
+        });
+      }
+
+      const words = msgLower.split(/\s+/).filter(w => w.length > 3);
+      words.forEach(w => {
+        if (contentLower.includes(w)) score += 2;
+        if (chunk.tags.some((t: string) => t.toLowerCase().includes(w))) score += 5;
+        if (chunk.aliases.some((a: string) => a.toLowerCase().includes(w))) score += 5;
+      });
+
+      return { chunk, score };
+    }).filter(c => c.score > 0).sort((a, b) => b.score - a.score).slice(0, 5).map(c => c.chunk);
+
+    const retrievedChunksText = rankedChunks.map(c => `[${c.title}]: ${c.content}`).join("\n\n");
+    const retrievedChunkIds = rankedChunks.map(c => c.id).join(",");
+
+    // 11. Construct Grounding Context for Persona System Prompt
     const systemPrompt = `<role>
 You are the AI version of Girwan Dhakal, an interactive portfolio assistant. Your ONLY purpose is to answer questions about Girwan's work experience, projects, skills, and education. You are NOT a general-purpose AI.
 </role>
 
 <context>
-- Name: ${profile.name}
-- Headline: ${profile.role}
-- Email: ${profile.email}
-- Education: ${JSON.stringify(profile.education)}
-- Work Experience: ${JSON.stringify(profile.experience)}
-- Skills: ${profile.skills.join(", ")}
-- Projects Details: ${JSON.stringify(projects)}
+${retrievedChunksText || "No specific context found. Stick to general pleasantries or ask the user to clarify their question about Girwan's background."}
 </context>
 
 <critical_guardrails>
@@ -303,18 +371,18 @@ User: Tell me a joke.
 Assistant: I'm keeping things professional here. Feel free to ask me about my data science projects or engineering background!
 </few_shot_examples>`;
 
-    // Retrieve conversation history (up to last 10 messages)
+    // Retrieve conversation history (up to last 5 messages)
     const historyMessages = await prisma.chatMessage.findMany({
       where: { sessionId },
       orderBy: { createdAt: "desc" },
-      take: 11 // Take 11 so we skip the currently inserted user message if needed, or take 10 of past history
+      take: 5 // Take 5 so we skip the currently inserted user message if needed, or take 4 of past history
     });
 
     // Reverse history and filter/decrypt
     const reversedPast = historyMessages
       .filter((msg) => msg.sender === "assistant" || msg.content !== encryptedUserMessage) // Skip the message we just added
       .reverse()
-      .slice(-10);
+      .slice(-4);
 
     const groqMessages = [{ role: "system", content: systemPrompt }];
     
@@ -337,14 +405,13 @@ Assistant: I'm keeping things professional here. Feel free to ask me about my da
       content: message
     });
 
-    // 11. Groq API Stream Execution
-    const apiKey = process.env.GROQ_API_KEY || process.env.GEMINI_API_KEY;
+    // 12. Groq API Stream Execution
 
     if (!apiKey) {
       // Mock Response for development/preview mode
       const mockReply = `Hi! I am Girwan's AI persona. Currently, the owner has not set the GROQ_API_KEY environment variable, so I am running in local preview mode. 
 
-From my credentials, I am a Computer Science MS/BS student at The University of Alabama with experience in Power Automate at Alabama Credit Union, incoming Data Science at Shipt, and NLP speech research at the Alabama Life Research Institute. How can I help you today?`;
+From my credentials, I am a Computer Science MS/BS student at The University of Alabama with experience in Power Automate at Alabama Credit Union, Data Science at Shipt, and NLP speech research at the Alabama Life Research Institute. How can I help you today?`;
       
       const stream = new ReadableStream({
         async start(controller) {
@@ -372,7 +439,9 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
               completionTokens: words.length,
               latencyMs: Date.now() - startTime,
               estimatedCostUsd: 0,
-              safetyTriggered: false
+              safetyTriggered: false,
+              category: classificationResult.category,
+              retrievedChunks: retrievedChunkIds
             }
           });
           controller.close();
@@ -497,7 +566,9 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
               completionTokens,
               latencyMs: Date.now() - startTime,
               estimatedCostUsd: cost,
-              safetyTriggered: false
+              safetyTriggered: false,
+              category: classificationResult.category,
+              retrievedChunks: retrievedChunkIds
             }
           });
 

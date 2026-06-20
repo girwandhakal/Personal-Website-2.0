@@ -9,6 +9,5 @@ export const navItems = [
   { label: "Skills", href: "#skills" },
   { label: "Experience", href: "#resume" },
   { label: "Education", href: "#education" },
-  { label: "Resume", href: "/Girwan-Dhakal-Resume.docx" },
   { label: "Contact", href: "#contact" }
 ] as const;

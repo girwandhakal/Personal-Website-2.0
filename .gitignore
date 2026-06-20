@@ -17,8 +17,10 @@ dev.db-journal
 prisma/dev.db
 prisma/dev.db-journal
 
-docs/
-
+docs/prompts/
+docs/specs/
+scratch/
+skills-lock.json
 # Python & Microservices
 venv/
 env/
@@ -33,3 +35,6 @@ pip-delete-this-directory.txt
 .pytest_cache/
 .coverage
 htmlcov/
+
+
+.agents/

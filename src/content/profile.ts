@@ -77,13 +77,13 @@ export const profile = {
   ],
   experience: [
     {
-      role: "Incoming Data Science Intern",
+      role: "Data Science Intern",
       company: "Shipt",
       location: "Birmingham, AL",
       period: "Jun 2026 - Present",
       bullets: [
-        "Partnering with business teams to define analytical questions, conduct exploratory analysis, and build statistical and predictive models on large datasets.",
-        "Designing, analyzing, and communicating experiment results to optimize business decisions."
+        "Cut Slack-based data requests by 75% by developing a Snowflake Cortex NLP-to-SQL agent and deploying a Next.js/D3.js self-service analytics dashboard on Snowflake Container Services.",
+        "Reduced data science/AI project setup time by 50% by creating a reusable template with CI/CD integration, agentic automation, and prebuilt config and Docker scaffolding."
       ]
     },
     {
@@ -92,9 +92,9 @@ export const profile = {
       location: "Tuscaloosa, AL",
       period: "Aug 2025 - May 2026",
       bullets: [
-        "Built end-to-end automation solution using Microsoft Power Automate that eliminated 16 monthly hours of manual financial reporting, enabling finance team to redirect saved time to other business operations.",
-        "Created Power BI dashboards, increasing usage of dashboards for strategic decisions by 20% and running training sessions for internal stakeholders.",
-        "Optimized data warehouse ETL T-SQL code, cutting daily update time by 30%."
+        "Built end-to-end automation solution using Microsoft Power Automate that eliminated 16 monthly hours of manual financial reporting, enabling teams to redirect saved time to other business operations.",
+        "Created Power BI dashboards, increased usage of dashboards for strategic decisions by 20% and ran weekly training sessions for internal stakeholders.",
+        "Optimized SQL data warehouse ETL T-SQL code, cutting daily update time by 30% and ensuring up-to-date tables at the start of each business day."
       ]
     },
     {
@@ -105,8 +105,8 @@ export const profile = {
       bullets: [
         "First-authored peer-reviewed research paper on childhood speech development; collaborated with a cross-functional scientific team; manuscript awaiting publication.",
         "Implemented Generative Speech Error Correction by fine-tuning Google FLAN-T5 LLM to correct 90k+ utterances produced by OpenAI Whisper, improving transcription accuracy by up to 15% on child speech.",
-        "Used UA-HPC to submit and manage SLURM jobs, run multiprocessing workflows.",
-        "Built scalable data preprocessing pipelines to parse speech annotations into structured datasets; conducted exploratory data analysis with Pandas and data visualizations using Matplotlib to uncover patterns."
+        "Wrote 10+ SLURM jobs for machine learning training and inference workflows, reducing manual execution time by 90% and enabling scalable computation on High-Performance Computers.",
+        "Built scalable data-engineering pipelines to parse speech annotations into structured datasets; conducted exploratory data analysis with Pandas and data visualizations using Matplotlib to uncover patterns."
       ]
     }
   ]

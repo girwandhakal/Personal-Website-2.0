@@ -360,108 +360,154 @@ export function PhoneMessenger() {
   );
 
   return (
-    <div
-      className="phone-messenger-root"
-      style={{
-        position: "fixed",
-        right: "24px",
-        bottom: "24px",
-        zIndex: 9999,
-        fontFamily: IOS_FONT,
-      }}
-    >
-      <AnimatePresence mode="wait">
-        {!isOpen ? (
-          /* ====== Docked Idle State ====== */
-          <motion.button
-            key="docked"
-            onClick={() => { setIsOpen(true); setShowNotification(false); }}
-            initial={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30, transition: { duration: 0.2 } }}
-            whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.02, transition: { duration: 0.2 } }}
-            whileTap={{ scale: 0.96 }}
-            aria-label="Open chat messenger"
+    <>
+      {/* Backdrop Blur Overlay */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            onClick={() => setIsOpen(false)}
             style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              outline: "none",
-              padding: 0,
+              position: "fixed",
+              inset: 0,
+              zIndex: 9998,
+              background: "rgba(0,0,0,0.4)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
             }}
-          >
-            {/* Inner motion div to handle the infinite bounce independently of exit animations */}
-            <motion.div
-              animate={prefersReducedMotion ? { y: 0 } : { y: showNotification ? [0, -8, 0] : 0 }}
-              transition={showNotification ? { y: { duration: 3, repeat: Infinity, ease: "easeInOut" } } : { duration: 0.3 }}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Docked Button Container (Fixed Bottom Right) */}
+      <div 
+        className="phone-dock-root"
+        style={{
+          position: "fixed",
+          right: "24px",
+          bottom: "24px",
+          zIndex: 9999,
+          fontFamily: IOS_FONT,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-end",
+          pointerEvents: isOpen ? "none" : "auto",
+        }}
+      >
+        <AnimatePresence>
+          {!isOpen && (
+            <motion.button
+              key="docked"
+              onClick={() => { setIsOpen(true); setShowNotification(false); }}
+              initial={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30, transition: { duration: 0.2 } }}
+              whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.02, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.96 }}
+              aria-label="Open chat messenger"
               style={{
-                width: "86px",
-                height: "172px",
-                borderRadius: "24px",
-                background: "linear-gradient(160deg, #1e293b 0%, #000000 100%)",
-                border: "3px solid #2a2a2e",
-              boxShadow: showNotification 
-                ? "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5), 0 0 28px rgba(10, 132, 255, 0.35)"
-                : "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5)",
-              position: "relative",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              transition: "box-shadow 0.8s ease-in-out",
-            }}>
-              {/* Dynamic Island */}
-              <div style={{
-                marginTop: "8px",
-                width: "28px",
-                height: "8px",
-                background: "#000",
-                borderRadius: "4px",
-              }}/>
-              
-              {/* Notification Badge on the phone itself */}
-              {showNotification && (
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                outline: "none",
+                padding: 0,
+              }}
+            >
+              {/* Inner motion div to handle the infinite bounce independently of exit animations */}
+              <motion.div
+                animate={prefersReducedMotion ? { y: 0 } : { y: showNotification ? [0, -8, 0] : 0 }}
+                transition={showNotification ? { y: { duration: 3, repeat: Infinity, ease: "easeInOut" } } : { duration: 0.3 }}
+                style={{
+                  width: "86px",
+                  height: "172px",
+                  borderRadius: "24px",
+                  background: "linear-gradient(160deg, #1e293b 0%, #000000 100%)",
+                  border: "3px solid #2a2a2e",
+                boxShadow: showNotification 
+                  ? "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5), 0 0 28px rgba(10, 132, 255, 0.35)"
+                  : "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5)",
+                position: "relative",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                transition: "box-shadow 0.8s ease-in-out",
+              }}>
+                {/* Dynamic Island */}
+                <div style={{
+                  marginTop: "8px",
+                  width: "28px",
+                  height: "8px",
+                  background: "#000",
+                  borderRadius: "4px",
+                }}/>
+                
+                {/* Notification Badge on the phone itself */}
+                {showNotification && (
+                  <div style={{
+                    position: "absolute",
+                    top: "-4px",
+                    right: "-4px",
+                    width: "14px",
+                    height: "14px",
+                    background: "#FF3B30",
+                    borderRadius: "50%",
+                    boxShadow: "0 2px 8px rgba(255,59,48,0.5)",
+                    border: "2px solid #0a0908",
+                  }}/>
+                )}
+
+                {/* Blinking "Eyes" (Lock Screen details) */}
+                <div className="eye-blink" style={{ position: "absolute", bottom: "30px", left: "16px", width: "12px", height: "12px", borderRadius: "50%", background: "rgba(255,255,255,0.3)" }}/>
+                <div className="eye-blink" style={{ position: "absolute", bottom: "30px", right: "16px", width: "12px", height: "12px", borderRadius: "50%", background: "rgba(255,255,255,0.3)" }}/>
+
+                {/* Home bar */}
                 <div style={{
                   position: "absolute",
-                  top: "-4px",
-                  right: "-4px",
-                  width: "14px",
-                  height: "14px",
-                  background: "#FF3B30",
-                  borderRadius: "50%",
-                  boxShadow: "0 2px 8px rgba(255,59,48,0.5)",
-                  border: "2px solid #0a0908",
+                  bottom: "6px",
+                  width: "32px",
+                  height: "3px",
+                  background: "rgba(255,255,255,0.4)",
+                  borderRadius: "2px",
                 }}/>
-              )}
+              </motion.div>
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
 
-              {/* Flashlight & Camera Buttons (Lock Screen details) */}
-              <div style={{ position: "absolute", bottom: "16px", left: "10px", width: "12px", height: "12px", borderRadius: "50%", background: "rgba(255,255,255,0.06)" }}/>
-              <div style={{ position: "absolute", bottom: "16px", right: "10px", width: "12px", height: "12px", borderRadius: "50%", background: "rgba(255,255,255,0.06)" }}/>
-
-              {/* Home bar */}
-              <div style={{
-                position: "absolute",
-                bottom: "6px",
-                width: "32px",
-                height: "3px",
-                background: "rgba(255,255,255,0.4)",
-                borderRadius: "2px",
-              }}/>
-            </motion.div>
-          </motion.button>
-        ) : (
-          /* ====== Active Smartphone State ====== */
-          <motion.div
-            key="phone-active"
-            ref={phoneFrameRef}
-            initial={prefersReducedMotion ? undefined : { y: 120, scale: 0.9, opacity: 0 }}
-            animate={{ y: 0, scale: 1, opacity: 1 }}
-            exit={prefersReducedMotion ? undefined : { y: 120, scale: 0.9, opacity: 0 }}
+      {/* Centered Phone Modal Container */}
+      <div
+        className="phone-messenger-root"
+        style={{
+          position: "fixed",
+          inset: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+          pointerEvents: "none",
+          fontFamily: IOS_FONT,
+        }}
+      >
+        <AnimatePresence>
+          {isOpen && (
+            /* ====== Active Smartphone State ====== */
+            <motion.div
+              key="phone-active"
+              ref={phoneFrameRef}
+              initial={prefersReducedMotion ? undefined : { y: 40, scale: 0.95, opacity: 0 }}
+              animate={{ y: 0, scale: 1, opacity: 1 }}
+              exit={prefersReducedMotion ? undefined : { scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
             className="phone-frame"
             style={{
+              pointerEvents: "auto",
               width: "340px",
               height: "600px",
               borderRadius: "44px",
@@ -816,8 +862,9 @@ export function PhoneMessenger() {
               }}/>
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Embedded Styles */}
       <style jsx global>{`
@@ -833,6 +880,15 @@ export function PhoneMessenger() {
         @keyframes ios-typing {
           0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
           30% { opacity: 1; transform: translateY(-4px); }
+        }
+
+        .eye-blink {
+          animation: blink-anim 4s infinite;
+          transform-origin: center;
+        }
+        @keyframes blink-anim {
+          0%, 92%, 98%, 100% { transform: scaleY(1); }
+          95% { transform: scaleY(0.1); }
         }
 
         .phone-msg-scroll::-webkit-scrollbar {
@@ -858,6 +914,6 @@ export function PhoneMessenger() {
           }
         }
       `}</style>
-    </div>
+    </>
   );
 }

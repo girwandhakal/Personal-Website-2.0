@@ -22,6 +22,9 @@ export default function HomePage() {
         <Resume />
         <Contact />
       </main>
+      <footer className="w-full py-8 flex items-center justify-center text-white/40 text-sm font-medium bg-[var(--black)] border-t border-[var(--grey)]/20">
+        &copy; 2026 Girwan Dhakal
+      </footer>
       <PhoneMessenger />
     </>
   );

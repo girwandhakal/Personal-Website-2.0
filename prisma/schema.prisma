@@ -1,8 +1,9 @@
 // prisma/schema.prisma
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 generator client {
@@ -35,12 +36,14 @@ model LlmLog {
   id               String      @id @default(uuid())
   messageId        String      @unique
   message          ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  model            String      // e.g. "gemini-1.5-flash"
+  model            String      // e.g. "llama3-8b"
   promptTokens     Int
   completionTokens Int
   latencyMs        Int
   estimatedCostUsd Float
   safetyTriggered  Boolean     @default(false)
+  category         String?     // Added for RAG telemetry
+  retrievedChunks  String?     // Comma-separated chunk IDs
   createdAt        DateTime    @default(now())
 }
 
@@ -56,4 +59,22 @@ model BannedFingerprint {
   fingerprint String   @unique
   reason      String
   createdAt   DateTime @default(now())
+}
+
+// ------------------------------------------------------------------
+// KNOWLEDGE BASE (Retrieval-Augmented Generation)
+// ------------------------------------------------------------------
+
+model KnowledgeChunk {
+  id          String   @id @default(uuid())
+  title       String
+  content     String
+  sourcePath  String
+  category    String   // e.g., 'project', 'profile', 'tool_index'
+  projectName String?  // Optional relation to a specific project
+  tags        String[] // Native Postgres Array!
+  tools       String[] // Native Postgres Array!
+  aliases     String[] // Native Postgres Array!
+  priority    Int      @default(0) // Higher priority chunks rank first
+  updatedAt   DateTime @updatedAt
 }

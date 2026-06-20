@@ -1,0 +1,112 @@
+[
+  {
+    "title": "Girwan Dhakal Profile",
+    "content": "Girwan Dhakal is a Software engineer and researcher designing high-performance systems and ML models. He is a Master’s student at the University of Alabama building software, machine learning systems, and research-backed applications. He is based in Alabama, USA. Email: girwandhakal@gmail.com",
+    "sourcePath": "src/knowledge/profile.json",
+    "category": "profile",
+    "projectName": null,
+    "tags": ["about", "profile", "contact", "summary", "role"],
+    "tools": [],
+    "aliases": ["girwan", "who is girwan", "contact info", "email", "location", "resume"],
+    "priority": 10
+  },
+  {
+    "title": "Technical Skills",
+    "content": "Girwan's technical skills include: Python, C#, Java, C++, JavaScript, TypeScript, SQL, React, Next.js, ASP.NET Core, Django, PyTorch, Scikit-learn, Numpy, Docker, Kubernetes, Git, CI/CD workflows, Microsoft Azure, Power BI, Power Automate, Linux.",
+    "sourcePath": "src/knowledge/skills.json",
+    "category": "skill",
+    "projectName": null,
+    "tags": ["skills", "languages", "frameworks", "tools"],
+    "tools": ["Python", "C#", "Java", "C++", "JavaScript", "TypeScript", "SQL", "React", "Next.js", "ASP.NET Core", "Django", "PyTorch", "Scikit-learn", "Numpy", "Docker", "Kubernetes", "Git", "CI/CD", "Azure", "Power BI", "Power Automate", "Linux"],
+    "aliases": ["tech stack", "technologies", "programming languages", "frontend", "backend", "machine learning"],
+    "priority": 9
+  },
+  {
+    "title": "Education",
+    "content": "Girwan Dhakal is pursuing his education at The University of Alabama in Tuscaloosa, AL. He is working towards a Master of Science in Computer Science (Expected 2024 - 2027) and a Bachelor of Science in Computer Science (Expected 2022 - 2027).",
+    "sourcePath": "src/knowledge/education.json",
+    "category": "education",
+    "projectName": null,
+    "tags": ["education", "degree", "university", "college", "master", "bachelor"],
+    "tools": [],
+    "aliases": ["school", "university of alabama", "ua", "degrees"],
+    "priority": 8
+  },
+  {
+    "title": "Work Experience: Shipt",
+    "content": "Data Science Intern at Shipt in Birmingham, AL (Jun 2026 - Present). Cut Slack-based data requests by 75% by developing a Snowflake Cortex NLP-to-SQL agent and deploying a Next.js/D3.js self-service analytics dashboard on Snowflake Container Services. Reduced data science/AI project setup time by 50% by creating a reusable template with CI/CD integration, agentic automation, and prebuilt config and Docker scaffolding.",
+    "sourcePath": "src/knowledge/work-experience.json",
+    "category": "work_experience",
+    "projectName": null,
+    "tags": ["work", "experience", "internship", "data science", "analytics", "shipt"],
+    "tools": ["SQL", "Python", "Snowflake Cortex", "NLP", "Next.js", "D3.js", "Docker", "CI/CD"],
+    "aliases": ["shipt", "data science intern", "data scientist"],
+    "priority": 10
+  },
+  {
+    "title": "Work Experience: Alabama Credit Union",
+    "content": "Data Analyst Co-op at Alabama Credit Union in Tuscaloosa, AL (Aug 2025 - May 2026). Built end-to-end automation solution using Microsoft Power Automate that eliminated 16 monthly hours of manual financial reporting, enabling teams to redirect saved time to other business operations. Created Power BI dashboards, increased usage of dashboards for strategic decisions by 20% and ran weekly training sessions for internal stakeholders. Optimized SQL data warehouse ETL T-SQL code, cutting daily update time by 30% and ensuring up-to-date tables at the start of each business day.",
+    "sourcePath": "src/knowledge/work-experience.json",
+    "category": "work_experience",
+    "projectName": null,
+    "tags": ["work", "experience", "data analyst", "co-op", "finance", "automation"],
+    "tools": ["Power Automate", "Power BI", "T-SQL", "SQL"],
+    "aliases": ["acu", "alabama credit union", "data analyst", "dashboards", "etl"],
+    "priority": 9
+  },
+  {
+    "title": "Work Experience: Alabama Life Research Institute",
+    "content": "Machine Learning Researcher at Alabama Life Research Institute in Tuscaloosa, AL (Jan 2025 - Present). First-authored peer-reviewed research paper on childhood speech development; collaborated with a cross-functional scientific team; manuscript awaiting publication. Implemented Generative Speech Error Correction by fine-tuning Google FLAN-T5 LLM to correct 90k+ utterances produced by OpenAI Whisper, improving transcription accuracy by up to 15% on child speech. Wrote 10+ SLURM jobs for machine learning training and inference workflows, reducing manual execution time by 90% and enabling scalable computation on High-Performance Computers. Built scalable data-engineering pipelines to parse speech annotations into structured datasets; conducted exploratory data analysis with Pandas and data visualizations using Matplotlib to uncover patterns.",
+    "sourcePath": "src/knowledge/work-experience.json",
+    "category": "work_experience",
+    "projectName": "child-language-ml",
+    "tags": ["work", "experience", "research", "machine learning", "nlp", "llm", "speech"],
+    "tools": ["Python", "PyTorch", "FLAN-T5", "OpenAI Whisper", "LLM", "Pandas", "Matplotlib", "SLURM", "HPC"],
+    "aliases": ["alri", "researcher", "ml researcher", "child language", "speech act", "whisper", "hpc"],
+    "priority": 10
+  },
+  {
+    "title": "Project: ClearPath AI Medical Financial Assistant",
+    "content": "ClearPath is an AI-powered application that helps users reduce medical debt and optimize payment decisions. It generates personalized recommendations from insurance coverage, personal finance data, and claim documents. Engineered 20+ REST API routes for cash-flow analysis and cost estimation.",
+    "sourcePath": "src/knowledge/projects.json",
+    "category": "project",
+    "projectName": "ClearPath",
+    "tags": ["project", "finance", "ai", "assistant", "medical debt"],
+    "tools": ["Next.js", "React", "TypeScript", "Prisma", "SQLite", "OpenAI API", "Plaid SDK", "LLM"],
+    "aliases": ["clearpath", "medical assistant", "money mentor"],
+    "priority": 9
+  },
+  {
+    "title": "Project: Southern Company Fleet Analytics Platform",
+    "content": "A scalable enterprise platform designed to centralize network infrastructure lifecycle, winning 2nd Place at the UA Innovate Hackathon. Engineered a context-aware AI chatbot using GPT-4o, integrated predictive risk models, and visualized 1000+ devices on a 3D geographic risk map.",
+    "sourcePath": "src/knowledge/projects.json",
+    "category": "project",
+    "projectName": "Southern Company Fleet Analytics",
+    "tags": ["project", "hackathon", "analytics", "enterprise", "fleet"],
+    "tools": ["Streamlit", "Python", "Scikit-learn", "OpenAI API", "GPT-4o", "Plotly", "Pandas", "Machine Learning"],
+    "aliases": ["southern company", "fleet analytics", "hackathon project", "3d map"],
+    "priority": 9
+  },
+  {
+    "title": "Project: Personal Website Chatbot",
+    "content": "An interactive portfolio chatbot embedded in Girwan's personal website. It acts as a retrieval-based Q&A system to answer questions about Girwan's background, projects, and skills. Features include an iMessage-style UI, robust safety pipeline (Presidio PII scanning, detect-secrets, prompt injection defense), and streaming LLM responses.",
+    "sourcePath": "src/knowledge/projects.json",
+    "category": "project",
+    "projectName": "Personal Website Chatbot",
+    "tags": ["project", "chatbot", "portfolio", "safety", "ai"],
+    "tools": ["Next.js", "React", "Framer Motion", "Prisma", "PostgreSQL", "Supabase", "Groq API", "Llama3", "Python", "FastAPI", "Microsoft Presidio", "detect-secrets"],
+    "aliases": ["portfolio bot", "website chat", "this chat", "chatbot"],
+    "priority": 10
+  },
+  {
+    "title": "Project: Snowflake AI Agent",
+    "content": "A project done at Shipt: Developed a Snowflake Cortex NLP-to-SQL agent that reduced Slack-based data requests by 75%. Also deployed a self-service analytics dashboard built with Next.js and D3.js hosted on Snowflake Container Services. It involved creating a reusable template with CI/CD integration, agentic automation, and Docker scaffolding.",
+    "sourcePath": "src/knowledge/projects.json",
+    "category": "project",
+    "projectName": "Snowflake AI Agent",
+    "tags": ["project", "data", "analytics", "dashboard"],
+    "tools": ["Next.js", "Snowflake", "D3.js", "SQL", "React"],
+    "aliases": ["snowflake project", "snowflake dashboard", "snowflake agent"],
+    "priority": 8
+  }
+]
