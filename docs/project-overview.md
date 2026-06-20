@@ -21,6 +21,30 @@ The chat interface (`src/app/api/chat/route.ts`) implements an advanced classifi
 2.  **Scoring & Retrieval**: The API executes an in-memory ranking heuristic over the `KnowledgeChunk` records fetched from Postgres (matching tags, tools, and project aliases natively stored as Postgres arrays).
 3.  **Context Injection**: Top-ranked chunks are dynamically injected into the system prompt's `<context>` tag to ensure the Llama model relies purely on grounded data. Memory is truncated to a strict **4-turn sliding window** to optimize token cost.
 
+#### Data Flow Visualized
+```mermaid
+sequenceDiagram
+    actor User
+    participant NextJS as Next.js API Route
+    participant Presidio as Python Safety Service
+    participant Supabase as Supabase (PostgreSQL)
+    participant Groq as Groq (LLaMA 3.1)
+
+    User->>NextJS: Send Chat Message
+    NextJS->>Supabase: Rate Limit & Ban Check
+    NextJS->>Presidio: Scan for PII / Secrets
+    Presidio-->>NextJS: Redacted Message
+    NextJS->>Supabase: Save Encrypted User Message
+    NextJS->>Groq: Stage 1: Classify Intent (JSON)
+    Groq-->>NextJS: Return Category, Tools, Projects
+    NextJS->>Supabase: Fetch KnowledgeChunks
+    NextJS->>NextJS: Score & Rank Chunks
+    NextJS->>Groq: Stage 2: Stream Response w/ Context
+    Groq-->>NextJS: Stream Text Output
+    NextJS-->>User: Display Response Stream
+    NextJS->>Supabase: Save Encrypted Assistant Message & LlmLog
+```
+
 *Note on Database Synchronization*: 
 - The `KnowledgeChunk` database table is **not** updated automatically. If `src/knowledge/data.json` or the master resume is modified, developers must manually run `npm run index:knowledge` to sync changes to Supabase.
 - The `ChatMessage` table **is** updated automatically in real-time. Every single chat interaction generates exactly two rows: one for the user query (`sender: "user"`) and one for the generated response (`sender: "assistant"`).
@@ -28,6 +52,7 @@ The chat interface (`src/app/api/chat/route.ts`) implements an advanced classifi
 ### 2. Comprehensive Safety & Security Guardrails
 *   **Python Presidio Microservice**: Pre-flight checks on user inputs. If the Python server is offline, a TypeScript regex fallback is deployed.
 *   **Prompt Injection Defense**: Detects jailbreak attempts (e.g., "ignore previous instructions") and automatically overrides the LLM call.
+*   **Uncertainty Escalation Rule**: The LLM is strictly prohibited from hallucinating or answering out-of-context questions (e.g., "Have you worked with AWS?"). If it lacks knowledge, it is hardcoded to respond exclusively with a redirection sentence advising the user to email `girwandhakal@gmail.com`.
 *   **Ban Shield**: Tracks violations and rate limits via hashed device fingerprints (`x-device-fingerprint`) and salted IP hashes. Malicious behavior automatically triggers a permanent device ban (stored in the `BannedFingerprint` table).
 *   **Encrypted Storage**: All user and assistant chat messages are encrypted at rest in the database using AES-256-GCM and a client-provided session key.
 

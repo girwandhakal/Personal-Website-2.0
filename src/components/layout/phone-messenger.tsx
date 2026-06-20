@@ -95,6 +95,13 @@ export function PhoneMessenger() {
   const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
 
+  // Listen for global custom event to trigger the chat open (e.g. from the contact section)
+  useEffect(() => {
+    const handleOpenChat = () => setIsOpen(true);
+    window.addEventListener("open-ai-chat", handleOpenChat);
+    return () => window.removeEventListener("open-ai-chat", handleOpenChat);
+  }, []);
+
   // Robust Callback Ref: Guarantees the listener attaches the exact millisecond the DOM node is created, even inside AnimatePresence
   const suggestionsCallbackRef = React.useCallback((node: HTMLDivElement | null) => {
     if (node) {

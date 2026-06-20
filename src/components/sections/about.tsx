@@ -11,11 +11,15 @@ export function About() {
         </Reveal>
         <Reveal className="about-copy max-w-3xl" delay={0.1}>
           <p>
-            I enjoy building practical systems at the intersection of software engineering, machine learning, and research. I like taking ambiguous problems, shaping them into clear technical directions, and shipping polished results.
+            I am a Computer Science researcher and engineer specializing in <strong>Agentic Engineering, Artificial Intelligence, and Data Science</strong>. Drawing from my experience across high-growth tech internships and academic research, I love taking ambiguous problems and architecting intelligent, autonomous software systems. As I look toward graduating in <strong>May 2027</strong>, I am actively seeking roles in <strong>Software Engineering</strong> and <strong>Data Science</strong> where I can build the next generation of AI-driven applications.
           </p>
-          <div className="proof-strip mt-10 text-left w-full mx-auto flex flex-col">
-            {profile.proof.map((item) => (
-              <span key={item}>{item}</span>
+          <div className="mt-12 flex flex-col gap-8 text-left w-full mx-auto max-w-2xl">
+            {profile.proof.map((item, i) => (
+              <div key={i} className="pl-6 border-l-[3px] border-white/10 hover:border-accent/60 transition-colors duration-300">
+                <span className="text-white/70 hover:text-white transition-colors duration-300 leading-relaxed text-[17px] md:text-lg block">
+                  {item}
+                </span>
+              </div>
             ))}
           </div>
 

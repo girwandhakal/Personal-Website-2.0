@@ -41,7 +41,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       
       <div className="relative z-10 flex flex-col gap-2 md:max-w-[70%]">
         <motion.span
-          className="text-sm font-mono tracking-widest uppercase"
+          className="text-sm font-bold tracking-widest uppercase"
           animate={{ color: isHovered ? "rgba(10, 9, 8, 0.7)" : "var(--grey)" }}
           transition={{ duration: 0.3 }}
         >
@@ -65,7 +65,26 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         >
           <div className="flex flex-col gap-4 mt-4">
             <p className="text-lg md:text-xl font-medium max-w-2xl text-[#0a0908]/80 leading-relaxed">
-              {project.summary}
+              {project.summary.includes("try it here") ? (
+                <>
+                  {project.summary.split("try it here")[0]}
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(new Event("open-ai-chat"));
+                      }
+                    }}
+                    className="text-orange-600 hover:text-orange-800 font-bold underline decoration-2 underline-offset-4 cursor-pointer relative z-20"
+                  >
+                    try it here
+                  </button>
+                  {project.summary.split("try it here")[1]}
+                </>
+              ) : (
+                project.summary
+              )}
             </p>
             <div className="flex flex-wrap gap-2">
               {project.tech.map(t => (

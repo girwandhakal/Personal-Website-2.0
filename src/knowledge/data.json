@@ -1,7 +1,7 @@
 [
   {
     "title": "Girwan Dhakal Profile",
-    "content": "Girwan Dhakal is a Software engineer and researcher designing high-performance systems and ML models. He is a Master’s student at the University of Alabama building software, machine learning systems, and research-backed applications. He is based in Alabama, USA. Email: girwandhakal@gmail.com",
+    "content": "Girwan Dhakal is a Computer Science researcher and engineer specializing in Agentic Engineering, Artificial Intelligence, and Data Science. As he looks toward graduating in May 2027, he is actively seeking roles in Software Engineering and Data Science to build the next generation of AI-driven applications. He is a Master’s student at the University of Alabama. He is based in Alabama, USA. Email: girwandhakal@gmail.com",
     "sourcePath": "src/knowledge/profile.json",
     "category": "profile",
     "projectName": null,
@@ -56,7 +56,7 @@
   },
   {
     "title": "Work Experience: Alabama Life Research Institute",
-    "content": "Machine Learning Researcher at Alabama Life Research Institute in Tuscaloosa, AL (Jan 2025 - Present). First-authored peer-reviewed research paper on childhood speech development; collaborated with a cross-functional scientific team; manuscript awaiting publication. Implemented Generative Speech Error Correction by fine-tuning Google FLAN-T5 LLM to correct 90k+ utterances produced by OpenAI Whisper, improving transcription accuracy by up to 15% on child speech. Wrote 10+ SLURM jobs for machine learning training and inference workflows, reducing manual execution time by 90% and enabling scalable computation on High-Performance Computers. Built scalable data-engineering pipelines to parse speech annotations into structured datasets; conducted exploratory data analysis with Pandas and data visualizations using Matplotlib to uncover patterns.",
+    "content": "Machine Learning Researcher at Alabama Life Research Institute in Tuscaloosa, AL (Jan 2025 - Present). Built a clinical joint-attention detection tool through systematic comparison of transformer architectures (PoseC3D volumetric, STGCN graph-based, SPOTER sequence) evaluated on a custom dataset of ~7 hours of video, achieving 80% classification accuracy. First-authored peer-reviewed research paper on childhood speech development. Implemented Generative Speech Error Correction by fine-tuning Google FLAN-T5 LLM to correct 90k+ utterances produced by OpenAI Whisper, improving transcription accuracy by up to 15%. Wrote 10+ SLURM jobs for machine learning training and inference workflows.",
     "sourcePath": "src/knowledge/work-experience.json",
     "category": "work_experience",
     "projectName": "child-language-ml",

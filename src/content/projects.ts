@@ -13,6 +13,17 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    title: "Personal AI Persona & RAG Chatbot",
+    eyebrow: "Agentic Engineering",
+    summary:
+      "A fully custom, context-aware AI chatbot integrated directly into this portfolio. It acts as my digital persona, answering questions about my experience, skills, and projects using advanced Retrieval-Augmented Generation (RAG). You can try it here to see it in action.",
+    impact:
+      "Engineered a secure Next.js API featuring semantic vector ranking via Supabase/pgvector, rigid LLM deterministic guardrails, and a dedicated Python microservice for PII redaction (Presidio). Built a polished, interactive chat UI with Framer Motion.",
+    tech: ["Next.js", "TypeScript", "Python", "Supabase", "pgvector", "OpenAI API", "Framer Motion", "Tailwind CSS"],
+    links: [{ label: "Try it out below!", href: "#contact" }],
+    accent: "white"
+  },
+  {
     title: "ClearPath: AI Medical Financial Assistant",
     eyebrow: "AI Financial Assistant",
     summary:

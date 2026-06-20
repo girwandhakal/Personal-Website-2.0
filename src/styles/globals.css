@@ -88,7 +88,7 @@ textarea {
   padding: 0 16px;
   border: 2.5px solid var(--white);
   background: var(--black);
-  box-shadow: 4px 4px 0 var(--line);
+  box-shadow: none;
   transform: translateX(-50%);
 }
 
@@ -191,7 +191,7 @@ textarea {
 
 .icon-link-tactile:hover {
   transform: translate(2px, 2px);
-  box-shadow: -2px -2px 0 var(--white);
+  box-shadow: none;
   background: var(--white);
   color: var(--black);
 }
@@ -206,7 +206,7 @@ textarea {
   border-color: var(--crimson);
   background: transparent;
   color: var(--crimson);
-  box-shadow: 2px 2px 0 var(--crimson);
+  box-shadow: none;
 }
 
 .section-band {
@@ -316,7 +316,7 @@ h3 {
   border: 2px solid var(--white);
   background: transparent;
   color: var(--white);
-  box-shadow: 4px 4px 0 var(--white);
+  box-shadow: none;
   font-weight: 900;
   transition: all 120ms cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
@@ -324,27 +324,27 @@ h3 {
 
 .button:hover {
   transform: translate(2px, 2px);
-  box-shadow: 2px 2px 0 var(--white);
+  box-shadow: none;
 }
 
 .button:active {
   transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0 var(--white);
+  box-shadow: none;
 }
 
 .button-primary {
   background: var(--orange);
   color: var(--black);
   border-color: var(--black);
-  box-shadow: 4px 4px 0 var(--black);
+  box-shadow: none;
 }
 
 .button-primary:hover {
-  box-shadow: 2px 2px 0 var(--black);
+  box-shadow: none;
 }
 
 .button-primary:active {
-  box-shadow: 0px 0px 0 var(--black);
+  box-shadow: none;
 }
 
 .button-secondary {
@@ -363,7 +363,7 @@ h3 {
   position: absolute;
   background: transparent !important;
   border: 2px solid var(--line) !important;
-  box-shadow: 8px 8px 0 color-mix(in srgb, var(--white) 4%, transparent) !important;
+  box-shadow: none;
 }
 
 .stage-piece::before {
@@ -426,7 +426,7 @@ h3 {
 .console-panel {
   background: color-mix(in srgb, var(--black) 94%, transparent);
   border: 2px solid var(--white);
-  box-shadow: 6px 6px 0 var(--orange);
+  box-shadow: none;
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
@@ -694,16 +694,16 @@ h3 {
   transition: all 150ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.project-card-orange .folder-body { box-shadow: 6px 6px 0 var(--orange); }
-.project-card-crimson .folder-body { box-shadow: 6px 6px 0 var(--crimson); }
-.project-card-white .folder-body { box-shadow: 6px 6px 0 var(--white); }
+.project-card-orange .folder-body { box-shadow: none; }
+.project-card-crimson .folder-body { box-shadow: none; }
+.project-card-white .folder-body { box-shadow: none; }
 
 .project-folder:hover .folder-body {
   transform: translate(3px, 3px);
 }
-.project-card-orange:hover .folder-body { box-shadow: 3px 3px 0 var(--orange); }
-.project-card-crimson:hover .folder-body { box-shadow: 3px 3px 0 var(--crimson); }
-.project-card-white:hover .folder-body { box-shadow: 3px 3px 0 var(--white); }
+.project-card-orange:hover .folder-body { box-shadow: none; }
+.project-card-crimson:hover .folder-body { box-shadow: none; }
+.project-card-white:hover .folder-body { box-shadow: none; }
 
 .project-schematic {
   height: 160px;
@@ -814,7 +814,7 @@ h3 {
   border: 2px solid var(--white);
   background: transparent;
   color: var(--white);
-  box-shadow: 4px 4px 0 var(--white);
+  box-shadow: none;
   
   font-size: 0.82rem;
   font-weight: 700;
@@ -824,34 +824,34 @@ h3 {
 .project-card-orange .button-tactile-link {
   border-color: var(--orange);
   color: var(--orange);
-  box-shadow: 4px 4px 0 var(--orange);
+  box-shadow: none;
 }
 .project-card-orange .button-tactile-link:hover {
   background: var(--orange);
   color: var(--black);
-  box-shadow: 2px 2px 0 var(--black);
+  box-shadow: none;
 }
 
 .project-card-crimson .button-tactile-link {
   border-color: var(--crimson);
   color: var(--crimson);
-  box-shadow: 4px 4px 0 var(--crimson);
+  box-shadow: none;
 }
 .project-card-crimson .button-tactile-link:hover {
   background: var(--crimson);
   color: var(--white);
-  box-shadow: 2px 2px 0 var(--white);
+  box-shadow: none;
 }
 
 .project-card-white .button-tactile-link {
   border-color: var(--white);
   color: var(--white);
-  box-shadow: 4px 4px 0 var(--white);
+  box-shadow: none;
 }
 .project-card-white .button-tactile-link:hover {
   background: var(--white);
   color: var(--black);
-  box-shadow: 2px 2px 0 var(--black);
+  box-shadow: none;
 }
 
 .button-tactile-link:hover {
@@ -859,7 +859,7 @@ h3 {
 }
 .button-tactile-link:active {
   transform: translate(4px, 4px);
-  box-shadow: 0px 0px 0 var(--white) !important;
+  box-shadow: none;
 }
 
 .skills-section {
@@ -882,7 +882,7 @@ h3 {
   border: 2px solid var(--white) !important;
   background: var(--black) !important;
   color: var(--white) !important;
-  box-shadow: 4px 4px 0 var(--white) !important;
+  box-shadow: none;
   
   font-size: 0.88rem;
   font-weight: 700;
@@ -893,7 +893,7 @@ h3 {
 
 .skill-cloud span:hover {
   transform: translate(2px, 2px) !important;
-  box-shadow: 2px 2px 0 var(--white) !important;
+  box-shadow: none;
   background: var(--orange) !important;
   color: var(--black) !important;
 }
@@ -1065,7 +1065,7 @@ h3 {
   padding: 32px;
   border: 2px solid var(--white);
   background: color-mix(in srgb, var(--black) 94%, transparent);
-  box-shadow: 6px 6px 0 var(--line);
+  box-shadow: none;
 }
 
 .contact-form label {
@@ -1094,7 +1094,7 @@ h3 {
   outline: none;
   border-color: var(--orange);
   background: color-mix(in srgb, var(--orange) 6%, var(--black));
-  box-shadow: 3px 3px 0 var(--orange);
+  box-shadow: none;
 }
 
 .form-status {
