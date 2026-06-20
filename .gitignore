@@ -19,3 +19,17 @@ prisma/dev.db-journal
 
 docs/
 
+# Python & Microservices
+venv/
+env/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/

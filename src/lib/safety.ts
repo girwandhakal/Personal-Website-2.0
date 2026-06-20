@@ -19,6 +19,7 @@ const SENSITIVE_PATTERNS = [
   { name: "Private Key", regex: /-----BEGIN (?:RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----[\s\S]+?-----END (?:RSA |DSA |EC |OPENSSH )?PRIVATE KEY-----/g },
   // Email Addresses
   { name: "Email", regex: /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g },
+
   // US/International Phone Numbers (e.g., (123) 456-7890, +1 123-456-7890)
   { name: "Phone Number", regex: /\b(?:\+?1[-.\s]?)?\(?[2-9]\d{2}\)?[-.\s]?[2-9]\d{2}[-.\s]?\d{4}\b/g },
   // Bank Routing / Account numbers (heuristics: 9 digits for routing, 9-18 for account)
@@ -28,9 +29,47 @@ const SENSITIVE_PATTERNS = [
   { name: "Passport", regex: /\b[A-Z0-9]{9}\b/g }, // Very generic, but combined with context usually
 ];
 
+import { Filter } from 'bad-words';
+
 export interface SafetyCheckResult {
   isSafe: boolean;
   redactedText: string;
+}
+
+const profanityFilter = new Filter();
+// Add custom modern slang, gaming toxicity, political insults, and abbreviations
+const modernSlang = [
+  // Acronyms & Abbreviations
+  "mf", "mfs", "stfu", "gtfo", "kys", "kms", "fu", "fku", "fuk", "lmao", "lmfao", "omfg",
+  
+  // General Insults & Intelligence Attacks
+  "dumb", "dumbass", "idiot", "stupid", "moron", "retard", "retarded", "braindead", 
+  "spaz", "sped", "schizo", "autistic", "mongoloid", "brainrot", "schizoid",
+  
+  // Modern Gaming / Gen Z Toxicity
+  "dogwater", "trash", "bot", "npc", "mid", "bozo", "clown", "cope", "seethe", "mald", 
+  "ratio", "skill issue", "gg ez", "touch grass", "noob", "n00b", "scrub",
+  
+  // Internet Subculture & Political Insults
+  "cuck", "simp", "incel", "beta", "soyboy", "snowflake", "chud", "libtard", "woke",
+  "groomer", "pedo", "pedophile", "nazi", "commie", "fascist", "bootlicker",
+  
+  // Severe Vulgarity, Slurs, and Harassment missed by older dictionaries
+  "thot", "hoe", "skank", "slut", "whore", "pussy", "dickhead", "shithead", "fucktard",
+  "twat", "wanker", "cunt", "fag", "faggot", "tranny", "nigga", "nigger", "kike", 
+  "spic", "chink", "gook", "wetback", "raghead", "towelhead", "unalive", "rape", "rapist",
+  "kill yourself", "jerk", "loser", "shut up", "crap", "bs", "af", "asshole", "bitch"
+];
+profanityFilter.addWords(...modernSlang);
+
+/**
+ * Scans text for vulgarity and insults.
+ */
+export function checkProfanity(text: string): SafetyCheckResult {
+  if (profanityFilter.isProfane(text)) {
+    return { isSafe: false, redactedText: profanityFilter.clean(text) };
+  }
+  return { isSafe: true, redactedText: text };
 }
 
 /**

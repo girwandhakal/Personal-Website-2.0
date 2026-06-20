@@ -12,6 +12,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "latest",
+    "bad-words": "^4.0.0",
     "lucide-react": "latest",
     "motion": "latest",
     "next": "latest",
@@ -23,6 +24,7 @@
   "devDependencies": {
     "@testing-library/jest-dom": "latest",
     "@testing-library/react": "latest",
+    "@types/bad-words": "^3.0.3",
     "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
