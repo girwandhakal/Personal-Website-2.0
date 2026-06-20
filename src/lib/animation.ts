@@ -7,6 +7,8 @@ export const navItems = [
   { label: "About", href: "#about" },
   { label: "Projects", href: "#projects" },
   { label: "Skills", href: "#skills" },
-  { label: "Resume", href: "#resume" },
+  { label: "Experience", href: "#resume" },
+  { label: "Education", href: "#education" },
+  { label: "Resume", href: "/Girwan-Dhakal-Resume.docx" },
   { label: "Contact", href: "#contact" }
 ] as const;

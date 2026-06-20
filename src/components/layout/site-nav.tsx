@@ -5,12 +5,17 @@ export function SiteNav() {
     <header className="site-nav-shell">
       <a className="brand-lockup" href="#top" aria-label="Girwan Dhakal home">
         <span className="brand-mark">GD</span>
-        <span className="brand-name">Girwan</span>
       </a>
 
       <nav className="site-nav" aria-label="Primary navigation">
         {navItems.map((item) => (
-          <a key={item.href} href={item.href} className="nav-item-link">
+          <a 
+            key={item.href} 
+            href={item.href} 
+            className="nav-item-link"
+            target={item.href.endsWith(".docx") ? "_blank" : undefined}
+            rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
+          >
             {item.label}
           </a>
         ))}

@@ -24,9 +24,7 @@ html {
 body {
   margin: 0;
   min-width: 320px;
-  background:
-    url("/assets/textures/grain.svg"),
-    linear-gradient(180deg, #0a0908 0%, #1b0d08 42%, #0a0908 100%);
+  background: var(--black);
   color: var(--white);
   
   font-family: var(--font-primary), var(--font-primary-fallback);
@@ -415,7 +413,6 @@ h3 {
   inset: 0;
   opacity: 0.16;
   mix-blend-mode: screen;
-  background-image: url("/assets/textures/grain.svg");
 }
 
 .hero-signal-panel {
@@ -617,9 +614,7 @@ h3 {
 }
 
 .about-section {
-  background:
-    linear-gradient(90deg, color-mix(in srgb, var(--crimson) 32%, transparent), transparent 42%),
-    var(--black);
+  background: var(--black);
 }
 
 .about-copy {
@@ -868,8 +863,8 @@ h3 {
 }
 
 .skills-section {
-  background: var(--white);
-  color: var(--black);
+  background: var(--black);
+  color: var(--white);
 }
 
 .skills-section .eyebrow {
@@ -884,10 +879,10 @@ h3 {
 
 .skill-cloud span {
   padding: 12px 16px !important;
-  border: 2px solid var(--black) !important;
-  background: var(--white) !important;
-  color: var(--black) !important;
-  box-shadow: 4px 4px 0 var(--black) !important;
+  border: 2px solid var(--white) !important;
+  background: var(--black) !important;
+  color: var(--white) !important;
+  box-shadow: 4px 4px 0 var(--white) !important;
   
   font-size: 0.88rem;
   font-weight: 700;
@@ -898,8 +893,9 @@ h3 {
 
 .skill-cloud span:hover {
   transform: translate(2px, 2px) !important;
-  box-shadow: 2px 2px 0 var(--black) !important;
+  box-shadow: 2px 2px 0 var(--white) !important;
   background: var(--orange) !important;
+  color: var(--black) !important;
 }
 
 .skill-cloud span:nth-child(3n):hover {
@@ -913,9 +909,7 @@ h3 {
 }
 
 .resume-section {
-  background:
-    linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--orange) 18%, transparent) 100%),
-    var(--black);
+  background: var(--black);
 }
 
 .resume-layout-grid {

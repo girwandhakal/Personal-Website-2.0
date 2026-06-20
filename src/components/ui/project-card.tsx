@@ -1,76 +1,99 @@
 "use client";
 
+import { motion } from "motion/react";
+import { useState } from "react";
 import { ArrowUpRight } from "lucide-react";
-import { motion, useReducedMotion } from "motion/react";
-
 import type { Project } from "@/content/projects";
 
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const prefersReducedMotion = useReducedMotion();
-
-  // Pick an SVG color accent based on project accent name
-  const accentColor = project.accent === "orange" ? "var(--orange)" : project.accent === "crimson" ? "var(--crimson)" : "var(--white)";
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const accentColors = {
+    orange: "var(--orange)",
+    crimson: "var(--crimson)",
+    white: "var(--white)"
+  };
+  const color = accentColors[project.accent as keyof typeof accentColors] || "var(--white)";
 
   return (
-    <motion.article
-      className={`project-folder project-card-${project.accent}`}
-      initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}
-      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay: index * 0.08, ease: [0.16, 1, 0.3, 1] }}
+    <motion.a
+      href={project.links[0]?.href || "#"}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--grey)]/20 py-12 px-4 md:px-8 cursor-pointer no-underline overflow-hidden"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
+      onBlur={() => setIsHovered(false)}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
     >
-      {/* Folder Tab Header */}
-      <div className="folder-tab">
-        <span className="folder-tab-label">{project.eyebrow}</span>
+      {/* Background slide effect */}
+      <motion.div
+        className="absolute inset-0 z-0 origin-left"
+        initial={{ scaleX: 0 }}
+        animate={{ scaleX: isHovered ? 1 : 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        style={{ backgroundColor: color }}
+      />
+      
+      <div className="relative z-10 flex flex-col gap-2 md:max-w-[70%]">
+        <motion.span
+          className="text-sm font-mono tracking-widest uppercase"
+          animate={{ color: isHovered ? "rgba(10, 9, 8, 0.7)" : "var(--grey)" }}
+          transition={{ duration: 0.3 }}
+        >
+          {project.eyebrow}
+        </motion.span>
+        
+        <motion.h3 
+          className="text-4xl md:text-5xl font-extrabold tracking-tighter leading-tight"
+          animate={{ color: isHovered ? "var(--black)" : "var(--white)" }}
+          transition={{ duration: 0.3 }}
+        >
+          {project.title}
+        </motion.h3>
+
+        {/* Details appear only on hover */}
+        <motion.div
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: isHovered ? "auto" : 0, opacity: isHovered ? 1 : 0 }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="overflow-hidden"
+        >
+          <div className="flex flex-col gap-4 mt-4">
+            <p className="text-lg md:text-xl font-medium max-w-2xl text-[#0a0908]/80 leading-relaxed">
+              {project.summary}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map(t => (
+                <span 
+                  key={t} 
+                  className="text-xs uppercase tracking-widest font-bold px-3 py-1 border border-[var(--black)]/20 rounded-full"
+                  style={{ color: "var(--black)" }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
 
-      {/* Main Folder Body */}
-      <div className="folder-body">
-        {/* Experimental Vector Schematic Graphic (Anti-AI) */}
-        <div className="project-schematic" aria-hidden="true">
-          <div className="schematic-grid-bg" />
-          <svg viewBox="0 0 200 100" className="schematic-svg">
-            <line x1="10" y1="50" x2="190" y2="50" stroke="var(--line)" strokeWidth="0.75" strokeDasharray="3 3" />
-            <line x1="100" y1="10" x2="100" y2="90" stroke="var(--line)" strokeWidth="0.75" strokeDasharray="3 3" />
-            {index % 2 === 0 ? (
-              <>
-                <circle cx="100" cy="50" r="32" fill="none" stroke={accentColor} strokeWidth="2" />
-                <rect x="78" y="28" width="44" height="44" fill="none" stroke="var(--line)" strokeWidth="1" />
-                <line x1="60" y1="10" x2="140" y2="90" stroke={accentColor} strokeWidth="1.5" />
-              </>
-            ) : (
-              <>
-                <rect x="68" y="18" width="64" height="64" fill="none" stroke={accentColor} strokeWidth="2" />
-                <circle cx="100" cy="50" r="24" fill="none" stroke="var(--line)" strokeWidth="1" />
-                <circle cx="100" cy="50" r="6" fill={accentColor} />
-              </>
-            )}
-            <circle cx="10" cy="50" r="2.5" fill={accentColor} />
-            <circle cx="190" cy="50" r="2.5" fill={accentColor} />
-          </svg>
-        </div>
-
-        <div className="project-copy">
-          <h3>{project.title}</h3>
-          <p>{project.summary}</p>
-          <strong className="project-impact-line">{project.impact}</strong>
-        </div>
-
-        <ul className="tech-list" aria-label={`${project.title} technology stack`}>
-          {project.tech.map((tech) => (
-            <li key={tech}>{tech}</li>
-          ))}
-        </ul>
-
-        <div className="project-links">
-          {project.links.map((link) => (
-            <a key={link.href + link.label} href={link.href} className="button-tactile-link">
-              <span>{link.label}</span>
-              <ArrowUpRight aria-hidden="true" size={17} />
-            </a>
-          ))}
-        </div>
-      </div>
-    </motion.article>
+      <motion.div 
+        className="relative z-10 shrink-0 mt-6 md:mt-0 flex items-center justify-center w-14 h-14 rounded-full border-2"
+        animate={{ 
+          borderColor: isHovered ? "var(--black)" : "var(--grey)",
+          color: isHovered ? "var(--black)" : "var(--white)",
+          scale: isHovered ? 1.1 : 1,
+          rotate: isHovered ? 45 : 0
+        }}
+        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <ArrowUpRight size={28} />
+      </motion.div>
+    </motion.a>
   );
 }

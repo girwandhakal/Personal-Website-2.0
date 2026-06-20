@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
-import { checkAndRedactSensitiveInfo } from "@/lib/safety";
+import { checkAndRedactSensitiveInfo, checkProfanity } from "@/lib/safety";
 
 interface Message {
   sender: "user" | "assistant" | "system";
@@ -63,9 +63,9 @@ function getTimeStamp(): string {
 }
 
 const CONVERSATION_STARTERS = [
-  "Tell me about your Shipt internship.",
-  "What did you build for Southern Company?",
-  "How did you improve Whisper accuracy?",
+  "Tell me about yourself?",
+  "What is your most impressive technical project?",
+  "Why are you the best fit for our engineering team?",
 ];
 
 // iOS-style font stack: Inter approximates SF Pro Display on the web
@@ -87,10 +87,27 @@ export function PhoneMessenger() {
   const [fingerprint, setFingerprint] = useState("");
   const [currentTime, setCurrentTime] = useState("10:00");
   const [showNotification, setShowNotification] = useState(true);
+  const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([]);
+  const [isFocused, setIsFocused] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const phoneFrameRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement | null>(null);
   const prefersReducedMotion = useReducedMotion();
+
+  // Robust Callback Ref: Guarantees the listener attaches the exact millisecond the DOM node is created, even inside AnimatePresence
+  const suggestionsCallbackRef = React.useCallback((node: HTMLDivElement | null) => {
+    if (node) {
+      suggestionsRef.current = node;
+      const handleWheel = (e: WheelEvent) => {
+        if (e.deltaY !== 0) {
+          e.preventDefault();
+          node.scrollLeft += e.deltaY;
+        }
+      };
+      node.addEventListener("wheel", handleWheel, { passive: false });
+    }
+  }, []);
 
   // Clock Update
   useEffect(() => {
@@ -153,19 +170,25 @@ export function PhoneMessenger() {
 
     // 1. Client-side PII and Secrets scanning
     const safetyResult = checkAndRedactSensitiveInfo(userText);
+    const profanityResult = checkProfanity(userText);
 
     // 2. Display the redacted version of the user's message
-    setMessages((prev) => [...prev, { sender: "user", content: safetyResult.redactedText, time: getTimeStamp() }]);
+    let finalRedacted = safetyResult.redactedText;
+    if (!profanityResult.isSafe) {
+      finalRedacted = checkProfanity(finalRedacted).redactedText;
+    }
+    
+    setMessages((prev) => [...prev, { sender: "user", content: finalRedacted, time: getTimeStamp() }]);
 
-    // 3. Block API request if sensitive data was found
-    if (!safetyResult.isSafe) {
+    // 3. Block API request if sensitive data or vulgarity was found
+    if (!safetyResult.isSafe || !profanityResult.isSafe) {
+      const systemMessage = !profanityResult.isSafe 
+        ? "Please keep the conversation professional. Vulgar language and insults are not allowed."
+        : "Please don’t send private information, credentials, API keys, passwords, or sensitive personal data in this chat.";
+
       setMessages((prev) => [
         ...prev,
-        { 
-          sender: "system", 
-          content: "Please don’t send private information, credentials, API keys, passwords, or sensitive personal data in this chat.", 
-          time: getTimeStamp() 
-        }
+        { sender: "system", content: systemMessage, time: getTimeStamp() }
       ]);
       setIsLoading(false);
       return;
@@ -194,11 +217,28 @@ export function PhoneMessenger() {
       }
 
       if (!response.ok) {
-        const errorText = await response.text();
-        setMessages((prev) => [
-          ...prev,
-          { sender: "system", content: errorText || "Could not complete message.", time: getTimeStamp() },
-        ]);
+        let errorText = "Could not complete message.";
+        let newRedactedText = null;
+        
+        try {
+          const data = await response.clone().json();
+          if (data.error) errorText = data.error;
+          if (data.redactedText) newRedactedText = data.redactedText;
+        } catch {
+          const rawText = await response.text();
+          if (rawText) errorText = rawText;
+        }
+
+        setMessages((prev) => {
+          const updated = [...prev];
+          if (newRedactedText && updated.length > 0 && updated[updated.length - 1].sender === "user") {
+            updated[updated.length - 1].content = newRedactedText;
+          }
+          return [
+            ...updated,
+            { sender: "system", content: errorText, time: getTimeStamp() },
+          ];
+        });
         setIsLoading(false);
         return;
       }
@@ -232,14 +272,45 @@ export function PhoneMessenger() {
         }
       }
 
+      // Extract dynamic suggestions if present
+      let finalContent = accumulated;
+      let newSuggestions: string[] = [];
+      const suggestionsStartIndex = finalContent.indexOf("<suggestions>");
+      
+      if (suggestionsStartIndex !== -1) {
+        const suggestionsBlock = finalContent.slice(suggestionsStartIndex);
+        // Try to extract the JSON array inside the tags, even if the closing tag is mangled
+        const innerTextMatch = suggestionsBlock.match(/<suggestions>([\s\S]*?)(?:<\/suggestions>|<\/suggestion|<\/suggestio|<\/suggesti|<\/suggest|<\/sugges|<\/sugge|<\/sugg|<\/sug|<\/su|<\/s|<\/|<|$)/);
+        
+        if (innerTextMatch) {
+          try {
+            // Only parse if it looks like a complete JSON array
+            const jsonStr = innerTextMatch[1].trim();
+            if (jsonStr.startsWith("[") && jsonStr.endsWith("]")) {
+              newSuggestions = JSON.parse(jsonStr);
+            }
+          } catch (e) {
+            // JSON parse failed, fallback to default starters
+          }
+        }
+        
+        // Always strip the raw XML block from the user's view
+        finalContent = finalContent.slice(0, suggestionsStartIndex).trim();
+      }
+
       // Add a realistic typing delay based on the length of the response
-      // Minimum 1 second, ~25ms per character, maximum 4 seconds
-      const typingDelay = Math.max(1000, Math.min(accumulated.length * 25, 4000));
+      // Minimum 1 second, ~25ms per character, maximum 2 seconds
+      const typingDelay = Math.max(1000, Math.min(finalContent.length * 25, 2000));
       await new Promise((resolve) => setTimeout(resolve, typingDelay));
 
+      setDynamicSuggestions(newSuggestions);
+      if (suggestionsRef.current) {
+        suggestionsRef.current.scrollLeft = 0;
+      }
+      
       setMessages((prev) => [
         ...prev,
-        { sender: "assistant", content: accumulated, time: getTimeStamp() }
+        { sender: "assistant", content: finalContent, time: getTimeStamp() }
       ]);
 
     } catch (e: any) {
@@ -604,47 +675,56 @@ export function PhoneMessenger() {
             </div>
 
             {/* ---- Suggestions ---- */}
-            {messages.length <= 2 && (
-              <div style={{
-                padding: "8px 12px",
-                display: "flex",
-                overflowX: "auto",
-                gap: "8px",
-                borderTop: "0.5px solid rgba(255,255,255,0.08)",
-                background: "rgba(28,28,30,0.9)",
-              }}
-              className="phone-msg-scroll"
-              >
-                {CONVERSATION_STARTERS.map((starter) => (
-                  <button
-                    key={starter}
-                    disabled={isLoading || isBanned}
-                    onClick={() => handleSendMessage(starter)}
-                    style={{
-                      padding: "6px 14px",
-                      border: "1px solid rgba(255,255,255,0.15)",
-                      borderRadius: "18px",
-                      background: "transparent",
-                      color: "#0A84FF",
-                      fontSize: "13px",
-                      fontWeight: 500,
-                      cursor: isLoading || isBanned ? "not-allowed" : "pointer",
-                      whiteSpace: "nowrap",
-                      fontFamily: IOS_FONT,
-                      transition: "background 150ms ease",
-                    }}
-                    onMouseOver={(e) => {
-                      if (!isLoading && !isBanned) e.currentTarget.style.background = "rgba(10,132,255,0.1)";
-                    }}
-                    onMouseOut={(e) => {
-                      e.currentTarget.style.background = "transparent";
-                    }}
-                  >
-                    {starter}
-                  </button>
-                ))}
-              </div>
-            )}
+            <AnimatePresence>
+              {!isBanned && !input && !isLoading && (messages.length <= 2 || dynamicSuggestions.length > 0) && (
+                <motion.div 
+                  initial={{ opacity: 0, y: 8, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.96 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 24 }}
+                  ref={suggestionsCallbackRef}
+                  style={{
+                    padding: "4px 12px 12px 12px",
+                    display: "flex",
+                    overflowX: "auto",
+                    gap: "8px",
+                    background: "transparent",
+                  }}
+                  className="phone-msg-scroll"
+                >
+                  {(dynamicSuggestions.length > 0 ? dynamicSuggestions : CONVERSATION_STARTERS).map((starter) => (
+                    <button
+                      key={starter}
+                      disabled={isLoading || isBanned}
+                      onClick={() => handleSendMessage(starter)}
+                      style={{
+                        padding: "6px 14px",
+                        border: "1px solid rgba(255,255,255,0.04)",
+                        borderRadius: "18px",
+                        background: "rgba(255,255,255,0.07)",
+                        color: "rgba(255,255,255,0.55)",
+                        fontSize: "13px",
+                        fontWeight: 400,
+                        cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        fontFamily: IOS_FONT,
+                        transition: "all 150ms ease",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.15)";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.9)";
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "rgba(255,255,255,0.07)";
+                        e.currentTarget.style.color = "rgba(255,255,255,0.55)";
+                      }}
+                    >
+                      {starter}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             {/* ---- Input / Compose Bar ---- */}
             <div style={{
@@ -659,17 +739,21 @@ export function PhoneMessenger() {
               <div style={{
                 flex: 1,
                 position: "relative",
-                border: "1px solid rgba(255,255,255,0.18)",
+                border: isFocused ? "1px solid rgba(10, 132, 255, 0.6)" : "1px solid rgba(255,255,255,0.18)",
+                boxShadow: isFocused ? "0 0 0 3px rgba(10, 132, 255, 0.15)" : "none",
                 borderRadius: "20px",
                 background: "rgba(255,255,255,0.06)",
                 display: "flex",
                 alignItems: "center",
+                transition: "all 0.2s ease",
               }}>
                 <textarea
                   disabled={isBanned || isLoading}
                   value={input}
                   onChange={(e) => setInput(e.target.value.substring(0, 400))}
                   onKeyDown={handleKeyPress}
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => setIsFocused(false)}
                   placeholder={isBanned ? "Blocked" : "iMessage"}
                   rows={1}
                   style={{
@@ -690,7 +774,8 @@ export function PhoneMessenger() {
               </div>
 
               {/* Send Button (iOS style arrow-up circle) */}
-              <button
+              <motion.button
+                whileTap={{ scale: 0.85 }}
                 disabled={isLoading || isBanned || !input.trim()}
                 onClick={() => handleSendMessage(input)}
                 style={{
@@ -712,7 +797,7 @@ export function PhoneMessenger() {
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
                   <path d="M12 20V4M12 4L6 10M12 4L18 10" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
-              </button>
+              </motion.button>
             </div>
 
             {/* ---- Home Indicator Bar ---- */}

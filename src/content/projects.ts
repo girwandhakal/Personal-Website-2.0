@@ -20,7 +20,7 @@ export const projects: Project[] = [
     impact:
       "Created 20+ REST-style API routes to power cash-flow analysis, cost estimation, and scenario planning.",
     tech: ["Next.js", "React", "TypeScript", "Prisma", "SQLite", "OpenAI API", "Plaid SDK"],
-    links: [{ label: "View Github", href: "https://github.com/girwandhakal" }],
+    links: [{ label: "View Github", href: "https://github.com/girwandhakal/ClearPath" }],
     accent: "orange"
   },
   {
@@ -33,5 +33,17 @@ export const projects: Project[] = [
     tech: ["Streamlit", "Python", "Scikit-learn", "OpenAI API", "Plotly", "Pandas"],
     links: [{ label: "View Github", href: "https://github.com/girwandhakal" }],
     accent: "crimson"
+  },
+  {
+    title: "Speech Act Analysis",
+    eyebrow: "Machine Learning Research",
+    summary:
+      "A research-focused repository containing Python code and models used in the computational analysis of Late Talker speech acts.",
+    impact:
+      "Utilized data science environments to clean, process, and analyze complex linguistic datasets.",
+    tech: ["Jupyter Notebook", "Python", "Data Science", "Machine Learning"],
+    links: [{ label: "View Github", href: "https://github.com/girwandhakal/Speech-Act-Analysis" }],
+    accent: "white"
   }
 ];
+

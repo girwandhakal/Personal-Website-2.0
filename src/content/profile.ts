@@ -3,7 +3,7 @@ export const profile = {
   role: "Software engineer and researcher designing high-performance systems and ML models.",
   headline: "Girwan Dhakal",
   subheadline:
-    "Master's student at UA building fast, accessible software, training generative NLP models, and designing data-driven automation tools.",
+    "Master’s student at the University of Alabama building software, machine learning systems, and research-backed applications.",
   email: "girwandhakal@gmail.com",
   location: "Alabama, USA",
   resumeHref: "/Girwan-Dhakal-Resume.docx",
@@ -70,7 +70,7 @@ export const profile = {
     },
     {
       institution: "The University of Alabama",
-      degree: "Bachelor of Science in Computer Science (GPA: 3.8/4.0)",
+      degree: "Bachelor of Science in Computer Science",
       location: "Tuscaloosa, AL",
       period: "2022 - 2027 (Expected)"
     }
