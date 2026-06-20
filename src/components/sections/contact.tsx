@@ -9,26 +9,22 @@ export function Contact() {
       id="contact"
       aria-labelledby="contact-title"
     >
-      <div className="section-inner contact-grid">
+      <div className="section-inner flex flex-col items-center text-center gap-12">
         <Reveal>
-          <p className="eyebrow">Contact</p>
-          <h2 id="contact-title">Have a role where the details matter?</h2>
-          <p className="contact-lede">
-            Send a note, review the work, or use the direct email path. The form is ready for email
-            provider wiring when deployment details are final.
-          </p>
-          <div className="social-row">
+          <h2 id="contact-title" className="text-5xl md:text-7xl font-extrabold tracking-tighter">Contact</h2>
+          
+          <div className="social-row flex justify-center gap-8 mt-10">
             {profile.socials.map(({ label, href, icon }) => {
               return (
-                <a key={label} href={href} aria-label={label}>
-                  <img aria-hidden="true" src={`/assets/icons/${icon}.svg`} alt="" width="20" height="20" />
+                <a key={label} href={href} aria-label={label} className="opacity-70 hover:opacity-100 transition-all transform hover:scale-110">
+                  <img aria-hidden="true" src={`/assets/icons/${icon}.svg`} alt="" width="36" height="36" />
                 </a>
               );
             })}
           </div>
         </Reveal>
 
-        <Reveal delay={0.1}>
+        <Reveal delay={0.1} className="w-full max-w-xl mx-auto">
           <ContactForm />
         </Reveal>
       </div>
