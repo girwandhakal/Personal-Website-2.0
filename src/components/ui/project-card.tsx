@@ -20,10 +20,19 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       href={project.links[0]?.href || "#"}
       target="_blank"
       rel="noopener noreferrer"
-      className="group relative flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--grey)]/20 py-12 px-4 md:px-8 cursor-pointer no-underline overflow-hidden"
-      onMouseEnter={() => setIsHovered(true)}
+      style={{ "--active-border": color } as React.CSSProperties}
+      className="group relative flex flex-col md:flex-row md:items-center justify-between border-b border-[var(--grey)]/20 transition-colors duration-300 active:border-[var(--active-border)] md:active:border-[var(--grey)]/20 py-12 px-4 md:px-8 cursor-pointer no-underline overflow-hidden"
+      onMouseEnter={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(true);
+        }
+      }}
       onMouseLeave={() => setIsHovered(false)}
-      onFocus={() => setIsHovered(true)}
+      onFocus={() => {
+        if (typeof window !== "undefined" && window.matchMedia("(hover: hover)").matches) {
+          setIsHovered(true);
+        }
+      }}
       onBlur={() => setIsHovered(false)}
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
