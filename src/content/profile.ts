@@ -81,33 +81,21 @@ export const profile = {
       company: "Shipt",
       location: "Birmingham, AL",
       period: "Jun 2026 - Present",
-      bullets: [
-        "Cut Slack-based data requests by 75% by developing a Snowflake Cortex NLP-to-SQL agent and deploying a Next.js/D3.js self-service analytics dashboard on Snowflake Container Services.",
-        "Reduced data science/AI project setup time by 50% by creating a reusable template with CI/CD integration, agentic automation, and prebuilt config and Docker scaffolding."
-      ]
+      description: "Developed a Snowflake Cortex AI agent that automated SQL queries, reducing manual data requests by 75%. Engineered a reusable CI/CD template that cut future AI project setup times in half."
     },
     {
       role: "Data Analyst Co-op",
       company: "Alabama Credit Union",
       location: "Tuscaloosa, AL",
       period: "Aug 2025 - May 2026",
-      bullets: [
-        "Built end-to-end automation solution using Microsoft Power Automate that eliminated 16 monthly hours of manual financial reporting, enabling teams to redirect saved time to other business operations.",
-        "Created Power BI dashboards, increased usage of dashboards for strategic decisions by 20% and ran weekly training sessions for internal stakeholders.",
-        "Optimized SQL data warehouse ETL T-SQL code, cutting daily update time by 30% and ensuring up-to-date tables at the start of each business day."
-      ]
+      description: "Built end-to-end Power Automate workflows that eliminated 16 hours of manual financial reporting every month. Optimized the data warehouse ETL processes with T-SQL to run 30% faster."
     },
     {
       role: "Machine Learning Researcher",
       company: "Alabama Life Research Institute",
       location: "Tuscaloosa, AL",
       period: "Jan 2025 - Present",
-      bullets: [
-        "First-authored peer-reviewed research paper on childhood speech development; collaborated with a cross-functional scientific team; manuscript awaiting publication.",
-        "Implemented Generative Speech Error Correction by fine-tuning Google FLAN-T5 LLM to correct 90k+ utterances produced by OpenAI Whisper, improving transcription accuracy by up to 15% on child speech.",
-        "Wrote 10+ SLURM jobs for machine learning training and inference workflows, reducing manual execution time by 90% and enabling scalable computation on High-Performance Computers.",
-        "Built scalable data-engineering pipelines to parse speech annotations into structured datasets; conducted exploratory data analysis with Pandas and data visualizations using Matplotlib to uncover patterns."
-      ]
+      description: "Fine-tuned the Google FLAN-T5 LLM to correct AI speech transcription errors, improving accuracy on child speech by 15%. Engineered highly scalable data pipelines to accelerate machine learning workflows on High-Performance Computers."
     }
   ]
 } as const;

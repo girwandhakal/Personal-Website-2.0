@@ -53,12 +53,10 @@ export function Resume() {
                     <span>{exp.period}</span>
                     <span className="flex items-center gap-2"><MapPin size={16}/> {exp.location}</span>
                   </div>
-                  {exp.bullets && (
-                    <ul className="text-left space-y-3 text-white/70 leading-relaxed text-base md:text-lg w-full">
-                      {exp.bullets.map((bullet: string, idx: number) => (
-                        <li key={idx} className="flex gap-4"><span className="text-[var(--orange)] mt-1.5 text-[10px]">■</span><span>{bullet}</span></li>
-                      ))}
-                    </ul>
+                  {exp.description && (
+                    <p className="text-left text-white/70 leading-relaxed text-lg md:text-2xl w-full">
+                      {exp.description}
+                    </p>
                   )}
                 </div>
               ))}
@@ -117,12 +115,10 @@ export function Resume() {
                     <span>{experiences[activeIndex].period}</span>
                     <span className="flex items-center gap-1.5 md:gap-2"><MapPin size={14} className="md:w-[16px] md:h-[16px]" /> {experiences[activeIndex].location}</span>
                   </div>
-                  {experiences[activeIndex].bullets && (
-                    <ul className="text-left space-y-2.5 md:space-y-3 text-white/70 leading-snug md:leading-normal text-[13px] md:text-base w-full">
-                      {experiences[activeIndex].bullets.map((bullet: string, idx: number) => (
-                        <li key={idx} className="flex gap-2.5 md:gap-4"><span className="text-[var(--orange)] mt-1.5 md:mt-2 text-[8px] md:text-xs shrink-0">■</span><span>{bullet}</span></li>
-                      ))}
-                    </ul>
+                  {experiences[activeIndex].description && (
+                    <p className="text-left text-white/70 leading-relaxed md:leading-relaxed text-base md:text-xl w-full">
+                      {experiences[activeIndex].description}
+                    </p>
                   )}
                 </motion.div>
               </AnimatePresence>
