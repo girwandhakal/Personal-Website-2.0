@@ -68,7 +68,7 @@ export function Resume() {
 
         {/* Universal Sticky View (Mobile & Desktop) */}
         {!prefersReducedMotion && (
-          <div className="flex sticky top-0 h-[100dvh] w-full flex-col items-center py-6 pt-24 md:py-16 border-t border-[var(--grey)]/20 md:overflow-hidden">
+          <div className="flex sticky top-0 h-[100dvh] w-full flex-col items-center py-6 pt-24 md:pt-32 md:pb-8 border-t border-[var(--grey)]/20 md:overflow-hidden">
             <h2 className="text-3xl md:text-6xl font-bold text-white tracking-tight z-10 mb-4 md:mb-8 text-center px-4 shrink-0">
               Work Experience
             </h2>

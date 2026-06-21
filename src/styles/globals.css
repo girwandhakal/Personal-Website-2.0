@@ -19,8 +19,6 @@ html {
   scroll-behavior: smooth;
   scroll-padding-top: 104px;
   background: var(--black);
-  overflow-x: hidden;
-  max-width: 100%;
 }
 
 body {
@@ -32,7 +30,7 @@ body {
   font-family: var(--font-primary), var(--font-primary-fallback);
   font-size: 18px;
   line-height: 1.55;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 button, input, textarea, select {
