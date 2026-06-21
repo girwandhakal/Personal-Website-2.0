@@ -8,7 +8,8 @@
     "start": "next start",
     "test": "vitest run",
     "test:watch": "vitest",
-    "index:knowledge": "npx tsx scripts/index-knowledge.ts"
+    "index:knowledge": "npx tsx scripts/index-knowledge.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
