@@ -56,12 +56,12 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
           {project.title}
         </motion.h3>
 
-        {/* Details appear only on hover */}
+        {/* Details appear only on hover (Desktop) */}
         <motion.div
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: isHovered ? "auto" : 0, opacity: isHovered ? 1 : 0 }}
           transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="overflow-hidden"
+          className="overflow-hidden hidden md:block"
         >
           <div className="flex flex-col gap-4 mt-4">
             <p className="text-lg md:text-xl font-medium max-w-2xl text-[#0a0908]/80 leading-relaxed">
@@ -99,6 +99,45 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
             </div>
           </div>
         </motion.div>
+
+        {/* Details always visible (Mobile) */}
+        <div className="overflow-hidden md:hidden">
+          <div className="flex flex-col gap-4 mt-4">
+            <p className="text-base font-medium text-[var(--white)]/80 leading-relaxed">
+              {project.summary.includes("try it here") ? (
+                <>
+                  {project.summary.split("try it here")[0]}
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (typeof window !== "undefined") {
+                        window.dispatchEvent(new Event("open-ai-chat"));
+                      }
+                    }}
+                    className="text-orange-400 hover:text-orange-300 font-bold underline decoration-2 underline-offset-4 cursor-pointer relative z-20"
+                  >
+                    try it here
+                  </button>
+                  {project.summary.split("try it here")[1]}
+                </>
+              ) : (
+                project.summary
+              )}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map(t => (
+                <span 
+                  key={t} 
+                  className="text-xs uppercase tracking-widest font-bold px-3 py-1 border border-[var(--white)]/20 rounded-full"
+                  style={{ color: "var(--white)" }}
+                >
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       <motion.div 

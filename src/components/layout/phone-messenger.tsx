@@ -391,16 +391,13 @@ export function PhoneMessenger() {
 
       {/* Docked Button Container (Fixed Bottom Right) */}
       <div 
-        className="phone-dock-root"
+        className="phone-dock-root hidden md:flex flex-col items-end"
         style={{
           position: "fixed",
           right: "24px",
           bottom: "24px",
           zIndex: 9999,
           fontFamily: IOS_FONT,
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-end",
           pointerEvents: isOpen ? "none" : "auto",
         }}
       >
@@ -512,19 +509,9 @@ export function PhoneMessenger() {
               animate={{ y: 0, scale: 1, opacity: 1 }}
               exit={prefersReducedMotion ? undefined : { scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 28 }}
-            className="phone-frame"
+            className="phone-frame w-full h-[100dvh] rounded-none border-0 shadow-none md:w-[340px] md:h-[600px] md:rounded-[44px] md:border-[3px] md:border-[#3a3a3c] md:shadow-[0_24px_80px_rgba(0,0,0,0.6),0_8px_24px_rgba(0,0,0,0.4),inset_0_1px_0_rgba(255,255,255,0.06)] overflow-hidden flex flex-col relative bg-black"
             style={{
               pointerEvents: "auto",
-              width: "340px",
-              height: "600px",
-              borderRadius: "44px",
-              background: "#000",
-              border: "3px solid #3a3a3c",
-              boxShadow: "0 24px 80px rgba(0,0,0,0.6), 0 8px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
-              overflow: "hidden",
-              display: "flex",
-              flexDirection: "column",
-              position: "relative",
             }}
           >
             {/* ---- Dynamic Island ---- */}
