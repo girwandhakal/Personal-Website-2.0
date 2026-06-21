@@ -34,13 +34,13 @@ export function Resume() {
       <section 
         id="resume" 
         ref={containerRef}
-        className="relative w-full bg-[var(--black)]"
+        className="relative w-full bg-[var(--black)] border-t border-[var(--grey)]/20"
         // Increased height to 150vh per item to slow down progression logic
         style={prefersReducedMotion ? {} : { height: `${experiences.length * 150}vh` } as React.CSSProperties}
       >
         {/* Static View for Reduced Motion */}
         {prefersReducedMotion && (
-          <div className="w-full py-24 px-6 border-t border-[var(--grey)]/20 block">
+          <div className="w-full py-24 px-6 block">
             <h2 className="text-4xl md:text-7xl font-bold text-white tracking-tight mb-16 text-center">
               Work Experience
             </h2>
@@ -68,13 +68,13 @@ export function Resume() {
 
         {/* Universal Sticky View (Mobile & Desktop) */}
         {!prefersReducedMotion && (
-          <div className="flex sticky top-0 h-[100dvh] w-full flex-col items-center py-6 pt-24 md:pt-32 md:pb-8 border-t border-[var(--grey)]/20 md:overflow-hidden">
+          <div className="flex sticky top-0 h-[100svh] w-full flex-col items-center py-6 pt-24 md:pt-32 md:pb-8 md:overflow-hidden">
             <h2 className="text-3xl md:text-6xl font-bold text-white tracking-tight z-10 mb-4 md:mb-8 text-center px-4 shrink-0">
               Work Experience
             </h2>
 
             {/* Scroll Progress Indicator with Step Markers */}
-            <div className="absolute left-4 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center justify-between z-20 py-2 h-[70dvh] md:h-[50vh]">
+            <div className="absolute left-4 md:left-12 top-1/2 -translate-y-1/2 flex flex-col items-center justify-between z-20 py-2 h-[70%] md:h-[50%]">
                {/* Background Line */}
                <div className="absolute top-0 bottom-0 w-[2px] bg-white/10 -z-10" />
                {/* Animated Fill Line */}

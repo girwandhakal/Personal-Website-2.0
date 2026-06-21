@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 
 export function About() {
   return (
-    <section className="about-section section-band" id="about" aria-labelledby="about-title">
+    <section className="about-section section-band border-t border-[var(--grey)]/20" id="about" aria-labelledby="about-title">
       <div className="section-inner flex flex-col items-center text-center gap-12">
         <Reveal>
           <h2 id="about-title" className="text-5xl md:text-7xl font-extrabold tracking-tighter">About Me</h2>

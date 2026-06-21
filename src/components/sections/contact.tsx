@@ -13,7 +13,7 @@ export function Contact() {
 
   return (
     <section
-      className="contact-section section-band"
+      className="contact-section section-band border-t border-[var(--grey)]/20"
       id="contact"
       aria-labelledby="contact-title"
     >

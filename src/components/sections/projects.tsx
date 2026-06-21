@@ -5,11 +5,11 @@ import { Reveal } from "@/components/motion/reveal";
 export function Projects() {
   return (
     <section
-      className="section-band bg-[var(--black)]"
+      className="section-band bg-[var(--black)] border-t border-[var(--grey)]/20"
       id="projects"
       aria-labelledby="projects-title"
     >
-      <div className="section-inner flex flex-col gap-0 border-t border-[var(--grey)]/20 px-0 md:px-0">
+      <div className="section-inner flex flex-col gap-0 px-0 md:px-0">
         <div className="px-4 md:px-8 py-12 pb-12 flex justify-center text-center">
           <Reveal>
             <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-[var(--white)]" id="projects-title">Projects</h2>
