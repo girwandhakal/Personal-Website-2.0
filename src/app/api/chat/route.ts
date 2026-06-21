@@ -423,7 +423,7 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
           const words = mockReply.split(" ");
           for (const word of words) {
             controller.enqueue(new TextEncoder().encode(word + " "));
-            await new Promise((resolve) => setTimeout(resolve, 80));
+            await new Promise((resolve) => setTimeout(resolve, 40));
           }
           
           // Encrypt and log mock response
