@@ -3,7 +3,7 @@ export const profile = {
   role: "Software Engineer & AI Researcher specializing in Agentic Systems and Data Science.",
   headline: "Girwan Dhakal",
   subheadline:
-    "Master’s student at the University of Alabama (Graduating May 2027) architecting autonomous software, machine learning pipelines, and intelligent data systems.",
+    "Master’s student at the University of Alabama (Graduating May 2027) architecting agentic software, machine learning pipelines, and intelligent data systems.",
   email: "girwandhakal@gmail.com",
   location: "Alabama, USA",
   resumeHref: "/Girwan-Dhakal-Resume.docx",
