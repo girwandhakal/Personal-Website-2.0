@@ -306,8 +306,8 @@ export function PhoneMessenger() {
       }
 
       // Add a realistic typing delay based on the length of the response
-      // Minimum 1 second, ~25ms per character, maximum 2 seconds
-      const typingDelay = Math.max(1000, Math.min(finalContent.length * 25, 2000));
+      // Minimum 0.5 seconds, ~12.5ms per character, maximum 1 second
+      const typingDelay = Math.max(500, Math.min(finalContent.length * 12.5, 1000));
       await new Promise((resolve) => setTimeout(resolve, typingDelay));
 
       setDynamicSuggestions(newSuggestions);
@@ -900,7 +900,7 @@ export function PhoneMessenger() {
             bottom: 0 !important;
           }
           .phone-frame {
-            width: 100vw !important;
+            width: 100% !important;
             height: 100dvh !important;
             border-radius: 0 !important;
             border: none !important;
