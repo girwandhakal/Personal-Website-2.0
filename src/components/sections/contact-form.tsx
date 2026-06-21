@@ -6,6 +6,24 @@ import { motion, AnimatePresence } from "motion/react";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
+async function getDeviceFingerprint(): Promise<string> {
+  if (typeof window === "undefined") return "server-fallback";
+  try {
+    const components = [
+      navigator.userAgent,
+      navigator.language,
+      Intl.DateTimeFormat().resolvedOptions().timeZone,
+      `${window.screen.width}x${window.screen.height}x${window.screen.colorDepth}`,
+    ];
+    const msgBuffer = new TextEncoder().encode(components.join("|"));
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  } catch (e) {
+    return "fallback-fingerprint-error";
+  }
+}
+
 export function ContactForm() {
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -40,8 +58,12 @@ export function ContactForm() {
     setErrorMessage("");
 
     try {
+      const fp = await getDeviceFingerprint();
       const response = await fetch("/api/contact", {
         method: "POST",
+        headers: {
+          "x-device-fingerprint": fp
+        },
         body: new FormData(event.currentTarget)
       });
       
@@ -61,6 +83,14 @@ export function ContactForm() {
 
   return (
     <form ref={formRef} className="contact-form text-left w-full relative" onSubmit={handleSubmit}>
+      {/* Honeypot field - visually hidden, screen readers ignore it */}
+      <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
+        <label>
+          Website
+          <input type="text" name="website" tabIndex={-1} autoComplete="off" />
+        </label>
+      </div>
+
       <label>
         Name
         <input name="name" autoComplete="name" required disabled={formState === "submitting"} />

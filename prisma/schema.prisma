@@ -78,3 +78,14 @@ model KnowledgeChunk {
   priority    Int      @default(0) // Higher priority chunks rank first
   updatedAt   DateTime @updatedAt
 }
+
+// ------------------------------------------------------------------
+// EMAIL SUBMISSIONS
+// ------------------------------------------------------------------
+
+model EmailSubmission {
+  id          String   @id @default(uuid())
+  ipHash      String
+  fingerprint String
+  createdAt   DateTime @default(now())
+}
