@@ -6,11 +6,10 @@ import { Projects } from "@/components/sections/projects";
 import { Resume } from "@/components/sections/resume";
 import { Skills } from "@/components/sections/skills";
 import { PhoneMessenger } from "@/components/layout/phone-messenger";
-import { IntroPreloader } from "@/components/layout/intro-preloader";
 
 export default function HomePage() {
   return (
-    <IntroPreloader>
+    <>
       <a className="skip-link" href="#main-content">
         Skip to content
       </a>
@@ -27,7 +26,7 @@ export default function HomePage() {
         &copy; 2026 Girwan Dhakal
       </footer>
       <PhoneMessenger />
-    </IntroPreloader>
+    </>
   );
 }
 
