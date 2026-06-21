@@ -143,14 +143,8 @@ export function PhoneMessenger() {
     if (!frame || !isOpen) return;
 
     const preventScroll = (e: WheelEvent | TouchEvent) => {
-      const scrollable = frame.querySelector('.phone-msg-scroll') as HTMLElement | null;
-      if (!scrollable) {
-        if (e.cancelable) e.preventDefault();
-        return;
-      }
-
-      // Check if the event target is inside the scrollable message thread
-      const isInsideScrollable = scrollable.contains(e.target as Node);
+      const target = e.target as Element;
+      const isInsideScrollable = !!target.closest('.phone-msg-scroll');
       
       if (!isInsideScrollable) {
         // If the user scrolls while hovering over the header, footer, or anywhere else, stop it
