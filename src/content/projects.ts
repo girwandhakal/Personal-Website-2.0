@@ -20,7 +20,7 @@ export const projects: Project[] = [
     impact:
       "Engineered a secure Next.js API featuring semantic vector ranking via Supabase/pgvector, rigid LLM deterministic guardrails, and a dedicated Python microservice for PII redaction (Presidio). Built a polished, interactive chat UI with Framer Motion.",
     tech: ["Next.js", "TypeScript", "Python", "Supabase", "pgvector", "OpenAI API", "Framer Motion", "Tailwind CSS"],
-    links: [{ label: "Try it out below!", href: "#contact" }],
+    links: [{ label: "View Github", href: "https://github.com/girwandhakal/Personal-Website-2.0" }],
     accent: "white"
   },
   {
@@ -42,7 +42,7 @@ export const projects: Project[] = [
     impact:
       "Engineered a context-aware AI chatbot using GPT-4o, integrated predictive risk models, and visualized 1000+ devices on a 3D geographic risk map.",
     tech: ["Streamlit", "Python", "Scikit-learn", "OpenAI API", "Plotly", "Pandas"],
-    links: [{ label: "View Github", href: "https://github.com/girwandhakal" }],
+    links: [{ label: "View Github", href: "https://github.com/girwandhakal/southern-company-analytics" }],
     accent: "crimson"
   },
   {
