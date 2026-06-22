@@ -10,7 +10,7 @@ describe("portfolio content", () => {
   it("contains hiring-focused core profile details", () => {
     expect(profile.name).toBe("Girwan Dhakal");
     expect(profile.primaryCta.href).toBe("#projects");
-    expect(profile.secondaryCta.href).toBe("#resume");
+    expect(profile.secondaryCta.href).toBe("https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing");
     expect(profile.email).toContain("@");
   });
 

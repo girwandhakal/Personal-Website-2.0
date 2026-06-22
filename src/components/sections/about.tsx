@@ -25,7 +25,7 @@ export function About() {
 
           <div className="mt-12 flex justify-center">
             <a className="button button-primary" href={profile.secondaryCta.href} target="_blank" rel="noopener noreferrer">
-              Get Resume
+              Get my resume
               <Download aria-hidden="true" size={20} />
             </a>
           </div>

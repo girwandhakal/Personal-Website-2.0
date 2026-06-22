@@ -6,14 +6,14 @@ export const profile = {
     "Master’s student at the University of Alabama (Graduating May 2027) architecting agentic software, machine learning pipelines, and intelligent data systems.",
   email: "girwandhakal@gmail.com",
   location: "Alabama, USA",
-  resumeHref: "/Girwan-Dhakal-Resume.docx",
+  resumeHref: "https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing",
   primaryCta: {
     label: "View Projects",
     href: "#projects"
   },
   secondaryCta: {
     label: "Download Resume",
-    href: "/Girwan-Dhakal-Resume.docx"
+    href: "https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing"
   },
   socials: [
     {
