@@ -4,6 +4,11 @@ import { prisma } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/crypto";
 import { checkAndRedactSensitiveInfo } from "@/lib/safety";
 
+// Groq retires models periodically, so keep the id in one configurable place.
+// Both `llama-3.1-8b-instant` and the rest of the Llama family were decommissioned;
+// override with GROQ_MODEL if this one is retired too.
+const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+
 // Hashing Helper for Client IP addresses to maintain GDPR compliance
 function getClientIpHash(req: NextRequest): string {
   const forwardedFor = req.headers.get("x-forwarded-for");
@@ -273,10 +278,14 @@ Message: "${message}"`;
           method: "POST",
           headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
           body: JSON.stringify({
-            model: "llama-3.1-8b-instant",
+            model: GROQ_MODEL,
             messages: [{ role: "user", content: classPrompt }],
             temperature: 0,
-            response_format: { type: "json_object" }
+            response_format: { type: "json_object" },
+            // Reasoning models spend tokens before emitting content; too small a
+            // budget returns an empty completion and fails JSON validation.
+            max_tokens: 512,
+            reasoning_effort: "low"
           })
         });
 
@@ -472,17 +481,24 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
         "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "llama-3.1-8b-instant",
+        model: GROQ_MODEL,
         messages: groqMessages,
         stream: true,
-        max_tokens: 1024
+        max_tokens: 1024,
+        reasoning_effort: "low"
       })
     });
 
     if (!groqResponse.ok) {
-      console.error("Groq API call failed status:", groqResponse.status);
+      // Log the provider's actual reason. Without this a retired model reads as a
+      // generic outage, which is what hid the `llama-3.1-8b-instant` removal.
+      const providerError = await groqResponse.text().catch(() => "");
+      console.error(
+        `Groq API call failed (model=${GROQ_MODEL}, status=${groqResponse.status}):`,
+        providerError
+      );
       return new Response(
-        "[SERVER ERROR] Direct Groq API invocation failed. Please try again later.",
+        `[SERVER ERROR] The chat model is unavailable (status ${groqResponse.status}). Please try again later.`,
         { status: 502 }
       );
     }
@@ -566,7 +582,7 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
           await prisma.llmLog.create({
             data: {
               messageId: assistantMsg.id,
-              model: "llama-3.1-8b-instant",
+              model: GROQ_MODEL,
               promptTokens,
               completionTokens,
               latencyMs: Date.now() - startTime,

@@ -16,10 +16,10 @@ export const projects: Project[] = [
     title: "Personal AI Persona & RAG Chatbot",
     eyebrow: "Agentic Engineering",
     summary:
-      "A fully custom, context-aware AI chatbot integrated directly into this portfolio. It acts as my digital persona, answering questions about my experience, skills, and projects using advanced Retrieval-Augmented Generation (RAG). You can try it here to see it in action.",
+      "A context-aware AI chatbot built into this portfolio. It answers questions about my experience, projects, and research as my digital persona, grounded in a retrieval layer over my own work. You can try it here to see it in action.",
     impact:
-      "Engineered a secure Next.js API featuring semantic vector ranking via Supabase/pgvector, rigid LLM deterministic guardrails, and a dedicated Python microservice for PII redaction (Presidio). Built a polished, interactive chat UI with Framer Motion.",
-    tech: ["Next.js", "TypeScript", "Python", "Supabase", "pgvector", "OpenAI API", "Framer Motion", "Tailwind CSS"],
+      "Engineered a Next.js API with semantic ranking over Supabase/pgvector, deterministic LLM guardrails against prompt injection, per-session AES-256-GCM encrypted logging, and a Python microservice for PII redaction with Presidio.",
+    tech: ["Next.js", "TypeScript", "Python", "Supabase", "pgvector", "Groq", "Framer Motion", "Tailwind CSS"],
     links: [{ label: "View Github", href: "https://github.com/girwandhakal/Personal-Website-2.0" }],
     accent: "white"
   },
@@ -27,9 +27,9 @@ export const projects: Project[] = [
     title: "ClearPath: AI Medical Financial Assistant",
     eyebrow: "AI Financial Assistant",
     summary:
-      "An AI-powered application that helps users reduce medical debt and optimize payment decisions by generating personalized recommendations from insurance coverage, personal finance data, and claim documents.",
+      "A full-stack medical financial assistant that reconciles bills against EOBs and combines insurance, claims, and Plaid financial data to generate personalized payment and coverage recommendations.",
     impact:
-      "Created 20+ REST-style API routes to power cash-flow analysis, cost estimation, and scenario planning.",
+      "Built 20+ REST-style API routes powering cash-flow analysis, cost estimation, and scenario planning — so a patient can see the cheapest route through a medical bill before paying it.",
     tech: ["Next.js", "React", "TypeScript", "Prisma", "SQLite", "OpenAI API", "Plaid SDK"],
     links: [{ label: "View Github", href: "https://github.com/girwandhakal/ClearPath" }],
     accent: "orange"
@@ -38,9 +38,9 @@ export const projects: Project[] = [
     title: "Southern Company Fleet Analytics Platform",
     eyebrow: "Enterprise Analytics",
     summary:
-      "A scalable enterprise platform designed to centralize network infrastructure lifecycle, winning 2nd Place at the UA Innovate Hackathon.",
+      "A Python and Streamlit analytics platform for network infrastructure lifecycle management, pairing predictive risk models with a GPT-4o assistant. Won 2nd Place at the UA Innovate Hackathon.",
     impact:
-      "Engineered a context-aware AI chatbot using GPT-4o, integrated predictive risk models, and visualized 1000+ devices on a 3D geographic risk map.",
+      "Engineered a context-aware GPT-4o assistant over fleet telemetry, integrated predictive failure-risk models, and visualized 1,000+ devices on a 3D geographic risk map.",
     tech: ["Streamlit", "Python", "Scikit-learn", "OpenAI API", "Plotly", "Pandas"],
     links: [{ label: "View Github", href: "https://github.com/girwandhakal/southern-company-analytics" }],
     accent: "crimson"
@@ -49,12 +49,11 @@ export const projects: Project[] = [
     title: "Speech Act Analysis",
     eyebrow: "Machine Learning Research",
     summary:
-      "A research-focused repository containing Python code and models used in the computational analysis of Late Talker speech acts.",
+      "The computational pipeline behind my first-authored research on childhood language development, modeling 60K+ child utterances drawn from multiple longitudinal speech corpora.",
     impact:
-      "Utilized data science environments to clean, process, and analyze complex linguistic datasets.",
-    tech: ["Jupyter Notebook", "Python", "Data Science", "Machine Learning"],
+      "Cleaned and modeled complex linguistic datasets, then diagnosed data leakage by auditing train/test splits and classification reports — rebuilding the evaluation sets to produce trustworthy held-out results.",
+    tech: ["Python", "PyTorch", "Scikit-learn", "Jupyter Notebook", "SLURM"],
     links: [{ label: "View Github", href: "https://github.com/girwandhakal/Speech-Act-Analysis" }],
     accent: "white"
   }
 ];
-

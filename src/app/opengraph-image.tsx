@@ -18,8 +18,8 @@ export default function Image() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: 72,
-          background: "#0a0908",
-          color: "#fbfffe",
+          background: "#f6f4f3",
+          color: "#183059",
           fontFamily: "sans-serif",
           position: "relative",
           overflow: "hidden"
@@ -31,7 +31,7 @@ export default function Image() {
             width: 420,
             height: 420,
             borderRadius: 0,
-            background: "#faa916",
+            background: "#f03a47",
             right: 80,
             top: 70,
             transform: "rotate(12deg)"
@@ -42,16 +42,16 @@ export default function Image() {
             position: "absolute",
             width: 330,
             height: 180,
-            border: "18px solid #96031a",
+            border: "18px solid #276fbf",
             right: 210,
             bottom: 92,
             transform: "rotate(-9deg)"
           }}
         />
-        <div style={{ display: "flex", fontSize: 34, color: "#faa916" }}>Playful software engineering</div>
+        <div style={{ display: "flex", fontSize: 34, color: "#af5b5b" }}>Playful software engineering</div>
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ fontSize: 112, lineHeight: 0.92, fontWeight: 900 }}>Girwan Dhakal</div>
-          <div style={{ fontSize: 36, maxWidth: 760, marginTop: 28, color: "#fbfffe" }}>
+          <div style={{ fontSize: 36, maxWidth: 760, marginTop: 28, color: "#183059" }}>
             Fast, polished web experiences with product sense and front-end craft.
           </div>
         </div>

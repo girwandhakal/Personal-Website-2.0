@@ -13,8 +13,8 @@ const outfit = Outfit({
 export const metadata: Metadata = siteMetadata;
 
 export const viewport: Viewport = {
-  themeColor: "#0a0908",
-  colorScheme: "dark light"
+  themeColor: "#f6f4f3",
+  colorScheme: "light"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

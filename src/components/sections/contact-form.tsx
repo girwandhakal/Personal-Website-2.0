@@ -57,6 +57,12 @@ export function ContactForm() {
     setFormState("submitting");
     setErrorMessage("");
 
+    // Snapshot the fields synchronously. React nulls `event.currentTarget` once the
+    // handler returns, so reading it after the `await` below can throw and get
+    // reported as a network error even though no request was ever made.
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
     try {
       const fp = await getDeviceFingerprint();
       const response = await fetch("/api/contact", {
@@ -64,9 +70,12 @@ export function ContactForm() {
         headers: {
           "x-device-fingerprint": fp
         },
-        body: new FormData(event.currentTarget)
+        body: formData,
+        // A cold serverless start can take far longer than a user will wait.
+        // Bound it so we can tell "slow" apart from "unreachable".
+        signal: AbortSignal.timeout(30_000)
       });
-      
+
       const body = await response.json().catch(() => null);
 
       if (response.ok) {
@@ -77,7 +86,11 @@ export function ContactForm() {
       }
     } catch (error) {
       setFormState("error");
-      setErrorMessage("Network error. Please try again later.");
+      setErrorMessage(
+        error instanceof Error && error.name === "TimeoutError"
+          ? "The server took too long to respond. Please try again."
+          : "Network error. Please try again later."
+      );
     }
   }
 
@@ -109,8 +122,15 @@ export function ContactForm() {
         type="submit" 
         disabled={formState === "submitting" || formState === "success"}
         style={
-          formState === "error" 
-            ? { backgroundColor: "#ef4444", color: "#ffffff", borderColor: "#ef4444" } 
+          formState === "error"
+            ? {
+                // A solid #f03a47 fill would put the message at 3.9:1 against
+                // white, under AA for this label size. A tinted panel with a
+                // red rule keeps the error reading while staying legible.
+                backgroundColor: "color-mix(in srgb, var(--accent) 14%, #ffffff)",
+                color: "var(--ink)",
+                borderColor: "var(--accent)"
+              }
             : {}
         }
       >
@@ -123,7 +143,7 @@ export function ContactForm() {
           ) : formState === "error" ? (
             <motion.div key="error" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2, type: "spring", stiffness: 300 }} className="flex items-center gap-2 px-2 text-sm md:text-base">
               <span className="truncate">{errorMessage || "Failed. Try Again."}</span>
-              <XCircle className="flex-shrink-0" aria-hidden="true" size={19} />
+              <XCircle className="flex-shrink-0 text-[var(--accent)]" aria-hidden="true" size={19} />
             </motion.div>
           ) : (
             <motion.div key="idle" initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} transition={{ duration: 0.2 }} className="flex items-center gap-2">
@@ -142,13 +162,13 @@ export function ContactForm() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="absolute -inset-[2px] z-20 flex flex-col items-center justify-center p-8 text-center bg-[#10b981] shadow-2xl"
+            className="absolute -inset-[2px] z-20 flex flex-col items-center justify-center p-8 text-center bg-[var(--blue)] shadow-2xl"
           >
             <motion.div
               initial={{ scale: 0, rotate: -45 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 15 }}
-              className="bg-white text-[#10b981] rounded-full p-4 mb-5 shadow-lg"
+              className="bg-white text-[var(--blue)] rounded-full p-4 mb-5 shadow-lg"
             >
               <Check size={56} strokeWidth={4} />
             </motion.div>
@@ -164,7 +184,7 @@ export function ContactForm() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="text-green-50 font-medium text-lg leading-snug max-w-sm"
+              className="text-white/90 font-medium text-lg leading-snug max-w-sm"
             >
               Thank you for reaching out. I'll get back to you shortly.
             </motion.p>

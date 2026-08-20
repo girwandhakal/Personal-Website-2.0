@@ -22,7 +22,7 @@ export default function HomePage() {
         <Resume />
         <Contact />
       </main>
-      <footer className="w-full py-8 flex items-center justify-center text-white/40 text-sm font-medium bg-[var(--black)] border-t border-[var(--grey)]/20">
+      <footer className="w-full py-8 flex items-center justify-center text-ink/60 text-sm font-medium bg-[var(--surface)] border-t border-ink/15">
         &copy; 2026 Girwan Dhakal
       </footer>
       <PhoneMessenger />
