@@ -74,6 +74,9 @@
 html {
   scroll-behavior: smooth;
   background: var(--surface);
+  /* Sole anchor offset for the fixed nav. Pairing this with a matching
+     `scroll-margin-top` on the sections stacked the two and landed every
+     anchor 176px down instead of 88px. */
   scroll-padding-top: calc(var(--nav-height) + 24px);
 }
 
@@ -118,10 +121,6 @@ img, svg {
 :focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
-}
-
-section[id] {
-  scroll-margin-top: calc(var(--nav-height) + 24px);
 }
 
 .skip-link {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { navItems } from "@/lib/animation";
 import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
@@ -12,6 +12,10 @@ import { AnimatePresence, motion } from "motion/react";
  */
 function useActiveSection(ids: readonly string[]) {
   const [active, setActive] = useState<string>("");
+  // While a click-initiated smooth scroll is in flight the spy must not run:
+  // it would walk the highlight through every section being passed over and
+  // could settle somewhere other than the item the user actually pressed.
+  const lockedUntil = useRef(0);
 
   useEffect(() => {
     const sections = ids
@@ -21,8 +25,17 @@ function useActiveSection(ids: readonly string[]) {
     if (sections.length === 0) return;
 
     const update = () => {
-      const offset = 140;
-      let current = "";
+      if (Date.now() < lockedUntil.current) return;
+
+      // Tie the trigger line to the real nav height rather than a magic number,
+      // so it keeps working if the nav is resized.
+      const navHeight =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue("--nav-height")
+        ) || 64;
+      const offset = navHeight + 76;
+
+      let current = sections[0].id;
       for (const section of sections) {
         if (section.getBoundingClientRect().top <= offset) {
           current = section.id;
@@ -36,23 +49,37 @@ function useActiveSection(ids: readonly string[]) {
       setActive(current);
     };
 
+    const onScrollEnd = () => {
+      lockedUntil.current = 0;
+      update();
+    };
+
     update();
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
+    window.addEventListener("scrollend", onScrollEnd);
     return () => {
       window.removeEventListener("scroll", update);
       window.removeEventListener("resize", update);
+      window.removeEventListener("scrollend", onScrollEnd);
     };
   }, [ids]);
 
-  return active;
+  /** Highlight a section immediately on click, ahead of the smooth scroll. */
+  const selectSection = useCallback((id: string) => {
+    setActive(id);
+    // Fallback release for browsers without `scrollend`.
+    lockedUntil.current = Date.now() + 1500;
+  }, []);
+
+  return [active, selectSection] as const;
 }
 
 const sectionIds = navItems.map((item) => item.href.replace("#", ""));
 
 export function SiteNav() {
   const [isOpen, setIsOpen] = useState(false);
-  const activeSection = useActiveSection(sectionIds);
+  const [activeSection, selectSection] = useActiveSection(sectionIds);
 
   // Close menu on escape
   useEffect(() => {
@@ -90,6 +117,7 @@ export function SiteNav() {
               href={item.href}
               className="nav-item-link"
               aria-current={activeSection === item.href.replace("#", "") ? "true" : undefined}
+              onClick={() => selectSection(item.href.replace("#", ""))}
               target={item.href.endsWith(".docx") ? "_blank" : undefined}
               rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
             >
@@ -152,7 +180,10 @@ export function SiteNav() {
                     className={`flex items-center justify-between text-3xl font-extrabold tracking-tight py-5 border-b border-ink/10 transition-colors ${
                       isActive ? "text-[var(--accent)]" : "text-ink hover:text-[var(--accent)]"
                     }`}
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => {
+                      selectSection(item.href.replace("#", ""));
+                      setIsOpen(false);
+                    }}
                     target={item.href.endsWith(".docx") ? "_blank" : undefined}
                     rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
                   >
