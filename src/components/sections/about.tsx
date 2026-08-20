@@ -11,7 +11,7 @@ export function About() {
         </Reveal>
         <Reveal className="about-copy max-w-3xl" delay={0.1}>
           <p>
-            I am a Computer Science researcher and engineer specializing in <strong>Agentic Engineering, Artificial Intelligence, and Data Science</strong>. Drawing from my experience across high-growth tech internships and academic research, I love taking ambiguous problems and architecting intelligent, agentic software systems. 
+            I am a Computer Science researcher and engineer specializing in <strong>Agentic Engineering, Artificial Intelligence, and Data Science</strong>. I build LLM systems that survive contact with production — retrieval agents, OCR data pipelines, and the evaluation tooling that keeps them honest — and I publish research on the modeling side. Across internships at Shipt and Alabama Credit Union and two years of machine learning research, that work has halved engineer onboarding time, surfaced five figures in annual savings, and reached peer review.
           </p>
           <div className="mt-12 flex flex-col gap-8 text-left w-full mx-auto max-w-2xl">
             {profile.proof.map((item, i) => (

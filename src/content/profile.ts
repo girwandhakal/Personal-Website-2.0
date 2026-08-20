@@ -1,9 +1,9 @@
 export const profile = {
   name: "Girwan Dhakal",
-  role: "Software Engineer & AI Researcher specializing in Agentic Systems and Data Science.",
+  role: "Machine Learning Engineer & Researcher building agentic AI systems that ship to production.",
   headline: "Girwan Dhakal",
   subheadline:
-    "Master’s student at the University of Alabama (Graduating May 2027) architecting agentic software, machine learning pipelines, and intelligent data systems.",
+    "Accelerated Master’s student at The University of Alabama building agentic AI in production — retrieval agents, LLM data pipelines, and machine learning research that reaches peer review.",
   email: "girwandhakal@gmail.com",
   location: "Alabama, USA",
   resumeHref: "https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing",
@@ -34,68 +34,75 @@ export const profile = {
   ],
   skills: [
     "Python",
-    "C#",
-    "Java",
-    "C++",
-    "JavaScript",
-    "TypeScript",
     "SQL",
-    "React",
-    "Next.js",
-    "ASP.NET Core",
-    "Django",
+    "TypeScript",
+    "JavaScript",
+    "Java",
+    "C",
     "PyTorch",
     "Scikit-learn",
-    "Numpy",
+    "LangGraph",
+    "LangFuse",
+    "Promptfoo",
+    "React",
+    "FastAPI",
+    "NumPy",
+    "Pandas",
+    "Plotly",
     "Docker",
-    "Kubernetes",
     "Git",
-    "CI/CD workflows",
-    "Microsoft Azure",
+    "CI/CD",
+    "Airflow",
+    "Snowflake",
+    "SLURM",
+    "GCP",
     "Power BI",
-    "Power Automate",
+    "ThoughtSpot",
     "Linux"
   ],
   proof: [
-    "Developed a Snowflake Cortex NLP-to-SQL AI agent at Shipt, reducing ad-hoc data requests by 75%.",
-    "Built a clinical joint-attention detection tool evaluating advanced transformer architectures (PoseC3D, STGCN, SPOTER) on ~7 hours of video to achieve 80% classification accuracy.",
-    "Engineered end-to-end autonomous data workflows at Alabama Credit Union, eliminating 16+ hours of manual financial reporting."
+    "Built a LangGraph RAG agent at Shipt that lets AI/ML engineers search internal documentation and manage infrastructure configurations, cutting onboarding and internal support time by 50%.",
+    "Shipped a Gemini-based OCR pipeline on GCP and Snowflake for previously unprocessed shopper receipts, surfacing $10K in projected annual vendor savings and expanding tax-recovery coverage to 99% of receipts.",
+    "First-authored a machine learning paper on childhood language development across 60K+ child utterances, and fine-tuned FLAN-T5 on 90K utterances to cut word error rate from 17.2 to 14.4."
   ],
   education: [
     {
       institution: "The University of Alabama",
-      degree: "Master of Science in Computer Science",
+      degree: "Master of Science in Computer Science (Accelerated Master’s Program)",
       location: "Tuscaloosa, AL",
-      period: "2024 - 2027 (Expected)"
+      period: "Aug 2024 - May 2027 (Expected)"
     },
     {
       institution: "The University of Alabama",
       degree: "Bachelor of Science in Computer Science",
       location: "Tuscaloosa, AL",
-      period: "2022 - 2027 (Expected)"
+      period: "Aug 2022 - May 2027 (Expected)"
     }
   ],
   experience: [
     {
-      role: "Data Science Intern",
+      role: "Data Science Intern — AI Platform",
       company: "Shipt",
       location: "Birmingham, AL",
-      period: "Jun 2026 - Present",
-      description: "Developed a Snowflake Cortex AI agent that automated SQL queries, reducing manual data requests by 75%. Engineered a reusable CI/CD template that cut future AI project setup times in half."
-    },
-    {
-      role: "Data Analyst Co-op",
-      company: "Alabama Credit Union",
-      location: "Tuscaloosa, AL",
-      period: "Aug 2025 - May 2026",
-      description: "Built end-to-end Power Automate workflows that eliminated 16 hours of manual financial reporting every month. Optimized the data warehouse ETL processes with T-SQL to run 30% faster."
+      period: "Jun 2026 - Aug 2026",
+      description:
+        "Built a LangGraph RAG agent for AI/ML engineers to search internal documentation and manage infrastructure configurations, cutting onboarding and internal support time by 50%. Developed a Gemini-based OCR pipeline on GCP and Snowflake for previously unprocessed shopper receipts, identifying $10K in projected annual vendor savings while expanding tax-recovery coverage to 99%. Tuned Shipt’s product substitution-ranking model with Optuna, lifting Recall@K by 20%."
     },
     {
       role: "Machine Learning Researcher",
       company: "Alabama Life Research Institute",
       location: "Tuscaloosa, AL",
       period: "Jan 2025 - Present",
-      description: "Fine-tuned the Google FLAN-T5 LLM to correct AI speech transcription errors, improving accuracy on child speech by 15%. Engineered highly scalable data pipelines to accelerate machine learning workflows on High-Performance Computers."
+      description:
+        "First-authored a research paper applying machine learning to childhood language development across 60K+ child utterances from multiple longitudinal speech corpora, now submitted for peer review. Fine-tuned Google FLAN-T5 on 90K utterances to reduce word error rate from 17.2 to 14.4, and benchmarked DeiT, Swin Transformer, and skeleton-based models on 7 hours of child interaction video for gesture classification."
+    },
+    {
+      role: "Data Analyst Co-op",
+      company: "Alabama Credit Union",
+      location: "Tuscaloosa, AL",
+      period: "Aug 2025 - May 2026",
+      description:
+        "Automated recurring workflows with Power Automate, eliminating 16 hours of manual reporting every month. Built and deployed 5 Power BI dashboards with business stakeholders and led weekly user training, increasing dashboard adoption by 50%. Optimized Microsoft SQL Server ETL pipelines to cut daily refresh time by 30%, delivering fresher data downstream."
     }
   ]
 } as const;

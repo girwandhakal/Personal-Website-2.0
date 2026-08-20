@@ -1,0 +1,166 @@
+\documentclass[letterpaper,10pt]{article}
+
+\usepackage{latexsym}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{marvosym}
+\usepackage[usenames,dvipsnames]{color}
+\usepackage{verbatim}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{fancyhdr}
+\usepackage[english]{babel}
+\usepackage{tabularx}
+\input{glyphtounicode}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot{}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Safe one-page margins
+\addtolength{\oddsidemargin}{-0.55in}
+\addtolength{\evensidemargin}{-0.55in}
+\addtolength{\textwidth}{1.1in}
+\addtolength{\topmargin}{-0.55in}
+\addtolength{\textheight}{1.1in}
+
+\urlstyle{same}
+\raggedbottom
+\raggedright
+\setlength{\tabcolsep}{0in}
+
+\titleformat{\section}{
+  \vspace{-3pt}\scshape\raggedright\large
+}{}{0em}{}[\color{black}\titlerule \vspace{-4pt}]
+
+\pdfgentounicode=1
+
+\newcommand{\resumeItem}[1]{
+  \item\small{#1}
+}
+
+\newcommand{\resumeSubheading}[4]{
+  \item
+    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+      \textbf{#1} & #2 \\
+      \textit{\small#3} & \textit{\small #4} \\
+    \end{tabular*}\vspace{-4pt}
+}
+
+\newcommand{\resumeProjectHeading}[2]{
+    \item
+    \begin{tabularx}{0.97\textwidth}{X r}
+      \small#1 & #2 \\
+    \end{tabularx}\vspace{-4pt}
+}
+
+\newcommand{\resumeSubHeadingListStart}{
+  \begin{itemize}[leftmargin=0.15in, label={}, itemsep=2pt, topsep=2pt]
+}
+
+\newcommand{\resumeSubHeadingListEnd}{
+  \end{itemize}
+}
+
+\newcommand{\resumeItemListStart}{
+  \begin{itemize}[label=$\bullet$, leftmargin=0.2in, itemsep=1pt, topsep=2pt]
+}
+
+\newcommand{\resumeItemListEnd}{
+  \end{itemize}\vspace{-2pt}
+}
+
+\begin{document}
+
+\begin{center}
+    \textbf{\Huge \scshape Girwan Dhakal} \\ \vspace{1pt}
+    \small 205-239-6124 $|$
+    \href{mailto:girwandhakal@gmail.com}{\underline{girwandhakal@gmail.com}} $|$
+    \href{https://www.linkedin.com/in/gdhakal}{\underline{linkedin.com/in/gdhakal}} $|$
+    \href{https://www.github.com/girwandhakal}{\underline{github.com/girwandhakal}}
+\end{center}
+\vspace{-8pt}
+
+\section{Education}
+\resumeSubHeadingListStart
+    \resumeSubheading
+      {The University of Alabama}{}
+      {Master of Science in Computer Science (Accelerated Master's Program)}{August 2024 -- May 2027}
+    \resumeSubheading
+      {The University of Alabama}{}
+      {Bachelor of Science in Computer Science}{August 2022 -- May 2027}
+\resumeSubHeadingListEnd
+
+\section{Experience}
+\resumeSubHeadingListStart
+
+\resumeSubheading
+  {Shipt}{Birmingham, AL}
+  {Data Science Intern -- AI Platform}{Jun. 2026 -- Aug. 2026}
+  \resumeItemListStart
+\resumeItem{Built a LangGraph RAG agent for AI/ML engineers to search internal documentation and manage infrastructure configurations, reducing onboarding and internal support time by \textbf{50\%}.}
+\resumeItem{Developed a Gemini-based OCR data pipeline for previously unprocessed shopper receipts using GCP and Snowflake, identifying \textbf{\$10K} in projected annual vendor savings while expanding tax-recovery coverage to \textbf{99\%} of all collected receipts.}
+\resumeItem{Centralized AI platform usage and cost metrics by building scheduled data pipelines from internal sources into Snowflake and developing a ThoughtSpot dashboard for company leadership.}
+\resumeItem{Improved Mean Reciprocal Rank (MRR) by \textbf{1.6\%} (0.550 $\rightarrow$ 0.559) and Recall@K by \textbf{20\%} by using Optuna to tune Shipt's product substitution-ranking model.}
+  \resumeItemListEnd
+
+
+    \resumeSubheading
+      {Alabama Life Research Institute}{Tuscaloosa, AL}
+      {Machine Learning Researcher}{Jan. 2025 -- Present}
+      \resumeItemListStart
+\resumeItem{First-authored a research paper applying machine learning to childhood language development using \textbf{60K+ child utterances} across multiple longitudinal speech corpora; manuscript submitted for peer review.}        
+\resumeItem{Benchmarked DeiT, Swin Transformer, and skeleton-based models on \textbf{7 hours} of child interaction video for gesture classification, evaluating performance for gesture classification.}
+\resumeItem{Fine-tuned Google FLAN-T5 Large Language Model on \textbf{90K} speech utterances, reducing WER from \textbf{17.2 to 14.4}.}
+\resumeItem{Diagnosed data leakage in model experiments by auditing train/test splits, classification reports and validation performance; rebuilt evaluation datasets to produce reliable held-out results.}      \resumeItemListEnd
+
+
+    \resumeSubheading
+      {Alabama Credit Union}{Tuscaloosa, AL}
+      {Data Analyst Co-op}{Aug. 2025 -- May 2026}
+      \resumeItemListStart
+        \resumeItem{Automated recurring workflows with Power Automate, eliminating \textbf{16} hours of manual reporting each month.}
+\resumeItem{Developed and deployed \textbf{5} Power BI dashboards with business stakeholders and led weekly user training, increasing dashboard adoption by \textbf{50\%}.}
+\resumeItem{Optimized Microsoft SQL Server ETL pipelines, reducing daily refresh time by \textbf{30\%} delivering fresher data to downstream Power BI dashboards.}
+      \resumeItemListEnd
+
+    \resumeSubheading
+      {RoomiCheck}{Tuscaloosa, AL}
+      {Technical Lead}{Dec. 2025 -- Present}
+      \resumeItemListStart
+        \resumeItem{Leading engineering of a roommate-matching platform for housing providers; secured \textbf{\$2,500} in non-dilutive funding through RiverPitch 2025 and the 2026 Aldag Entrepreneurship Competition.}
+\resumeItem{Built and deployed a FastAPI-based adaptive questionnaire using LLMs that converts free-text responses into structured roommate profiles; piloted the system with \textbf{50+ users}.}
+\resumeItemListEnd
+
+
+\resumeSubHeadingListEnd
+
+\section{Projects}
+\resumeSubHeadingListStart
+
+    \resumeProjectHeading
+        {\textbf{\href{https://github.com/girwandhakal/ClearPath}{\underline{ClearPath AI Medical Financial Assistant}}} $|$ \emph{Next.js, React, TypeScript, Prisma, SQLite, OpenAI, Plaid}}{}
+        \resumeItemListStart
+            \resumeItem{Built a full-stack medical financial assistant that reconciles bills with EOBs and combines insurance, claims, and Plaid financial data to generate personalized payment and coverage recommendations.}
+        \resumeItemListEnd
+
+    \resumeProjectHeading
+        {\textbf{\href{https://github.com/girwandhakal/southern-company-analytics}{\underline{Southern Company Fleet Analytics Platform}}} $|$ \emph{Streamlit, Python, Scikit-learn, OpenAI, Plotly, Pandas}}{}
+        \resumeItemListStart
+            \resumeItem{Designed a Python/Streamlit analytics platform with predictive models and a GPT-4o assistant, winning \textbf{2nd Place} at UA Innovate Hackathon.}
+        \resumeItemListEnd
+
+\resumeSubHeadingListEnd
+
+\section{Technical Skills}
+\begin{itemize}[leftmargin=0.15in, label={}, itemsep=1pt, topsep=2pt]
+    \small{\item{
+     \textbf{Languages}{: Python, SQL, C, Java, JavaScript, TypeScript} \\
+     \textbf{Frameworks \& Libraries}{: PyTorch, Scikit-learn, LangGraph, LangFuse, Promptfoo, React, FastAPI, NumPy, Pandas, Plotly} \\
+     \textbf{Tools \& Platforms}{: Docker, Git, CI/CD, Airflow, Snowflake, SLURM, Linux, GCP, Power BI, ThoughtSpot}
+    }}
+\end{itemize}
+
+\end{document}
