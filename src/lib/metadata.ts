@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const siteMetadata: Metadata = {
   metadataBase: new URL("https://girwandhakal.dev"),
-  title: "Girwan Dhakal | Playful Software Engineer",
+  title: "Girwan Dhakal's Website",
   description:
     "Girwan Dhakal is a software engineer building playful, fast, and polished web experiences with React, Next.js, TypeScript, and product-minded execution.",
   openGraph: {
