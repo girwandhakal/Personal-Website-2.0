@@ -314,6 +314,72 @@ h3 {
   text-wrap: pretty;
 }
 
+/* --- Load-in sequence ------------------------------------------------------
+   The headline words rise out from behind a clipping mask, then the subtitle
+   and buttons fade up under them. CSS rather than JS so it starts at first
+   paint and needs no hydration. */
+
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* h1 runs a 0.9 line-height, which would clip the glyphs against the mask
+     edge. Pad the box out and pull the layout back by the same amount. */
+  padding: 0.08em 0.02em 0.12em;
+  margin: -0.08em -0.02em -0.12em;
+}
+
+.hero-word > span {
+  display: inline-block;
+  animation: hero-word-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: calc(var(--word-index, 0) * 110ms + 60ms);
+}
+
+@keyframes hero-word-rise {
+  from {
+    transform: translateY(105%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-subtitle.hero-rise {
+  animation-delay: 380ms;
+}
+
+.hero-actions.hero-rise {
+  animation-delay: 520ms;
+}
+
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-glow {
+  animation: hero-glow-in 1.6s ease-out both;
+}
+
+@keyframes hero-glow-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .hero-actions {
   justify-content: center;
   margin-top: var(--step-2);
@@ -629,6 +695,10 @@ h3 {
   *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
+    /* Without this the staggered hero delays still apply, and `fill-mode:
+       both` would hold the copy at its hidden start state for half a second
+       before snapping in. */
+    animation-delay: 0ms !important;
     transition-duration: 0.001ms !important;
   }
 
