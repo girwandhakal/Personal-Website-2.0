@@ -103,6 +103,14 @@ export const profile = {
       period: "Aug 2025 - May 2026",
       description:
         "Automated recurring workflows with Power Automate, eliminating 16 hours of manual reporting every month. Built and deployed 5 Power BI dashboards with business stakeholders and led weekly user training, increasing dashboard adoption by 50%. Optimized Microsoft SQL Server ETL pipelines to cut daily refresh time by 30%, delivering fresher data downstream."
+    },
+    {
+      role: "Technical Lead",
+      company: "RoomiCheck",
+      location: "Tuscaloosa, AL",
+      period: "Dec 2025 - Present",
+      description:
+        "Leading engineering on a roommate-matching platform for housing providers, and secured $2,500 in non-dilutive funding through RiverPitch 2025 and the 2026 Aldag Entrepreneurship Competition. Built and deployed a FastAPI adaptive questionnaire that uses LLMs to turn free-text answers into structured roommate profiles, piloted with 50+ users."
     }
   ]
 } as const;

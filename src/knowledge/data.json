@@ -66,6 +66,17 @@
     "priority": 10
   },
   {
+    "title": "Work Experience: RoomiCheck",
+    "content": "Technical Lead at RoomiCheck in Tuscaloosa, AL (Dec 2025 - Present). Girwan leads engineering on a roommate-matching platform for housing providers, and the team secured $2,500 in non-dilutive funding through RiverPitch 2025 and the 2026 Aldag Entrepreneurship Competition. He built and deployed a FastAPI-based adaptive questionnaire that uses large language models to convert free-text responses into structured roommate profiles, and piloted the system with 50+ users.",
+    "sourcePath": "src/knowledge/work-experience.json",
+    "category": "work_experience",
+    "projectName": null,
+    "tags": ["work", "experience", "startup", "leadership", "technical lead", "llm", "funding"],
+    "tools": ["Python", "FastAPI", "LLM", "PostgreSQL"],
+    "aliases": ["roomicheck", "technical lead", "startup", "riverpitch", "aldag", "roommate matching", "founder"],
+    "priority": 9
+  },
+  {
     "title": "Project: ClearPath AI Medical Financial Assistant",
     "content": "ClearPath is a full-stack medical financial assistant that reconciles bills against EOBs and combines insurance, claims, and Plaid financial data to generate personalized payment and coverage recommendations. Girwan built 20+ REST-style API routes powering cash-flow analysis, cost estimation, and scenario planning, so a patient can see the cheapest route through a medical bill before paying it.",
     "sourcePath": "src/knowledge/projects.json",
