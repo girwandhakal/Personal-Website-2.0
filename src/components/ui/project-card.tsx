@@ -51,7 +51,9 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       <div className="relative z-10 flex flex-col gap-2 md:max-w-[70%]">
         <motion.span
           className="text-sm font-bold tracking-widest uppercase"
-          animate={{ color: isHovered ? "rgba(10, 9, 8, 0.7)" : "var(--grey)" }}
+          // Plain --grey (#6d676e) on black is ~3.6:1, under the AA 4.5:1 floor
+          // for this small uppercase label.
+          animate={{ color: isHovered ? "rgba(10, 9, 8, 0.75)" : "rgba(251, 255, 254, 0.72)" }}
           transition={{ duration: 0.3 }}
         >
           {project.eyebrow}

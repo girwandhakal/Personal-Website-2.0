@@ -12,7 +12,7 @@ export function Projects() {
       <div className="section-inner flex flex-col gap-0 px-0 md:px-0">
         <div className="px-4 md:px-8 py-12 pb-12 flex justify-center text-center">
           <Reveal>
-            <h2 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-[var(--white)]" id="projects-title">Projects</h2>
+            <h2 className="text-[var(--white)]" id="projects-title">Projects</h2>
           </Reveal>
         </div>
         {projects.map((project, index) => (

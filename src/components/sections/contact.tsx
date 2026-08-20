@@ -19,7 +19,7 @@ export function Contact() {
     >
       <div className="section-inner flex flex-col items-center text-center gap-12">
         <Reveal>
-          <h2 id="contact-title" className="text-5xl md:text-7xl font-extrabold tracking-tighter">Contact</h2>
+          <h2 id="contact-title">Contact</h2>
           
           <div className="social-row flex justify-center gap-8 mt-10">
             {profile.socials.map(({ label, href, icon }) => {

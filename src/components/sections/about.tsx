@@ -7,7 +7,7 @@ export function About() {
     <section className="about-section section-band border-t border-[var(--grey)]/20" id="about" aria-labelledby="about-title">
       <div className="section-inner flex flex-col items-center text-center gap-12">
         <Reveal>
-          <h2 id="about-title" className="text-5xl md:text-7xl font-extrabold tracking-tighter">About Me</h2>
+          <h2 id="about-title">About Me</h2>
         </Reveal>
         <Reveal className="about-copy max-w-3xl" delay={0.1}>
           <p>
