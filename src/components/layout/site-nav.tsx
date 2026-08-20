@@ -81,26 +81,74 @@ export function SiteNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, selectSection] = useActiveSection(sectionIds);
 
+  // Lock body scroll while the mobile menu is open.
+  //
+  // `overflow: hidden` on <body> alone is not reliable outside Chrome: Safari
+  // and Firefox on mobile can still scroll/rubber-band the page behind a
+  // `position: fixed` overlay via touch, since <html> — not <body> — is the
+  // actual scrolling box here (globals.css sets no overflow on <html>). On
+  // iOS Safari specifically that drag reflows the page under the user's
+  // finger mid-tap, so links in the open menu can miss. Pinning <body> with
+  // `position: fixed` removes it from the scrollable flow entirely, which is
+  // the standard technique that holds across all three engines.
+  //
+  // Unlocking happens imperatively from the click handlers below rather than
+  // from this effect's cleanup, and deliberately *before* `setIsOpen(false)`.
+  // A nav link's native hash-jump fires synchronously right after this click
+  // handler returns; if the unlock instead ran later, in an effect cleanup
+  // triggered by the state update, its ordering against that native jump
+  // would be up to each browser engine to decide — which is the exact kind
+  // of Chrome-only-timing bug this fix exists to remove.
+  const lockedScrollY = useRef<number | null>(null);
+
+  const unlockScroll = useCallback((restore: boolean) => {
+    if (lockedScrollY.current === null) return;
+    const y = lockedScrollY.current;
+    lockedScrollY.current = null;
+    const { style } = document.body;
+    style.position = "";
+    style.top = "";
+    style.left = "";
+    style.right = "";
+    style.width = "";
+    if (restore) {
+      window.scrollTo({ top: y, behavior: "instant" as ScrollBehavior });
+    }
+  }, []);
+
+  const closeMenu = useCallback(
+    (restoreScroll: boolean) => {
+      unlockScroll(restoreScroll);
+      setIsOpen(false);
+    },
+    [unlockScroll]
+  );
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    lockedScrollY.current = window.scrollY;
+    const { style } = document.body;
+    style.position = "fixed";
+    style.top = `-${lockedScrollY.current}px`;
+    style.left = "0";
+    style.right = "0";
+    style.width = "100%";
+
+    // Safety net: if the component unmounts (or isOpen is flipped by some
+    // path other than closeMenu) while still locked, don't leave <body>
+    // pinned.
+    return () => unlockScroll(false);
+  }, [isOpen, unlockScroll]);
+
   // Close menu on escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false);
+      if (e.key === "Escape") closeMenu(true);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
+  }, [closeMenu]);
 
   return (
     <>
@@ -138,7 +186,7 @@ export function SiteNav() {
           top: "calc(1rem + env(safe-area-inset-top, 0px))",
           right: "calc(1rem + env(safe-area-inset-right, 0px))"
         }}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => (isOpen ? closeMenu(true) : setIsOpen(true))}
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
         aria-label={isOpen ? "Close menu" : "Open menu"}
@@ -182,7 +230,9 @@ export function SiteNav() {
                     }`}
                     onClick={() => {
                       selectSection(item.href.replace("#", ""));
-                      setIsOpen(false);
+                      // Don't restore scroll — let the browser's hash
+                      // navigation to the target section win instead.
+                      closeMenu(false);
                     }}
                     target={item.href.endsWith(".docx") ? "_blank" : undefined}
                     rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
@@ -200,7 +250,7 @@ export function SiteNav() {
             </nav>
 
             {/* Click outside / empty space dismiss layer */}
-            <div className="flex-1 min-h-16" onClick={() => setIsOpen(false)} />
+            <div className="flex-1 min-h-16" onClick={() => closeMenu(true)} />
           </motion.div>
         )}
       </AnimatePresence>
