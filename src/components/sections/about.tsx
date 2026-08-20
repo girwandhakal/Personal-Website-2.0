@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 
 export function About() {
   return (
-    <section className="about-section section-band border-t border-[var(--grey)]/20" id="about" aria-labelledby="about-title">
+    <section className="about-section section-band border-t border-ink/15" id="about" aria-labelledby="about-title">
       <div className="section-inner flex flex-col items-center text-center gap-12">
         <Reveal>
           <h2 id="about-title">About Me</h2>
@@ -15,8 +15,8 @@ export function About() {
           </p>
           <div className="mt-12 flex flex-col gap-8 text-left w-full mx-auto max-w-2xl">
             {profile.proof.map((item, i) => (
-              <div key={i} className="pl-6 border-l-[3px] border-white/10 hover:border-accent/60 transition-colors duration-300">
-                <span className="text-white/70 hover:text-white transition-colors duration-300 leading-relaxed text-[17px] md:text-lg block">
+              <div key={i} className="pl-6 border-l-[3px] border-ink/15 hover:border-accent transition-colors duration-300">
+                <span className="text-ink/75 hover:text-ink transition-colors duration-300 leading-relaxed text-[17px] md:text-lg block">
                   {item}
                 </span>
               </div>

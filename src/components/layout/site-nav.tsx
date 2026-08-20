@@ -103,8 +103,8 @@ export function SiteNav() {
       <button
         className={`md:hidden fixed z-50 grid place-items-center w-12 h-12 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orange)] shadow-xl rounded-full border-2 backdrop-blur-md ${
           isOpen
-            ? "bg-[var(--black)] border-[var(--white)] text-[var(--orange)] opacity-100"
-            : "bg-[var(--black)]/70 border-white/25 text-white/70 hover:text-white hover:border-white/50"
+            ? "bg-[var(--surface)] border-[var(--ink)] text-[var(--accent)] opacity-100"
+            : "bg-[var(--surface)]/80 border-ink/25 text-ink/70 hover:text-ink hover:border-ink/60"
         }`}
         style={{
           top: "calc(1rem + env(safe-area-inset-top, 0px))",
@@ -127,7 +127,7 @@ export function SiteNav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="fixed inset-0 z-40 bg-[var(--black)]/97 backdrop-blur-xl flex flex-col md:hidden overflow-y-auto"
+            className="fixed inset-0 z-40 bg-[var(--surface)]/97 backdrop-blur-xl flex flex-col md:hidden overflow-y-auto"
             style={{
               paddingTop: "calc(6rem + env(safe-area-inset-top, 0px))",
               paddingBottom: "calc(2rem + env(safe-area-inset-bottom, 0px))",
@@ -149,8 +149,8 @@ export function SiteNav() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04 + 0.08 }}
                     aria-current={isActive ? "true" : undefined}
-                    className={`flex items-center justify-between text-3xl font-extrabold tracking-tight py-5 border-b border-white/10 transition-colors ${
-                      isActive ? "text-[var(--orange)]" : "text-white hover:text-[var(--orange)]"
+                    className={`flex items-center justify-between text-3xl font-extrabold tracking-tight py-5 border-b border-ink/10 transition-colors ${
+                      isActive ? "text-[var(--accent)]" : "text-ink hover:text-[var(--accent)]"
                     }`}
                     onClick={() => setIsOpen(false)}
                     target={item.href.endsWith(".docx") ? "_blank" : undefined}
@@ -159,7 +159,7 @@ export function SiteNav() {
                     {item.label}
                     {isActive && (
                       <span
-                        className="w-2 h-2 rounded-full bg-[var(--orange)]"
+                        className="w-2 h-2 rounded-full bg-[var(--accent)]"
                         aria-hidden="true"
                       />
                     )}

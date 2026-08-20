@@ -1,8 +1,16 @@
 "use client";
 
+import { Mail } from "lucide-react";
+
 import { Reveal } from "@/components/motion/reveal";
 import { ContactForm } from "@/components/sections/contact-form";
+import { GithubIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { profile } from "@/content/profile";
+
+// The /assets/icons SVGs were stroked with a near-white hex, which disappears on
+// the light background. These render inline so they inherit `currentColor` and
+// flip to white on the accent hover fill — an <img> cannot do that.
+const SOCIAL_ICONS = { github: GithubIcon, linkedin: LinkedinIcon, mail: Mail } as const;
 
 export function Contact() {
   const triggerChat = () => {
@@ -13,7 +21,7 @@ export function Contact() {
 
   return (
     <section
-      className="contact-section section-band border-t border-[var(--grey)]/20"
+      className="contact-section section-band border-t border-ink/15"
       id="contact"
       aria-labelledby="contact-title"
     >
@@ -23,9 +31,10 @@ export function Contact() {
           
           <div className="social-row flex justify-center gap-8 mt-10">
             {profile.socials.map(({ label, href, icon }) => {
+              const Icon = SOCIAL_ICONS[icon as keyof typeof SOCIAL_ICONS] ?? Mail;
               return (
-                <a key={label} href={href} aria-label={label} className="opacity-70 hover:opacity-100 transition-all transform hover:scale-110">
-                  <img aria-hidden="true" src={`/assets/icons/${icon}.svg`} alt="" width="36" height="36" />
+                <a key={label} href={href} aria-label={label}>
+                  <Icon aria-hidden="true" size={24} strokeWidth={2} />
                 </a>
               );
             })}

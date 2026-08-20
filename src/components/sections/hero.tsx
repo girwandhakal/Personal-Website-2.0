@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowRight, Download } from "lucide-react";
+import { ArrowRight, Download } from "lucide-react";
 
 import { profile } from "@/content/profile";
 import { ScrollField } from "@/components/motion/scroll-field";
@@ -9,10 +9,6 @@ export function Hero() {
       <ScrollField />
       <div className="hero-grid">
         <div className="hero-copy">
-          <p className="hero-kicker">
-            <span aria-hidden="true">◆</span>
-            Available for 2027 new-grad roles
-          </p>
           <h1 id="hero-title">{profile.headline}</h1>
           <p className="hero-subtitle">{profile.subheadline}</p>
 
@@ -35,11 +31,6 @@ export function Hero() {
           </div>
         </div>
       </div>
-
-      <a className="scroll-cue" href="#about">
-        Scroll
-        <ArrowDown aria-hidden="true" size={14} />
-      </a>
     </section>
   );
 }
