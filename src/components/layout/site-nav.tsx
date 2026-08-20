@@ -77,6 +77,34 @@ function useActiveSection(ids: readonly string[]) {
 
 const sectionIds = navItems.map((item) => item.href.replace("#", ""));
 
+/**
+ * Scrolls to a section ourselves rather than letting the clicked <a>'s native
+ * fragment-navigation do it.
+ *
+ * That native path turned out to be the real bug: on the mobile menu, the
+ * click handler synchronously removes `position: fixed` from <body> to
+ * release the scroll lock, and several mobile browsers cancel a link's
+ * default action outright when the tapped element's layout shifts mid-click
+ * (an anti-tapjacking heuristic — most aggressive on iOS Safari). Chrome
+ * doesn't apply it, which is why this only ever "worked" there. Calling
+ * scrollIntoView explicitly removes the browser's default action from the
+ * picture entirely, so there's nothing left for that heuristic to cancel.
+ */
+function scrollToSection(id: string, href: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  // No explicit `behavior` here — it inherits html's `scroll-behavior`
+  // (smooth, or auto under prefers-reduced-motion), matching what native
+  // anchor navigation already did.
+  el.scrollIntoView({ block: "start" });
+  // Keep the address bar and back-button history in sync with the section,
+  // same as native fragment navigation would — pushState doesn't itself
+  // scroll, so it can't fight the scrollIntoView call above.
+  if (typeof window !== "undefined" && "pushState" in window.history) {
+    window.history.pushState(null, "", href);
+  }
+}
+
 export function SiteNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, selectSection] = useActiveSection(sectionIds);
@@ -86,19 +114,15 @@ export function SiteNav() {
   // `overflow: hidden` on <body> alone is not reliable outside Chrome: Safari
   // and Firefox on mobile can still scroll/rubber-band the page behind a
   // `position: fixed` overlay via touch, since <html> — not <body> — is the
-  // actual scrolling box here (globals.css sets no overflow on <html>). On
-  // iOS Safari specifically that drag reflows the page under the user's
-  // finger mid-tap, so links in the open menu can miss. Pinning <body> with
-  // `position: fixed` removes it from the scrollable flow entirely, which is
-  // the standard technique that holds across all three engines.
+  // actual scrolling box here (globals.css sets no overflow on <html>).
+  // Pinning <body> with `position: fixed` removes it from the scrollable
+  // flow entirely, which is the standard technique that holds across all
+  // three engines.
   //
-  // Unlocking happens imperatively from the click handlers below rather than
-  // from this effect's cleanup, and deliberately *before* `setIsOpen(false)`.
-  // A nav link's native hash-jump fires synchronously right after this click
-  // handler returns; if the unlock instead ran later, in an effect cleanup
-  // triggered by the state update, its ordering against that native jump
-  // would be up to each browser engine to decide — which is the exact kind
-  // of Chrome-only-timing bug this fix exists to remove.
+  // Unlocking is imperative (called from the click handlers below), not tied
+  // to this effect's cleanup — a link tap needs the layout corrected before
+  // `scrollToSection` reads the target's position, and doing that inside a
+  // React-scheduled effect would leave the ordering up to each browser.
   const lockedScrollY = useRef<number | null>(null);
 
   const unlockScroll = useCallback((restore: boolean) => {
@@ -165,7 +189,13 @@ export function SiteNav() {
               href={item.href}
               className="nav-item-link"
               aria-current={activeSection === item.href.replace("#", "") ? "true" : undefined}
-              onClick={() => selectSection(item.href.replace("#", ""))}
+              onClick={(e) => {
+                if (item.href.endsWith(".docx")) return; // real download link, not a section
+                e.preventDefault();
+                const id = item.href.replace("#", "");
+                selectSection(id);
+                scrollToSection(id, item.href);
+              }}
               target={item.href.endsWith(".docx") ? "_blank" : undefined}
               rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
             >
@@ -228,11 +258,17 @@ export function SiteNav() {
                     className={`flex items-center justify-between text-3xl font-extrabold tracking-tight py-5 border-b border-ink/10 transition-colors ${
                       isActive ? "text-[var(--accent)]" : "text-ink hover:text-[var(--accent)]"
                     }`}
-                    onClick={() => {
-                      selectSection(item.href.replace("#", ""));
-                      // Don't restore scroll — let the browser's hash
-                      // navigation to the target section win instead.
+                    onClick={(e) => {
+                      if (item.href.endsWith(".docx")) return; // real download link, not a section
+                      e.preventDefault();
+                      const id = item.href.replace("#", "");
+                      selectSection(id);
+                      // Release the scroll lock without restoring the old
+                      // position, then drive the scroll ourselves — see
+                      // scrollToSection for why we don't rely on the <a>'s
+                      // own default action here.
                       closeMenu(false);
+                      scrollToSection(id, item.href);
                     }}
                     target={item.href.endsWith(".docx") ? "_blank" : undefined}
                     rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
