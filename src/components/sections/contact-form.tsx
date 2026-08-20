@@ -57,6 +57,12 @@ export function ContactForm() {
     setFormState("submitting");
     setErrorMessage("");
 
+    // Snapshot the fields synchronously. React nulls `event.currentTarget` once the
+    // handler returns, so reading it after the `await` below can throw and get
+    // reported as a network error even though no request was ever made.
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
     try {
       const fp = await getDeviceFingerprint();
       const response = await fetch("/api/contact", {
@@ -64,9 +70,12 @@ export function ContactForm() {
         headers: {
           "x-device-fingerprint": fp
         },
-        body: new FormData(event.currentTarget)
+        body: formData,
+        // A cold serverless start can take far longer than a user will wait.
+        // Bound it so we can tell "slow" apart from "unreachable".
+        signal: AbortSignal.timeout(30_000)
       });
-      
+
       const body = await response.json().catch(() => null);
 
       if (response.ok) {
@@ -77,7 +86,11 @@ export function ContactForm() {
       }
     } catch (error) {
       setFormState("error");
-      setErrorMessage("Network error. Please try again later.");
+      setErrorMessage(
+        error instanceof Error && error.name === "TimeoutError"
+          ? "The server took too long to respond. Please try again."
+          : "Network error. Please try again later."
+      );
     }
   }
 
