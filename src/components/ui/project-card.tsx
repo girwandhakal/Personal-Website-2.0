@@ -61,14 +61,6 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       />
 
       <div className="relative z-10 flex flex-col gap-2 md:max-w-[70%]">
-        <motion.span
-          className="text-sm font-bold tracking-widest uppercase"
-          animate={{ color: isHovered ? "rgba(255, 255, 255, 0.85)" : "rgba(24, 48, 89, 0.7)" }}
-          transition={{ duration: 0.3 }}
-        >
-          {project.eyebrow}
-        </motion.span>
-
         <motion.h3
           className="text-4xl md:text-5xl font-extrabold tracking-tighter leading-tight"
           animate={{ color: isHovered ? ON_FILL : "var(--ink)" }}

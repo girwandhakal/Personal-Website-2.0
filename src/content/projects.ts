@@ -1,6 +1,5 @@
 export type Project = {
   title: string;
-  eyebrow: string;
   summary: string;
   impact: string;
   tech: string[];
@@ -14,7 +13,6 @@ export type Project = {
 export const projects: Project[] = [
   {
     title: "Personal AI Persona & RAG Chatbot",
-    eyebrow: "Agentic Engineering",
     summary:
       "A context-aware AI chatbot built into this portfolio. It answers questions about my experience, projects, and research as my digital persona, grounded in a retrieval layer over my own work. You can try it here to see it in action.",
     impact:
@@ -25,7 +23,6 @@ export const projects: Project[] = [
   },
   {
     title: "ClearPath: AI Medical Financial Assistant",
-    eyebrow: "AI Financial Assistant",
     summary:
       "A full-stack medical financial assistant that reconciles bills against EOBs and combines insurance, claims, and Plaid financial data to generate personalized payment and coverage recommendations.",
     impact:
@@ -36,7 +33,6 @@ export const projects: Project[] = [
   },
   {
     title: "Southern Company Fleet Analytics Platform",
-    eyebrow: "Enterprise Analytics",
     summary:
       "A Python and Streamlit analytics platform for network infrastructure lifecycle management, pairing predictive risk models with a GPT-4o assistant. Won 2nd Place at the UA Innovate Hackathon.",
     impact:
@@ -47,7 +43,6 @@ export const projects: Project[] = [
   },
   {
     title: "Speech Act Analysis",
-    eyebrow: "Machine Learning Research",
     summary:
       "The computational pipeline behind my first-authored research on childhood language development, modeling 60K+ child utterances drawn from multiple longitudinal speech corpora.",
     impact:
