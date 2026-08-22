@@ -108,6 +108,9 @@ function scrollToSection(id: string, href: string) {
 export function SiteNav() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeSection, selectSection] = useActiveSection(sectionIds);
+  // Which item the sliding pill sits behind: whatever's hovered, falling
+  // back to whatever's active, so the pill never just vanishes.
+  const [hoveredHref, setHoveredHref] = useState<string | null>(null);
 
   // Lock body scroll while the mobile menu is open.
   //
@@ -182,46 +185,80 @@ export function SiteNav() {
           <span className="brand-mark">GD</span>
         </a>
 
-        <nav className="site-nav" aria-label="Primary navigation">
-          {navItems.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              className="nav-item-link"
-              aria-current={activeSection === item.href.replace("#", "") ? "true" : undefined}
-              onClick={(e) => {
-                if (item.href.endsWith(".docx")) return; // real download link, not a section
-                e.preventDefault();
-                const id = item.href.replace("#", "");
-                selectSection(id);
-                scrollToSection(id, item.href);
-              }}
-              target={item.href.endsWith(".docx") ? "_blank" : undefined}
-              rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
-            >
-              {item.label}
-            </a>
-          ))}
+        <nav
+          className="site-nav"
+          aria-label="Primary navigation"
+          onMouseLeave={() => setHoveredHref(null)}
+        >
+          {navItems.map((item) => {
+            const isCurrent = activeSection === item.href.replace("#", "");
+            // Nothing hovered yet -> the pill rests on the active section.
+            const isHighlighted = hoveredHref ? hoveredHref === item.href : isCurrent;
+            return (
+              <a
+                key={item.href}
+                href={item.href}
+                className={`nav-item-link${isHighlighted ? " nav-item-link--on" : ""}`}
+                aria-current={isCurrent ? "true" : undefined}
+                onMouseEnter={() => setHoveredHref(item.href)}
+                onFocus={() => setHoveredHref(item.href)}
+                onBlur={() => setHoveredHref(null)}
+                onClick={(e) => {
+                  if (item.href.endsWith(".docx")) return; // real download link, not a section
+                  e.preventDefault();
+                  const id = item.href.replace("#", "");
+                  selectSection(id);
+                  scrollToSection(id, item.href);
+                }}
+                target={item.href.endsWith(".docx") ? "_blank" : undefined}
+                rel={item.href.endsWith(".docx") ? "noopener noreferrer" : undefined}
+              >
+                {isHighlighted && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    className="nav-pill"
+                    transition={{ type: "spring", stiffness: 500, damping: 34 }}
+                  />
+                )}
+                <span className="relative z-10">{item.label}</span>
+              </a>
+            );
+          })}
         </nav>
       </header>
 
       {/* Mobile Floating Hamburger Trigger */}
       <button
-        className={`md:hidden fixed z-50 grid place-items-center w-12 h-12 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orange)] shadow-xl rounded-full border-2 backdrop-blur-md ${
+        className={`md:hidden fixed z-50 grid place-items-center w-12 h-12 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--orange)] rounded-full border ${
           isOpen
-            ? "bg-[var(--surface)] border-[var(--ink)] text-[var(--accent)] opacity-100"
-            : "bg-[var(--surface)]/80 border-ink/25 text-ink/70 hover:text-ink hover:border-ink/60"
+            ? "bg-[var(--surface)]/90 border-ink/15 text-[var(--accent)] opacity-100"
+            : "bg-[var(--surface)]/88 border-ink/10 text-ink/70 hover:text-ink hover:bg-[var(--surface)]/95"
         }`}
         style={{
           top: "calc(1rem + env(safe-area-inset-top, 0px))",
-          right: "calc(1rem + env(safe-area-inset-right, 0px))"
+          right: "calc(1rem + env(safe-area-inset-right, 0px))",
+          backdropFilter: "blur(40px) saturate(160%)",
+          WebkitBackdropFilter: "blur(40px) saturate(160%)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,0.7), inset 0 0 0 1px rgba(255,255,255,0.35), 0 8px 24px -8px rgba(24,48,89,0.28), 0 2px 6px rgba(24,48,89,0.08)"
         }}
         onClick={() => (isOpen ? closeMenu(true) : setIsOpen(true))}
         aria-expanded={isOpen}
         aria-controls="mobile-menu"
         aria-label={isOpen ? "Close menu" : "Open menu"}
       >
-        {isOpen ? <X size={24} /> : <Menu size={24} />}
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={isOpen ? "close" : "open"}
+            className="grid place-items-center"
+            initial={{ rotate: -90, opacity: 0, scale: 0.6 }}
+            animate={{ rotate: 0, opacity: 1, scale: 1 }}
+            exit={{ rotate: 90, opacity: 0, scale: 0.6 }}
+            transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
+          </motion.span>
+        </AnimatePresence>
       </button>
 
       {/* Mobile Off-Canvas Menu */}

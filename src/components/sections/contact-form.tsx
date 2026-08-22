@@ -162,7 +162,7 @@ export function ContactForm() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.02 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="absolute -inset-[2px] z-20 flex flex-col items-center justify-center p-8 text-center bg-[var(--blue)] shadow-2xl"
+            className="absolute -inset-[1px] z-20 flex flex-col items-center justify-center p-8 text-center bg-[var(--blue)] shadow-2xl rounded-[26px]"
           >
             <motion.div
               initial={{ scale: 0, rotate: -45 }}

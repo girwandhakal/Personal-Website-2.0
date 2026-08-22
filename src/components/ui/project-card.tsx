@@ -100,13 +100,16 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
               )}
             </p>
             <div className="flex flex-wrap gap-2">
-              {project.tech.map(t => (
-                <span
+              {project.tech.map((t, i) => (
+                <motion.span
                   key={t}
                   className="text-xs uppercase tracking-widest font-bold px-3 py-1 border border-white/35 rounded-full text-white"
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+                  transition={{ duration: 0.25, delay: isHovered ? i * 0.03 : 0, ease: [0.16, 1, 0.3, 1] }}
                 >
                   {t}
-                </span>
+                </motion.span>
               ))}
             </div>
           </div>
@@ -153,7 +156,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       </div>
 
       <motion.div
-        className="relative z-10 shrink-0 mt-6 md:mt-0 flex items-center justify-center w-14 h-14 rounded-full border-2"
+        className="relative z-10 shrink-0 mt-6 md:mt-0 flex items-center justify-center w-14 h-14 rounded-full border"
         animate={{
           borderColor: isHovered ? ON_FILL : "rgba(24, 48, 89, 0.4)",
           color: isHovered ? ON_FILL : "var(--ink)",

@@ -45,7 +45,7 @@ export function Contact() {
             
             <button 
               onClick={triggerChat}
-              className="group flex items-center gap-2 px-6 py-2.5 bg-transparent text-foreground font-bold rounded-none transition-all duration-300 border border-foreground hover:bg-foreground/5 hover:-translate-y-1 hover:shadow-[4px_4px_0px_currentColor] active:translate-y-0 active:shadow-none"
+              className="group flex items-center gap-2 px-6 py-2.5 rounded-full text-foreground font-bold transition-all duration-300 border border-ink/10 bg-(--surface)/78 [backdrop-filter:blur(20px)_saturate(180%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.85),inset_0_0_0_1px_rgba(255,255,255,0.4),0_10px_30px_-10px_rgba(24,48,89,0.25),0_2px_8px_rgba(24,48,89,0.08)] hover:-translate-y-0.5 hover:bg-(--ink) hover:text-(--surface) hover:border-(--ink) active:translate-y-0"
               aria-label="Message AI Bot"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">

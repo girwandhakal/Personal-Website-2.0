@@ -64,6 +64,27 @@
 
   --nav-height: 64px;
 
+  /* --- Glass system -------------------------------------------------------
+     Shared across the nav, buttons, pills, cards and form fields so the
+     whole site reads as one material: hairline borders (never the old
+     2–2.5px ink outlines), a soft layered shadow with an inset top
+     highlight to suggest a lit glass edge, and a translucent + blurred
+     surface over whatever scrolls behind it. */
+  --radius-pill: 999px;
+  --radius-lg: 26px;
+  --radius-md: 16px;
+  --radius-sm: 10px;
+
+  --glass-border: color-mix(in srgb, var(--ink) 10%, transparent);
+  --glass-bg: color-mix(in srgb, var(--surface) 55%, transparent);
+  --glass-bg-strong: color-mix(in srgb, var(--surface) 78%, transparent);
+  --glass-blur: blur(20px) saturate(180%);
+  --glass-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 85%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 40%, transparent),
+    0 10px 30px -10px color-mix(in srgb, var(--ink) 25%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ink) 8%, transparent);
+
   color-scheme: light;
 }
 
@@ -154,16 +175,23 @@ img, svg {
   align-items: stretch;
   width: min(1120px, calc(100% - 28px));
   min-height: var(--nav-height);
-  padding: 0 16px;
-  border: 2.5px solid var(--ink);
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  /* Heavier than the shared --glass-bg/--glass-blur tokens: nav text sits
+     directly over whatever's scrolling underneath, so it needs more blur
+     and a more opaque surface than a button or pill ever does to stay
+     legible against busy backgrounds. */
   background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  box-shadow: var(--glass-shadow);
   transform: translateX(-50%);
 }
 
 .brand-lockup {
   position: absolute;
-  left: 16px;
+  left: 22px;
   top: 0;
   bottom: 0;
   display: inline-flex;
@@ -175,60 +203,56 @@ img, svg {
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 40px;
+  width: 36px;
   aspect-ratio: 1;
-  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, white 55%, transparent);
   background: var(--accent);
   color: var(--accent-ink);
   font-weight: 900;
+  box-shadow: inset 0 1px 0 color-mix(in srgb, white 60%, transparent);
   transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .brand-lockup:hover .brand-mark {
-  transform: translate(2px, 2px);
+  transform: scale(1.06);
 }
 
 .site-nav {
   display: flex;
   justify-content: center;
-  gap: 0;
-  align-items: stretch;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 6px 6px 0;
 }
 
 .nav-item-link {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 0 18px;
-  height: 100%;
+  padding: 9px 20px;
+  border-radius: 999px;
   color: var(--ink-subtle);
   font-size: 0.85rem;
   font-weight: 700;
   border: none;
-  transition: color 120ms ease, background-color 120ms ease;
+  transition: color 160ms ease;
 }
 
-.nav-item-link:hover {
-  background: var(--accent);
-  color: var(--accent-ink);
-}
-
-.nav-item-link[aria-current="true"] {
-  color: var(--ink);
-}
-
-.nav-item-link[aria-current="true"]::after {
-  content: "";
+/* The pill itself is a shared `layoutId` element in site-nav.tsx — Motion
+   tweens its position/size between items instead of it just appearing, so
+   selection reads as one continuous slide rather than two independent
+   fades. This rule only covers its look; the motion is spring-driven. */
+.nav-pill {
   position: absolute;
-  left: 18px;
-  right: 18px;
-  bottom: 12px;
-  height: 2px;
-  background: var(--accent);
+  inset: 0;
+  z-index: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 90%, transparent);
 }
 
-.nav-item-link[aria-current="true"]:hover::after {
-  background: var(--accent-ink);
+.nav-item-link--on {
+  color: var(--accent-ink);
 }
 
 /* ---------------------------------------------------------------------------
@@ -451,24 +475,32 @@ h3 {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  padding: 12px 24px;
-  border: 2px solid var(--ink);
-  background: transparent;
+  padding: 12px 26px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
   color: var(--ink);
   font-weight: 900;
-  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 120ms ease,
-              color 120ms ease,
-              border-color 120ms ease;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 160ms ease,
+              background-color 160ms ease,
+              color 160ms ease,
+              border-color 160ms ease;
   cursor: pointer;
 }
 
 .button:hover {
-  transform: translate(2px, 2px);
+  transform: translateY(-2px) scale(1.015);
 }
 
+/* Quick, slightly-overshot settle on release rather than an instant snap —
+   the bit of give is what makes the press read as physical. */
 .button:active {
-  transform: translate(4px, 4px);
+  transform: scale(0.96);
+  transition-duration: 90ms;
 }
 
 /* Navy fill rather than red: white-on-navy is 13:1, where white-on-red is
@@ -476,23 +508,23 @@ h3 {
 .button-primary {
   background: var(--ink);
   color: var(--surface);
-  border-color: var(--ink);
+  border-color: color-mix(in srgb, white 30%, var(--ink));
 }
 
 .button-primary:hover {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, white 30%, var(--accent));
   color: var(--accent-ink);
 }
 
 .button-secondary {
-  border-color: var(--ink);
+  border-color: var(--glass-border);
   color: var(--ink);
 }
 
 .button-secondary:hover {
-  background: var(--ink);
-  color: var(--surface);
+  background: color-mix(in srgb, var(--ink) 8%, var(--glass-bg-strong));
+  border-color: color-mix(in srgb, var(--ink) 20%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -525,34 +557,43 @@ h3 {
 }
 
 .skill-cloud span {
-  padding: 10px 16px;
-  border: 2px solid var(--line-strong);
-  background: var(--surface-raised);
+  padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--ink);
   font-size: 0.88rem;
   font-weight: 700;
-  transition: transform 100ms ease, background-color 100ms ease,
-              color 100ms ease, border-color 100ms ease;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              background-color 160ms ease,
+              color 160ms ease, border-color 160ms ease;
   cursor: default;
 }
 
 /* Hover fills use navy / blue / rose — each at least 4.7:1 against white
    label text. Red is skipped here because these labels are small. */
 .skill-cloud span:hover {
-  transform: translate(2px, 2px);
+  transform: translateY(-3px) scale(1.05);
   background: var(--navy);
-  border-color: var(--navy);
+  border-color: color-mix(in srgb, white 30%, var(--navy));
   color: #ffffff;
+}
+
+.skill-cloud span:active {
+  transform: scale(0.96);
+  transition-duration: 90ms;
 }
 
 .skill-cloud span:nth-child(3n):hover {
   background: var(--blue);
-  border-color: var(--blue);
+  border-color: color-mix(in srgb, white 30%, var(--blue));
 }
 
 .skill-cloud span:nth-child(4n):hover {
   background: var(--rose);
-  border-color: var(--rose);
+  border-color: color-mix(in srgb, white 30%, var(--rose));
 }
 
 /* ---------------------------------------------------------------------------
@@ -594,26 +635,38 @@ h3 {
   place-items: center;
   width: 52px;
   aspect-ratio: 1;
-  border: 1px solid var(--line-strong);
-  background: var(--surface-raised);
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: var(--ink);
   transition: background-color 140ms ease, border-color 140ms ease,
-              color 140ms ease, transform 140ms ease;
+              color 140ms ease, transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .social-row a:hover {
   background: var(--accent);
-  border-color: var(--accent);
+  border-color: color-mix(in srgb, white 30%, var(--accent));
   color: var(--accent-ink);
-  transform: translateY(-2px);
+  transform: translateY(-3px) scale(1.08);
+}
+
+.social-row a:active {
+  transform: scale(0.94);
+  transition-duration: 90ms;
 }
 
 .contact-form {
   display: grid;
   gap: var(--step-3);
   padding: var(--step-3);
-  border: 2px solid var(--ink);
-  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
 }
 
 .contact-form label {
@@ -627,8 +680,9 @@ h3 {
 .contact-form input,
 .contact-form textarea {
   width: 100%;
-  border: 2px solid var(--line-strong);
-  background: var(--surface);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--glass-border);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
   color: var(--ink);
   /* 16px prevents iOS Safari from zooming the viewport on focus. */
   font-size: 16px;
@@ -671,7 +725,7 @@ h3 {
 
 @media (min-width: 981px) {
   .nav-item-link {
-    padding: 0 20px;
+    padding: 9px 22px;
   }
 }
 

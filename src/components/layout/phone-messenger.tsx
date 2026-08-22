@@ -89,6 +89,7 @@ export function PhoneMessenger() {
   const [showNotification, setShowNotification] = useState(true);
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
+  const [isDockHovered, setIsDockHovered] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const phoneFrameRef = useRef<HTMLDivElement>(null);
@@ -384,8 +385,8 @@ export function PhoneMessenger() {
       </AnimatePresence>
 
       {/* Docked Button Container (Fixed Bottom Right) */}
-      <div 
-        className="phone-dock-root hidden md:flex flex-col items-end"
+      <div
+        className="phone-dock-root hidden md:flex flex-col items-end gap-3"
         style={{
           position: "fixed",
           right: "24px",
@@ -395,26 +396,46 @@ export function PhoneMessenger() {
           pointerEvents: isOpen ? "none" : "auto",
         }}
       >
+        {/* Discoverability nudge: shown on first load alongside the bounce
+            and notification dot, then again on hover for repeat visitors —
+            rather than a permanent label competing with the page. */}
+        <AnimatePresence>
+          {!isOpen && (showNotification || isDockHovered) && (
+            <motion.div
+              key="dock-label"
+              className="phone-dock-label"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 6 }}
+              transition={{ duration: 0.25, delay: showNotification ? 0.6 : 0, ease: [0.16, 1, 0.3, 1] }}
+            >
+              Chat with my AI twin
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence>
           {!isOpen && (
             <motion.button
               key="docked"
               onClick={() => { setIsOpen(true); setShowNotification(false); }}
+              onMouseEnter={() => setIsDockHovered(true)}
+              onMouseLeave={() => setIsDockHovered(false)}
+              onFocus={() => setIsDockHovered(true)}
+              onBlur={() => setIsDockHovered(false)}
               initial={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30, transition: { duration: 0.2 } }}
               whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.02, transition: { duration: 0.2 } }}
               whileTap={{ scale: 0.96 }}
               aria-label="Open chat messenger"
+              className="phone-dock-glass"
               style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                background: "none",
-                border: "none",
                 cursor: "pointer",
                 outline: "none",
-                padding: 0,
               }}
             >
               {/* Inner motion div to handle the infinite bounce independently of exit animations */}
@@ -857,6 +878,34 @@ export function PhoneMessenger() {
       {/* Embedded Styles */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        /* A frosted pedestal for the docked phone, built from the same glass
+           tokens as the nav — so it reads as this site's chrome cradling a
+           (deliberately dark-bezeled, realistic) phone, not a foreign
+           widget dropped on the page. */
+        .phone-dock-glass {
+          padding: 14px 14px 10px;
+          border-radius: var(--radius-lg, 26px);
+          border: 1px solid var(--glass-border);
+          background: var(--glass-bg-strong);
+          backdrop-filter: var(--glass-blur);
+          -webkit-backdrop-filter: var(--glass-blur);
+          box-shadow: var(--glass-shadow);
+        }
+
+        .phone-dock-label {
+          padding: 8px 16px;
+          border-radius: var(--radius-pill, 999px);
+          border: 1px solid var(--glass-border);
+          background: var(--glass-bg-strong);
+          backdrop-filter: var(--glass-blur);
+          -webkit-backdrop-filter: var(--glass-blur);
+          box-shadow: var(--glass-shadow);
+          color: var(--ink);
+          font-size: 13px;
+          font-weight: 600;
+          white-space: nowrap;
+        }
 
         .ios-typing-dot {
           width: 7px;
