@@ -40,11 +40,12 @@ export function ContactForm() {
         if (formRef.current) formRef.current.reset();
       }, 4000);
     } else if (formState === "error") {
-      // Temporary red button state resets after 3 seconds
+      // Temporary red button state resets after 5 seconds (long enough to
+      // actually read a rate-limit explanation, not just see it flash by)
       timeout = setTimeout(() => {
         setFormState("idle");
         setErrorMessage("");
-      }, 3000);
+      }, 5000);
     }
     
     return () => clearTimeout(timeout);

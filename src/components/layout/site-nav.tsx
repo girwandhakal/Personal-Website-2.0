@@ -75,7 +75,9 @@ function useActiveSection(ids: readonly string[]) {
   return [active, selectSection] as const;
 }
 
-const sectionIds = navItems.map((item) => item.href.replace("#", ""));
+const sectionIds = navItems
+  .filter((item) => item.href.startsWith("#"))
+  .map((item) => item.href.replace("#", ""));
 
 /**
  * Scrolls to a section ourselves rather than letting the clicked <a>'s native
@@ -92,7 +94,13 @@ const sectionIds = navItems.map((item) => item.href.replace("#", ""));
  */
 function scrollToSection(id: string, href: string) {
   const el = document.getElementById(id);
-  if (!el) return;
+  if (!el) {
+    // Section doesn't exist on this page (e.g. the nav was clicked from
+    // /projects) — do a real navigation back to the homepage anchor instead
+    // of silently doing nothing.
+    if (typeof window !== "undefined") window.location.href = `/${href}`;
+    return;
+  }
   // No explicit `behavior` here — it inherits html's `scroll-behavior`
   // (smooth, or auto under prefers-reduced-motion), matching what native
   // anchor navigation already did.
@@ -204,7 +212,7 @@ export function SiteNav() {
                 onFocus={() => setHoveredHref(item.href)}
                 onBlur={() => setHoveredHref(null)}
                 onClick={(e) => {
-                  if (item.href.endsWith(".docx")) return; // real download link, not a section
+                  if (!item.href.startsWith("#")) return; // real link (download, other page), not a section
                   e.preventDefault();
                   const id = item.href.replace("#", "");
                   selectSection(id);
@@ -296,7 +304,7 @@ export function SiteNav() {
                       isActive ? "text-[var(--accent)]" : "text-ink hover:text-[var(--accent)]"
                     }`}
                     onClick={(e) => {
-                      if (item.href.endsWith(".docx")) return; // real download link, not a section
+                      if (!item.href.startsWith("#")) return; // real link (download, other page), not a section
                       e.preventDefault();
                       const id = item.href.replace("#", "");
                       selectSection(id);

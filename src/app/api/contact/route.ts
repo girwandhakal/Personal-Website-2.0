@@ -23,7 +23,7 @@ async function checkRateLimits(fingerprint: string): Promise<RateLimitVerdict> {
     if (globalCount >= 1) {
       return {
         exceeded: true,
-        message: "Server is currently busy processing other messages. Please wait a minute and try again."
+        message: "Rate limit reached (1 message/min). Please wait a moment and try again."
       };
     }
 
@@ -35,7 +35,7 @@ async function checkRateLimits(fingerprint: string): Promise<RateLimitVerdict> {
     if (deviceCount >= 3) {
       return {
         exceeded: true,
-        message: "You have reached your daily limit of 3 messages. Please try again tomorrow."
+        message: "You've reached the daily limit of 3 messages from this device. Please try again tomorrow."
       };
     }
 
