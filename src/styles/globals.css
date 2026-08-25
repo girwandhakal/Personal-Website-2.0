@@ -714,6 +714,237 @@ h3 {
 }
 
 /* ---------------------------------------------------------------------------
+   Projects — bento grid of glass tiles that morph into a full-detail sheet.
+   The tile and the sheet share a Motion `layoutId` (project-tile-<slug>), so
+   opening one reads as the tile itself expanding into place rather than a
+   page swap — the closest a DOM can get to iOS/macOS's app-launch morph.
+   --------------------------------------------------------------------------- */
+
+.project-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 260px;
+  padding: var(--step-3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease;
+}
+
+.project-tile:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 85%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 40%, transparent),
+    0 18px 40px -14px color-mix(in srgb, var(--ink) 32%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.project-tile:active {
+  transform: translateY(-1px) scale(0.99);
+  transition-duration: 90ms;
+}
+
+.project-tile-open {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  color: var(--ink-subtle);
+  transition: transform 260ms cubic-bezier(0.34, 1.56, 0.64, 1), color 200ms ease, border-color 200ms ease;
+}
+
+.project-tile:hover .project-tile-open {
+  transform: rotate(45deg);
+  color: var(--tile-accent);
+  border-color: color-mix(in srgb, var(--tile-accent) 45%, transparent);
+}
+
+.project-tile-chip {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  color: var(--ink-muted);
+  background: color-mix(in srgb, var(--surface) 55%, transparent);
+}
+
+.project-tile-chip--muted {
+  color: var(--ink-subtle);
+}
+
+/* --- Detail sheet ------------------------------------------------------- */
+
+.project-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0;
+}
+
+.project-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+}
+
+.project-modal {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 840px;
+  max-height: 88svh;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  border: 1px solid var(--glass-border);
+  border-bottom: none;
+  /* Opaque, not glass: the backdrop behind it is already blurred, so the
+     sheet itself reads as a solid surface sitting on top rather than
+     another translucent layer stacking on the first. */
+  background: var(--surface-raised);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+}
+
+.project-modal-scroll {
+  position: relative;
+  height: 100%;
+  max-height: 88svh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--step-4) var(--step-3) calc(var(--step-4) + var(--safe-bottom));
+  -webkit-overflow-scrolling: touch;
+  /* Scrolls the same either way — just without a visible track/thumb, so
+     the sheet reads as one clean surface instead of a scroll pane. */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.project-modal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.project-modal-close {
+  position: absolute;
+  top: var(--step-3);
+  right: var(--step-3);
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  color: var(--ink);
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease,
+              background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.project-modal-close:hover {
+  background: var(--tile-accent);
+  border-color: color-mix(in srgb, white 30%, var(--tile-accent));
+  color: #fff;
+  transform: translateY(-2px) rotate(90deg) scale(1.08);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 45%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 22%, transparent),
+    0 12px 26px -12px color-mix(in srgb, var(--tile-accent) 60%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.project-modal-close:active {
+  transform: rotate(90deg) scale(0.92);
+  transition-duration: 90ms;
+}
+
+/* Each tab is its own free-standing glass pill — no shared segmented-control
+   surface underneath them, so there's nothing for a selection indicator to
+   slide across. The active pill just fills with the project's accent. */
+.project-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-tab {
+  padding: 9px 18px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-shadow);
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--ink-subtle);
+  white-space: nowrap;
+  transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 200ms ease,
+              color 200ms ease, background-color 200ms ease, border-color 200ms ease;
+}
+
+.project-tab:hover {
+  transform: translateY(-2px) scale(1.015);
+  color: var(--ink);
+  border-color: color-mix(in srgb, var(--tile-accent) 35%, var(--glass-border));
+}
+
+.project-tab[data-active="true"] {
+  color: #fff;
+  background: var(--tile-accent);
+  border-color: color-mix(in srgb, white 30%, var(--tile-accent));
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 45%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, white 22%, transparent),
+    0 12px 26px -12px color-mix(in srgb, var(--tile-accent) 60%, transparent),
+    0 2px 8px color-mix(in srgb, var(--ink) 10%, transparent);
+}
+
+.project-tab:active {
+  transform: scale(0.96);
+  transition-duration: 90ms;
+}
+
+/* --- Above the sheet's bottom-anchored mobile layout, present it as a
+   centered dialog with rounded corners all around. --- */
+@media (min-width: 640px) {
+  .project-modal-layer {
+    align-items: center;
+    padding: var(--step-3);
+  }
+
+  .project-modal {
+    border-radius: var(--radius-lg);
+    border-bottom: 1px solid var(--glass-border);
+    max-height: 82svh;
+  }
+
+  .project-modal-scroll {
+    max-height: 82svh;
+    padding: var(--step-4);
+  }
+}
+
+/* ---------------------------------------------------------------------------
    Desktop enhancements (mobile-first: base styles above target small screens)
    --------------------------------------------------------------------------- */
 
@@ -734,8 +965,21 @@ h3 {
   .button:hover,
   .skill-cloud span:hover,
   .social-row a:hover,
-  .brand-lockup:hover .brand-mark {
+  .brand-lockup:hover .brand-mark,
+  .project-tab:hover,
+  .project-modal-close:hover {
     transform: none;
+  }
+
+  .project-tile:hover {
+    transform: none;
+    box-shadow: var(--glass-shadow);
+  }
+
+  .project-tile:hover .project-tile-open {
+    transform: none;
+    color: var(--ink-subtle);
+    border-color: var(--glass-border);
   }
 }
 
