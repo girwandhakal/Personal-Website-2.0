@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 
@@ -31,6 +31,20 @@ const MORPH_TRANSITION = { type: "spring", stiffness: 320, damping: 32, mass: 0.
 /** The mobile sheet's transition. Pure translate + fade, so it runs on the
  * compositor and can't be starved by main-thread work — see `useCompact`. */
 const SHEET_TRANSITION = { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as const;
+
+/** Swipe-down-to-dismiss thresholds for the mobile sheet. Either a far enough
+ * drag or a fast enough flick closes it; anything less springs back. The
+ * velocity escape hatch is what makes a short, quick flick feel right — with
+ * distance alone you'd have to drag a third of the screen every time. */
+const DISMISS_DISTANCE = 120;
+/** px/sec. */
+const DISMISS_VELOCITY = 600;
+/** How far the sheet is thrown on a swipe dismiss, so it carries on downward
+ * out of frame instead of drifting back up to the gentler default exit. */
+const DISMISS_EXIT_Y = 340;
+const DEFAULT_EXIT_Y = 20;
+/** Releasing short of the threshold returns the sheet home. */
+const SNAP_BACK = { type: "spring", stiffness: 500, damping: 40 } as const;
 
 /**
  * True on phones and touch devices, where the tile->sheet morph is dropped in
@@ -224,7 +238,16 @@ function ProjectDetail({
   const reactId = useId();
   const accent = ACCENT_FILLS[project.accent];
   const closeRef = useRef<HTMLButtonElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  // Drives the compact sheet's y directly, so the swipe gesture and the
+  // entrance animation write to the same value without fighting each other.
+  const sheetControls = useAnimationControls();
+  // Swapped to a much larger value the moment a swipe actually dismisses, so
+  // the exit continues the gesture downward rather than animating back up to
+  // the subtle default the X button uses.
+  const [exitY, setExitY] = useState(DEFAULT_EXIT_Y);
   // False while the tile->sheet morph is in flight, true once it lands; keeps
   // the expensive backdrop-filter blur off anything that's moving (see the
   // `data-settled` rules in globals.css). With no morph there's no layout
@@ -317,6 +340,105 @@ function ProjectDetail({
     };
   }, [onClose]);
 
+  // The compact sheet's entrance. Driven imperatively rather than through the
+  // `animate` prop because the swipe gesture below writes to the same `y`, and
+  // only one of them can own it.
+  useEffect(() => {
+    if (morph) return;
+    sheetControls.start({
+      opacity: 1,
+      y: 0,
+      transition: prefersReducedMotion ? { duration: 0.001 } : SHEET_TRANSITION
+    });
+  }, [morph, prefersReducedMotion, sheetControls]);
+
+  // Swipe-down-to-dismiss (touch only).
+  //
+  // Hand-rolled on touch events rather than built on Motion's `drag`, because
+  // Motion's drag can't survive this particular gesture: the browser decides
+  // within a frame or two that a downward touch is a scroll, and once it does
+  // it CANCELS the pointer-event stream — Motion's drag stops getting moves
+  // and the sheet freezes mid-swipe. (Verified: exactly one `pointermove`
+  // arrives, then only raw `touchmove`.) The usual cure is `touch-action:
+  // none`, but that would also disable the sheet content's own scrolling.
+  // Owning a non-passive `touchmove` and calling `preventDefault()` the
+  // instant we claim the gesture keeps it ours without giving up scrolling.
+  //
+  // The rule for claiming it: the gesture must be heading DOWN *and* the
+  // content must already be scrolled to the very top. Otherwise it stays a
+  // normal scroll, so a long project can still be read without the sheet
+  // closing out from under you. That decision is deferred to the first few px
+  // of movement, since that's the earliest the direction is actually known.
+  useEffect(() => {
+    if (morph) return; // desktop keeps the tile-expand morph and the X button
+    const sheet = sheetRef.current;
+    const pane = scrollRef.current;
+    if (!sheet || !pane) return;
+
+    let startY = 0;
+    let lastY = 0;
+    let lastT = 0;
+    let velocity = 0;
+    let decided = true;
+    let dragging = false;
+
+    const onTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      startY = lastY = e.touches[0].clientY;
+      lastT = performance.now();
+      velocity = 0;
+      decided = false;
+      dragging = false;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const y = e.touches[0].clientY;
+      const dy = y - startY;
+
+      if (!decided) {
+        if (Math.abs(dy) < 6) return; // too small to read a direction yet
+        decided = true;
+        dragging = dy > 0 && pane.scrollTop <= 0;
+      }
+      if (!dragging) return; // it's a scroll — leave it alone
+
+      // `performance.now()`, not `e.timeStamp`: consecutive touch events can
+      // carry the same stamp, which would leave dt at 0 and strand the
+      // velocity at its last value — a fast flick would then read as slow.
+      const now = performance.now();
+      const dt = now - lastT;
+      if (dt > 0) velocity = ((y - lastY) / dt) * 1000; // px/sec
+      lastY = y;
+      lastT = now;
+
+      e.preventDefault(); // keep the gesture ours rather than the pane's
+      sheetControls.set({ y: Math.max(0, dy) });
+    };
+
+    const onTouchEnd = () => {
+      if (!dragging) return;
+      dragging = false;
+      if (lastY - startY > DISMISS_DISTANCE || velocity > DISMISS_VELOCITY) {
+        setExitY(DISMISS_EXIT_Y);
+        onClose();
+      } else {
+        sheetControls.start({ y: 0, transition: SNAP_BACK });
+      }
+    };
+
+    sheet.addEventListener("touchstart", onTouchStart, { passive: true });
+    sheet.addEventListener("touchmove", onTouchMove, { passive: false });
+    sheet.addEventListener("touchend", onTouchEnd, { passive: true });
+    sheet.addEventListener("touchcancel", onTouchEnd, { passive: true });
+    return () => {
+      sheet.removeEventListener("touchstart", onTouchStart);
+      sheet.removeEventListener("touchmove", onTouchMove);
+      sheet.removeEventListener("touchend", onTouchEnd);
+      sheet.removeEventListener("touchcancel", onTouchEnd);
+    };
+  }, [morph, onClose, sheetControls]);
+
   return (
     <div className="project-modal-layer">
       <motion.div
@@ -331,6 +453,7 @@ function ProjectDetail({
       />
 
       <motion.div
+        ref={sheetRef}
         layoutId={morph ? `project-tile-${project.slug}` : undefined}
         role="dialog"
         aria-modal="true"
@@ -339,9 +462,11 @@ function ProjectDetail({
         data-settled={settled}
         style={{ "--tile-accent": accent } as React.CSSProperties}
         // Compact: a compositor-only slide + fade, no shared layout at all.
+        // `animate` is the controls object rather than a target because the
+        // swipe gesture writes to the same `y` — see the effects above.
         initial={morph ? undefined : { opacity: 0, y: 28 }}
-        animate={morph ? undefined : { opacity: 1, y: 0 }}
-        exit={morph ? undefined : { opacity: 0, y: 20 }}
+        animate={morph ? undefined : sheetControls}
+        exit={morph ? undefined : { opacity: 0, y: exitY }}
         transition={
           prefersReducedMotion
             ? { duration: 0.001 }
@@ -352,7 +477,7 @@ function ProjectDetail({
         onLayoutAnimationStart={() => setSettled(false)}
         onLayoutAnimationComplete={() => setSettled(true)}
       >
-        <div className="project-modal-scroll">
+        <div className="project-modal-scroll" ref={scrollRef}>
           <button
             ref={closeRef}
             type="button"
