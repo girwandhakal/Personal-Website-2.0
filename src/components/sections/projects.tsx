@@ -186,33 +186,38 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
   // page scroll, which reads as the background "scrolling" behind the tile
   // as it expands. Locking first removes that window entirely.
   useLayoutEffect(() => {
-    // Lock via `overflow: hidden` on <html> — *not* the old trick of pinning
-    // <body> to `position: fixed` with a negative `top` equal to `scrollY`
-    // (then restoring with `window.scrollTo()` on close). That trick works
-    // by making `window.scrollY` itself go to 0 while locked and jump back
-    // on unlock, and every project tile carries a Motion `layoutId` — Motion
-    // caches its own idea of the page's scroll offset for its layout
-    // projection math, and only resyncs it opportunistically. The fake-0 and
-    // the real scrollTo() could each land in a window Motion's cache didn't
-    // observe, so the *second* time a tile opened, that cache would still be
-    // off by roughly the page's scroll distance — producing a huge,
-    // self-correcting spring "flight" on every other tile that the very
-    // first open never showed, because nothing had gone stale yet.
-    // `overflow: hidden` never touches `window.scrollY` at all, so there's
-    // nothing left for that cache to get wrong.
-    const html = document.documentElement;
-    const previousOverflow = html.style.overflow;
-    html.style.overflow = "hidden";
+    // Lock by intercepting the *inputs* that cause scrolling (wheel,
+    // touch-drag, keyboard) rather than by changing any CSS `overflow`.
+    // Two things that both change `overflow` were tried and both leave a
+    // visible artifact:
+    //  - `position: fixed` on <body> with a negative `top` (the old
+    //    technique here) makes `window.scrollY` itself go to 0 while locked
+    //    and jump back on unlock — and since every project tile carries a
+    //    Motion `layoutId`, Motion's layout-projection system (which caches
+    //    its own idea of the scroll offset, resynced only opportunistically)
+    //    could miss both of those changes, leaving its cache stale by
+    //    roughly the page's scroll distance — producing a large, spring-
+    //    driven "flight" of every other tile on the *second* open.
+    //  - `overflow: hidden` on <html> avoids that, but still makes the
+    //    browser's real scrollbar (thumb + track) disappear the instant it's
+    //    set and reappear on cleanup — `scrollbar-gutter: stable` keeps the
+    //    *space* reserved so nothing reflows, but the scrollbar graphic
+    //    itself still pops in and out, which read as its own small jitter.
+    // Never touching `overflow`, `window.scrollY`, or `<body>`'s position at
+    // all — just swallowing the events that would otherwise scroll the
+    // page — leaves both untouched: the scrollbar stays exactly as drawn
+    // the whole time, and there's nothing for Motion's cache to miss.
+    const scrollPane = () => document.querySelector(".project-modal-scroll");
+    const isInsideScrollPane = (node: EventTarget | null) =>
+      node instanceof Node && (scrollPane()?.contains(node) ?? false);
 
-    // iOS/older Android don't fully honor `overflow: hidden` on <html> for a
-    // touch *drag* — the page behind can still rubber-band. Block touchmove
-    // outside the sheet's own scroll pane instead (this doesn't touch
-    // `window.scrollY` either, so it can't reintroduce the desync above).
+    const onWheel = (e: WheelEvent) => {
+      if (!isInsideScrollPane(e.target)) e.preventDefault();
+    };
+    window.addEventListener("wheel", onWheel, { passive: false });
+
     const onTouchMove = (e: TouchEvent) => {
-      const scrollPane = document.querySelector(".project-modal-scroll");
-      if (!(e.target instanceof Node) || !scrollPane?.contains(e.target)) {
-        e.preventDefault();
-      }
+      if (!isInsideScrollPane(e.target)) e.preventDefault();
     };
     window.addEventListener("touchmove", onTouchMove, { passive: false });
 
@@ -221,15 +226,25 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     // without it that scroll-into-view could itself move the real page.
     closeRef.current?.focus({ preventScroll: true });
 
+    const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+        return;
+      }
+      // Only swallow a scroll key when focus has somehow landed outside the
+      // sheet — while it's inside, these should behave normally (Space on a
+      // focused button, arrow keys in a scrollable panel, etc).
+      if (SCROLL_KEYS.has(e.key) && !isInsideScrollPane(document.activeElement)) {
+        e.preventDefault();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchmove", onTouchMove);
-      html.style.overflow = previousOverflow;
     };
   }, [onClose]);
 
