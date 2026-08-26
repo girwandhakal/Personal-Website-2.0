@@ -186,18 +186,35 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
   // page scroll, which reads as the background "scrolling" behind the tile
   // as it expands. Locking first removes that window entirely.
   useLayoutEffect(() => {
-    // `overflow: hidden` alone doesn't hold on mobile Safari/Firefox, where
-    // <html> — not <body> — is the real scrolling box: touch can still
-    // rubber-band the page behind the sheet. Pinning <body> with
-    // `position: fixed` (same technique as the mobile nav menu) removes it
-    // from the scrollable flow entirely across all three engines.
-    const scrollY = window.scrollY;
-    const { style } = document.body;
-    style.position = "fixed";
-    style.top = `-${scrollY}px`;
-    style.left = "0";
-    style.right = "0";
-    style.width = "100%";
+    // Lock via `overflow: hidden` on <html> — *not* the old trick of pinning
+    // <body> to `position: fixed` with a negative `top` equal to `scrollY`
+    // (then restoring with `window.scrollTo()` on close). That trick works
+    // by making `window.scrollY` itself go to 0 while locked and jump back
+    // on unlock, and every project tile carries a Motion `layoutId` — Motion
+    // caches its own idea of the page's scroll offset for its layout
+    // projection math, and only resyncs it opportunistically. The fake-0 and
+    // the real scrollTo() could each land in a window Motion's cache didn't
+    // observe, so the *second* time a tile opened, that cache would still be
+    // off by roughly the page's scroll distance — producing a huge,
+    // self-correcting spring "flight" on every other tile that the very
+    // first open never showed, because nothing had gone stale yet.
+    // `overflow: hidden` never touches `window.scrollY` at all, so there's
+    // nothing left for that cache to get wrong.
+    const html = document.documentElement;
+    const previousOverflow = html.style.overflow;
+    html.style.overflow = "hidden";
+
+    // iOS/older Android don't fully honor `overflow: hidden` on <html> for a
+    // touch *drag* — the page behind can still rubber-band. Block touchmove
+    // outside the sheet's own scroll pane instead (this doesn't touch
+    // `window.scrollY` either, so it can't reintroduce the desync above).
+    const onTouchMove = (e: TouchEvent) => {
+      const scrollPane = document.querySelector(".project-modal-scroll");
+      if (!(e.target instanceof Node) || !scrollPane?.contains(e.target)) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
 
     // `preventScroll` stops the browser from scrolling any ancestor to bring
     // the (already fully on-screen, fixed-position) close button into view —
@@ -211,12 +228,8 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
-      style.position = "";
-      style.top = "";
-      style.left = "";
-      style.right = "";
-      style.width = "";
-      window.scrollTo({ top: scrollY, behavior: "instant" as ScrollBehavior });
+      window.removeEventListener("touchmove", onTouchMove);
+      html.style.overflow = previousOverflow;
     };
   }, [onClose]);
 
