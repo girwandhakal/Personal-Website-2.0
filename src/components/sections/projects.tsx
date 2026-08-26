@@ -28,6 +28,44 @@ const SPAN_PATTERN = ["md:col-span-7", "md:col-span-5", "md:col-span-5", "md:col
  * since Motion falls back to it when no `transition.layout` is given. */
 const MORPH_TRANSITION = { type: "spring", stiffness: 320, damping: 32, mass: 0.9 } as const;
 
+/** The mobile sheet's transition. Pure translate + fade, so it runs on the
+ * compositor and can't be starved by main-thread work — see `useCompact`. */
+const SHEET_TRANSITION = { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as const;
+
+/**
+ * True on phones and touch devices, where the tile->sheet morph is dropped in
+ * favour of a plain slide-up.
+ *
+ * The morph is a Motion shared-layout (`layoutId`) animation, and those are
+ * driven from JavaScript on the main thread: every frame Motion re-measures
+ * boxes, computes deltas, and writes transforms plus per-frame border-radius
+ * corrections for the sheet and all four tiles. A desktop CPU absorbs that
+ * without dropping a frame; a phone doesn't, which is the whole reason the
+ * animation felt worse there. Profiling also showed the morph applies a
+ * *non-uniform* scale (scaleY ~0.39 -> 1 against scaleX ~0.92 -> 1) to the
+ * sheet's real content, so text visibly squashes and stretches on the way in.
+ *
+ * translate + opacity, by contrast, are compositor-only properties: the layer
+ * is rasterized once and then just moved, so the transition holds up even
+ * while the main thread is busy mounting the sheet.
+ *
+ * Defaults to the morph so SSR and the desktop first paint are unchanged; the
+ * media query resolves on mount, long before anyone can tap a tile.
+ */
+function useCompact() {
+  const [compact, setCompact] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 639px), (hover: none)");
+    const apply = () => setCompact(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  return compact;
+}
+
 const TABS = [
   { key: "context", label: "The Problem" },
   { key: "approach", label: "The Build" },
@@ -97,11 +135,13 @@ function SummaryWithChatLink({ text, accentClass }: { text: string; accentClass:
 function ProjectTile({
   project,
   index,
-  onOpen
+  onOpen,
+  morph
 }: {
   project: Project;
   index: number;
   onOpen: (project: Project) => void;
+  morph: boolean;
 }) {
   const accent = ACCENT_FILLS[project.accent];
   const prefersReducedMotion = useReducedMotion();
@@ -113,7 +153,10 @@ function ProjectTile({
   return (
     <motion.button
       type="button"
-      layoutId={`project-tile-${project.slug}`}
+      // Dropping the id on compact viewports is what takes the tile out of
+      // Motion's projection tree entirely, so no per-frame layout work runs
+      // for it while the sheet opens.
+      layoutId={morph ? `project-tile-${project.slug}` : undefined}
       onClick={() => onOpen(project)}
       style={{ "--tile-accent": accent } as React.CSSProperties}
       className={`project-tile ${SPAN_PATTERN[index % SPAN_PATTERN.length]}`}
@@ -168,27 +211,31 @@ function ProjectTile({
   );
 }
 
-function ProjectDetail({ project, onClose }: { project: Project; onClose: () => void }) {
+function ProjectDetail({
+  project,
+  onClose,
+  morph
+}: {
+  project: Project;
+  onClose: () => void;
+  morph: boolean;
+}) {
   const [activeTab, setActiveTab] = useState<TabKey>("context");
   const reactId = useId();
   const accent = ACCENT_FILLS[project.accent];
   const closeRef = useRef<HTMLButtonElement>(null);
   const prefersReducedMotion = useReducedMotion();
-  // Stays false for the ~duration of the tile->sheet shared-layout transform,
-  // true once it settles. See the `data-settled` CSS below for why.
-  const [settled, setSettled] = useState(false);
-  // Gates the tabs/panel/footer — everything below the header — out of the
-  // very first commit. Profiling on a throttled mobile CPU showed the click
-  // that opens a tile spending ~170ms synchronously mounting this component's
-  // *entire* DOM (header, four tabs, a tab panel, tech chips, the GitHub
-  // link) in one React commit, all before the browser could paint the first
-  // frame of the shared-layout animation — that one-time stall, not the
-  // animation itself (which profiled at a clean 60fps throughout), was what
-  // read as "not as smooth as the website." Rendering just the lightweight
-  // header + close button on mount, then the rest one frame later, splits
-  // that cost across two commits so neither blocks the frame the tap needs
-  // to feel instant on.
-  const [showDetails, setShowDetails] = useState(false);
+  // False while the tile->sheet morph is in flight, true once it lands; keeps
+  // the expensive backdrop-filter blur off anything that's moving (see the
+  // `data-settled` rules in globals.css). With no morph there's no layout
+  // animation and so no completion callback coming — start settled.
+  const [settled, setSettled] = useState(!morph);
+  // NOTE: don't try deferring the tabs/panel/footer to a later commit to
+  // shrink the tap's synchronous mount cost — that was tried and made things
+  // visibly worse. The sheet's content is what determines its final box, so
+  // mounting it a frame late moves Motion's layout target mid-flight, which
+  // costs more in re-measurement than the split saves and shows up as a jump.
+  // The whole sheet mounts in one commit, on purpose.
 
   // `useLayoutEffect`, not `useEffect`: this has to land *before* the browser
   // paints the first frame of the open transition. `useEffect` fires after
@@ -237,9 +284,9 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     // to know it's focusable — a synchronous reflow, right here inside a
     // `useLayoutEffect` that's already blocking the first paint. Deferring
     // one frame lets that first paint happen on schedule. (Profiling showed
-    // this alone isn't what fixed the mobile opening hitch — the `showDetails`
-    // deferral above did the actual work — but there's no reason to leave an
-    // avoidable forced reflow in the critical path either.)
+    // this isn't on its own what made mobile smooth — dropping the morph
+    // there was — but there's no reason to leave an avoidable forced reflow
+    // in the critical path either.)
     // `preventScroll` stops the browser from scrolling any ancestor to bring
     // the (already fully on-screen, fixed-position) close button into view —
     // without it that scroll-into-view could itself move the real page.
@@ -270,14 +317,6 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     };
   }, [onClose]);
 
-  // Ordinary `useEffect`, not `useLayoutEffect`: this one *should* land
-  // after paint — that's the entire point (see the comment on `showDetails`
-  // above).
-  useEffect(() => {
-    const frame = requestAnimationFrame(() => setShowDetails(true));
-    return () => cancelAnimationFrame(frame);
-  }, []);
-
   return (
     <div className="project-modal-layer">
       <motion.div
@@ -292,14 +331,24 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
       />
 
       <motion.div
-        layoutId={`project-tile-${project.slug}`}
+        layoutId={morph ? `project-tile-${project.slug}` : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${reactId}-title`}
         className="project-modal"
         data-settled={settled}
         style={{ "--tile-accent": accent } as React.CSSProperties}
-        transition={prefersReducedMotion ? { duration: 0.001 } : MORPH_TRANSITION}
+        // Compact: a compositor-only slide + fade, no shared layout at all.
+        initial={morph ? undefined : { opacity: 0, y: 28 }}
+        animate={morph ? undefined : { opacity: 1, y: 0 }}
+        exit={morph ? undefined : { opacity: 0, y: 20 }}
+        transition={
+          prefersReducedMotion
+            ? { duration: 0.001 }
+            : morph
+              ? MORPH_TRANSITION
+              : SHEET_TRANSITION
+        }
         onLayoutAnimationStart={() => setSettled(false)}
         onLayoutAnimationComplete={() => setSettled(true)}
       >
@@ -324,66 +373,62 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
             </p>
           </header>
 
-          {showDetails && (
-            <>
-              <div role="tablist" aria-label={`${project.title} details`} className="project-tabs mt-6">
-                {TABS.map((tab) => (
-                  <ProjectTabButton
-                    key={tab.key}
-                    label={tab.label}
-                    isActive={activeTab === tab.key}
-                    onSelect={() => setActiveTab(tab.key)}
-                    tabId={`${reactId}-tab-${tab.key}`}
-                    panelId={`${reactId}-panel-${tab.key}`}
-                  />
-                ))}
-              </div>
+          <div role="tablist" aria-label={`${project.title} details`} className="project-tabs mt-6">
+            {TABS.map((tab) => (
+              <ProjectTabButton
+                key={tab.key}
+                label={tab.label}
+                isActive={activeTab === tab.key}
+                onSelect={() => setActiveTab(tab.key)}
+                tabId={`${reactId}-tab-${tab.key}`}
+                panelId={`${reactId}-panel-${tab.key}`}
+              />
+            ))}
+          </div>
 
-              <div className="min-h-32 py-6">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={activeTab}
-                    id={`${reactId}-panel-${activeTab}`}
-                    role="tabpanel"
-                    aria-labelledby={`${reactId}-tab-${activeTab}`}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                  >
-                    <p className="text-base md:text-lg leading-relaxed text-ink-muted max-w-3xl text-pretty">
-                      {project[activeTab]}
-                    </p>
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+          <div className="min-h-32 py-6">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                id={`${reactId}-panel-${activeTab}`}
+                role="tabpanel"
+                aria-labelledby={`${reactId}-tab-${activeTab}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <p className="text-base md:text-lg leading-relaxed text-ink-muted max-w-3xl text-pretty">
+                  {project[activeTab]}
+                </p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
 
-              <footer className="flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-ink/12">
-                <div className="flex flex-wrap gap-2">
-                  {project.tech.map((t) => (
-                    <span key={t} className="project-tile-chip">
-                      {t}
-                    </span>
-                  ))}
-                </div>
+          <footer className="flex flex-wrap items-center justify-between gap-6 pt-6 border-t border-ink/12">
+            <div className="flex flex-wrap gap-2">
+              {project.tech.map((t) => (
+                <span key={t} className="project-tile-chip">
+                  {t}
+                </span>
+              ))}
+            </div>
 
-                <a
-                  href={project.links[0]?.href || "#"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group button button-secondary shrink-0"
-                >
-                  <GithubIcon size={18} aria-hidden="true" />
-                  <span>{project.links[0]?.label ?? "View Github"}</span>
-                  <ArrowUpRight
-                    size={16}
-                    className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    aria-hidden="true"
-                  />
-                </a>
-              </footer>
-            </>
-          )}
+            <a
+              href={project.links[0]?.href || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group button button-secondary shrink-0"
+            >
+              <GithubIcon size={18} aria-hidden="true" />
+              <span>{project.links[0]?.label ?? "View Github"}</span>
+              <ArrowUpRight
+                size={16}
+                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
+            </a>
+          </footer>
         </div>
       </motion.div>
     </div>
@@ -393,6 +438,9 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
 export function Projects() {
   const [selected, setSelected] = useState<Project | null>(null);
   const closeDetail = useCallback(() => setSelected(null), []);
+  // Resolved once here rather than per-tile, so the tiles and the sheet can
+  // never disagree about whether a shared-layout morph is running.
+  const morph = !useCompact();
 
   return (
     <section
@@ -416,7 +464,13 @@ export function Projects() {
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
           {projects.map((project, index) => (
-            <ProjectTile key={project.slug} project={project} index={index} onOpen={setSelected} />
+            <ProjectTile
+              key={project.slug}
+              project={project}
+              index={index}
+              onOpen={setSelected}
+              morph={morph}
+            />
           ))}
         </div>
 
@@ -441,6 +495,7 @@ export function Projects() {
             key={selected.slug}
             project={selected}
             onClose={closeDetail}
+            morph={morph}
           />
         )}
       </AnimatePresence>

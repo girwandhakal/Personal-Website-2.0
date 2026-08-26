@@ -1021,6 +1021,30 @@ h3 {
   }
 }
 
+/* --- Mobile/touch: no backdrop-filter anywhere in the projects flow ------
+   A full-viewport blur(28px) behind the sheet, plus four blurred tiles, is
+   sustained GPU work on a phone for a purely decorative effect — and
+   toggling it around the animation churns compositing layers on top of
+   that. Both tiles and scrim sit over a flat colour band, so the blur was
+   barely legible here anyway; the scrim just darkens a little to make up
+   for what the blur was contributing. These use `[data-settled]` to match
+   the specificity of the toggling rules above, and sit later in the file so
+   they win in both states. --------------------------------------------- */
+@media (max-width: 639px), (hover: none) {
+  .project-modal-backdrop,
+  .project-modal-backdrop[data-settled] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: color-mix(in srgb, black 45%, transparent);
+  }
+
+  .project-tile,
+  .project-tile[data-settled] {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
