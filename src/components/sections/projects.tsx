@@ -39,6 +39,8 @@ const SHEET_TRANSITION = { duration: 0.3, ease: [0.16, 1, 0.3, 1] } as const;
 const DISMISS_DISTANCE = 120;
 /** px/sec. */
 const DISMISS_VELOCITY = 600;
+/** A velocity reading older than this is treated as a standstill. */
+const VELOCITY_STALE_MS = 100;
 /** How far the sheet is thrown on a swipe dismiss, so it carries on downward
  * out of frame instead of drifting back up to the gentler default exit. */
 const DISMISS_EXIT_Y = 340;
@@ -419,6 +421,12 @@ function ProjectDetail({
     const onTouchEnd = () => {
       if (!dragging) return;
       dragging = false;
+      // A finger that stopped moving stops firing touchmove, which would
+      // otherwise leave `velocity` frozen at whatever it was when the drag was
+      // still in motion — so dragging down, pausing, then lifting would read
+      // as a flick and dismiss against the user's intent. Treat a stale
+      // reading as a standstill and judge that release on distance alone.
+      if (performance.now() - lastT > VELOCITY_STALE_MS) velocity = 0;
       if (lastY - startY > DISMISS_DISTANCE || velocity > DISMISS_VELOCITY) {
         setExitY(DISMISS_EXIT_Y);
         onClose();
