@@ -99,6 +99,17 @@ html {
      `scroll-margin-top` on the sections stacked the two and landed every
      anchor 176px down instead of 88px. */
   scroll-padding-top: calc(var(--nav-height) + 24px);
+  /* Reserves the classic (non-overlay) scrollbar's gutter at all times,
+     whether or not one is actually drawn. Without this, every scroll-lock
+     that pins <body> to `position: fixed` (the project detail sheet, the
+     mobile nav menu) takes <html> out of overflow — its real scrollbar
+     disappears, handing every percentage-width element ~15-17px of extra
+     room to reflow into, and reflows back the moment it unlocks. That's a
+     desktop-only jitter (macOS/mobile use overlay scrollbars that never
+     took layout space to begin with), and it's exactly what "the page
+     resizes when you close the tile" was: the gutter, not the content,
+     should be what appears/disappears. */
+  scrollbar-gutter: stable;
 }
 
 body {
