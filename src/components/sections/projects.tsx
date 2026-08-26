@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 
 import { GithubIcon } from "@/components/ui/social-icons";
@@ -21,6 +21,12 @@ const ACCENT_FILLS = {
 /** Bento span pattern: wide/narrow/narrow/wide, repeating — an asymmetric
  * grid reads far less like a list than a uniform one does. */
 const SPAN_PATTERN = ["md:col-span-7", "md:col-span-5", "md:col-span-5", "md:col-span-7"];
+
+/** The tile<->sheet morph's spring, shared so open and close feel identical —
+ * without this the tile's own `transition` (tuned for its scroll-in reveal)
+ * silently governed the *close* leg of the shared `layoutId` animation,
+ * since Motion falls back to it when no `transition.layout` is given. */
+const MORPH_TRANSITION = { type: "spring", stiffness: 320, damping: 32, mass: 0.9 } as const;
 
 const TABS = [
   { key: "context", label: "The Problem" },
@@ -99,6 +105,10 @@ function ProjectTile({
 }) {
   const accent = ACCENT_FILLS[project.accent];
   const prefersReducedMotion = useReducedMotion();
+  // While the shared layoutId animation is in flight (this tile closing back
+  // in from the full sheet), the tile's `backdrop-filter` blur is switched
+  // off — see the `data-settled` rule in globals.css for why.
+  const [settled, setSettled] = useState(true);
 
   return (
     <motion.button
@@ -107,10 +117,18 @@ function ProjectTile({
       onClick={() => onOpen(project)}
       style={{ "--tile-accent": accent } as React.CSSProperties}
       className={`project-tile ${SPAN_PATTERN[index % SPAN_PATTERN.length]}`}
+      data-settled={settled}
       initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
       whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.6, delay: (index % SPAN_PATTERN.length) * 0.08, ease: [0.16, 1, 0.3, 1] }}
+      transition={{
+        duration: 0.6,
+        delay: (index % SPAN_PATTERN.length) * 0.08,
+        ease: [0.16, 1, 0.3, 1],
+        layout: prefersReducedMotion ? { duration: 0.001 } : MORPH_TRANSITION
+      }}
+      onLayoutAnimationStart={() => setSettled(false)}
+      onLayoutAnimationComplete={() => setSettled(true)}
     >
       <div className="relative z-10 flex flex-col h-full gap-5 text-left">
         <div className="flex items-start justify-between gap-4">
@@ -156,14 +174,18 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
   const accent = ACCENT_FILLS[project.accent];
   const closeRef = useRef<HTMLButtonElement>(null);
   const prefersReducedMotion = useReducedMotion();
+  // Stays false for the ~duration of the tile->sheet shared-layout transform,
+  // true once it settles. See the `data-settled` CSS below for why.
+  const [settled, setSettled] = useState(false);
 
-  useEffect(() => {
-    closeRef.current?.focus();
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKeyDown);
-
+  // `useLayoutEffect`, not `useEffect`: this has to land *before* the browser
+  // paints the first frame of the open transition. `useEffect` fires after
+  // paint, so for a frame or two the page was still a normal scrollable
+  // document — any native scroll-into-view (e.g. the focus() call below,
+  // previously issued even earlier with nothing pinned yet) could nudge real
+  // page scroll, which reads as the background "scrolling" behind the tile
+  // as it expands. Locking first removes that window entirely.
+  useLayoutEffect(() => {
     // `overflow: hidden` alone doesn't hold on mobile Safari/Firefox, where
     // <html> — not <body> — is the real scrolling box: touch can still
     // rubber-band the page behind the sheet. Pinning <body> with
@@ -176,6 +198,16 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     style.left = "0";
     style.right = "0";
     style.width = "100%";
+
+    // `preventScroll` stops the browser from scrolling any ancestor to bring
+    // the (already fully on-screen, fixed-position) close button into view —
+    // without it that scroll-into-view could itself move the real page.
+    closeRef.current?.focus({ preventScroll: true });
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKeyDown);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
@@ -192,6 +224,7 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     <div className="project-modal-layer">
       <motion.div
         className="project-modal-backdrop"
+        data-settled={settled}
         onClick={onClose}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -206,12 +239,11 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
         aria-modal="true"
         aria-labelledby={`${reactId}-title`}
         className="project-modal"
+        data-settled={settled}
         style={{ "--tile-accent": accent } as React.CSSProperties}
-        transition={
-          prefersReducedMotion
-            ? { duration: 0.001 }
-            : { type: "spring", stiffness: 320, damping: 32, mass: 0.9 }
-        }
+        transition={prefersReducedMotion ? { duration: 0.001 } : MORPH_TRANSITION}
+        onLayoutAnimationStart={() => setSettled(false)}
+        onLayoutAnimationComplete={() => setSettled(true)}
       >
         <div className="project-modal-scroll">
           <button

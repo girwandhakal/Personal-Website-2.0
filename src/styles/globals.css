@@ -735,7 +735,22 @@ h3 {
   overflow: hidden;
   cursor: pointer;
   text-align: left;
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease,
+              backdrop-filter 180ms ease;
+}
+
+/* `data-settled="false"` marks the ~250ms window where this tile is
+   mid-flight through the shared `layoutId` morph into/out of the detail
+   sheet (see projects.tsx). `backdrop-filter` has to re-sample whatever's
+   drawn behind it on every frame its content changes — with the modal
+   repainting on top of it each frame while resizing, that resample is the
+   single biggest cause of dropped frames on a phone GPU. Turning it off for
+   just that window (the plain translucent background reads fine without it
+   for a quarter second) removes the stutter; the 180ms transition above
+   fades it back in once the transform settles instead of popping. */
+.project-tile[data-settled="false"] {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .project-tile:hover {
@@ -803,6 +818,18 @@ h3 {
   background: color-mix(in srgb, black 22%, transparent);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
+  transition: backdrop-filter 180ms ease;
+}
+
+/* Same reasoning as `.project-tile[data-settled="false"]` above: this is a
+   full-viewport blur sitting directly under the sheet while it's actively
+   resizing on top of it, which is the worst case for backdrop-filter's
+   per-frame resample cost. Dropping the blur for that one window and
+   keeping only the (cheap) tint is what actually fixes the open/close
+   stutter — the blur fades back in over the tint once the sheet lands. */
+.project-modal-backdrop[data-settled="false"] {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .project-modal {
