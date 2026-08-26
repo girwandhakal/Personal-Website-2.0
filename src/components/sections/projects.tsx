@@ -234,12 +234,12 @@ function ProjectDetail({ project, onClose }: { project: Project; onClose: () => 
     window.addEventListener("touchmove", onTouchMove, { passive: false });
 
     // Focusing a newly-mounted node forces the browser to lay it out early
-    // to know it's focusable — a synchronous reflow of the whole (fairly
-    // large) sheet, right here inside a `useLayoutEffect` that's already
-    // blocking the first paint. Deferring one frame lets that first paint
-    // happen on schedule and folds the reflow into the *next* one instead,
-    // which is what actually fixed the opening hitch on mobile (measured
-    // with CPU throttling — see the projects.tsx PR history).
+    // to know it's focusable — a synchronous reflow, right here inside a
+    // `useLayoutEffect` that's already blocking the first paint. Deferring
+    // one frame lets that first paint happen on schedule. (Profiling showed
+    // this alone isn't what fixed the mobile opening hitch — the `showDetails`
+    // deferral above did the actual work — but there's no reason to leave an
+    // avoidable forced reflow in the critical path either.)
     // `preventScroll` stops the browser from scrolling any ancestor to bring
     // the (already fully on-screen, fixed-position) close button into view —
     // without it that scroll-into-view could itself move the real page.
