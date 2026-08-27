@@ -300,7 +300,7 @@ export function SiteNav() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: i * 0.04 + 0.08 }}
                     aria-current={isActive ? "true" : undefined}
-                    className={`flex items-center justify-between text-3xl font-extrabold tracking-tight py-5 border-b border-ink/10 transition-colors ${
+                    className={`flex items-center justify-between text-3xl font-medium tracking-tight py-5 border-b border-ink/10 transition-colors ${
                       isActive ? "text-[var(--accent)]" : "text-ink hover:text-[var(--accent)]"
                     }`}
                     onClick={(e) => {

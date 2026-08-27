@@ -177,7 +177,7 @@ export function ContactForm() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-3xl font-extrabold text-white tracking-tight mb-2"
+              className="text-3xl font-medium text-white tracking-tight mb-2"
             >
               Message Sent!
             </motion.h3>

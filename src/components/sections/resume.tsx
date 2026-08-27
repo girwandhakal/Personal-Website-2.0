@@ -55,7 +55,7 @@ export function Resume() {
       <>
         <section id="resume" className="w-full bg-[var(--surface)] border-t border-ink/15">
           <div className="section-inner">
-            <h2 className="font-bold text-ink tracking-tight mb-14 text-center mx-auto">
+            <h2 className="font-semibold text-ink tracking-tight mb-14 text-center mx-auto">
               Work Experience
             </h2>
             <ExperienceList />
@@ -80,7 +80,7 @@ export function Resume() {
             overflow-y-auto pane inside a 100svh sticky frame, which traps
             touch scrolling and stretched 3 roles across ~4.5 screens. */}
         <div className="md:hidden section-inner">
-          <h2 className="font-bold text-ink tracking-tight mb-12 text-center mx-auto">
+          <h2 className="font-semibold text-ink tracking-tight mb-12 text-center mx-auto">
             Work Experience
           </h2>
           <ExperienceList />
@@ -88,7 +88,7 @@ export function Resume() {
 
         {/* Desktop: scroll-driven sticky presentation. */}
         <div className="hidden md:flex sticky top-0 h-[100svh] w-full flex-col items-center py-6 pt-32 pb-8 overflow-hidden">
-          <h2 className="font-bold text-ink tracking-tight z-10 mb-8 text-center px-4 shrink-0 mx-auto">
+          <h2 className="font-semibold text-ink tracking-tight z-10 mb-8 text-center px-4 shrink-0 mx-auto">
             Work Experience
           </h2>
 
@@ -152,7 +152,7 @@ function Education() {
   return (
     <section id="education" className="w-full bg-[var(--surface)] border-t border-ink/15">
       <div className="section-inner text-center">
-        <h2 className="font-bold text-ink tracking-tight mb-14 md:mb-20 mx-auto">
+        <h2 className="font-semibold text-ink tracking-tight mb-14 md:mb-20 mx-auto">
           Education
         </h2>
         <div className="flex flex-col md:flex-row justify-center text-left divide-y md:divide-y-0 md:divide-x divide-ink/20">

@@ -150,7 +150,7 @@ function SummaryWithChatLink({ text, accentClass }: { text: string; accentClass:
           e.stopPropagation();
           if (typeof window !== "undefined") window.dispatchEvent(new Event("open-ai-chat"));
         }}
-        className={`font-bold underline decoration-2 underline-offset-4 cursor-pointer relative z-10 ${accentClass}`}
+        className={`font-semibold underline decoration-2 underline-offset-4 cursor-pointer relative z-10 ${accentClass}`}
       >
         try it here
       </button>
@@ -198,7 +198,7 @@ function ProjectTile({
       <div className="relative z-10 flex flex-col h-full gap-5 text-left">
         <div className="flex items-start justify-between gap-4">
           <span
-            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-black shrink-0"
+            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-semibold shrink-0"
             style={{ background: "var(--tile-accent)", color: "#fff" }}
             aria-hidden="true"
           >
@@ -210,7 +210,7 @@ function ProjectTile({
         </div>
 
         <div className="flex flex-col gap-2.5">
-          <h3 className="text-2xl md:text-3xl font-extrabold tracking-tighter leading-[1.05] text-ink">
+          <h3 className="text-2xl md:text-3xl font-medium tracking-tighter leading-[1.05] text-ink">
             {project.title}
           </h3>
           <p className="text-sm md:text-base text-ink-muted leading-relaxed line-clamp-3">
@@ -549,7 +549,7 @@ function ProjectDetail({
           </button>
 
           <header className="flex flex-col gap-3 pr-12">
-            <h2 id={`${reactId}-title`} className="text-3xl md:text-5xl font-extrabold tracking-tighter leading-[1.02] text-ink">
+            <h2 id={`${reactId}-title`} className="text-3xl md:text-5xl font-medium tracking-tighter leading-[1.02] text-ink">
               {project.title}
             </h2>
 
