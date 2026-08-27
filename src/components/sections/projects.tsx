@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  AnimatePresence,
-  motion,
-  useAnimationControls,
-  useIsPresent,
-  useReducedMotion
-} from "motion/react";
+import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 
@@ -275,11 +269,6 @@ function ProjectDetail({
   // `data-settled` rules in globals.css). With no morph there's no layout
   // animation and so no completion callback coming — start settled.
   const [settled, setSettled] = useState(!morph);
-  // True until this sheet is dismissed. Everything inside here that would
-  // otherwise animate on exit has to go instant once this flips — see the
-  // tab panel below and the comment on `Projects`' two AnimatePresences for
-  // why a single lingering exit animation used to stall the whole close.
-  const isPresent = useIsPresent();
   // NOTE: don't try deferring the tabs/panel/footer to a later commit to
   // shrink the tap's synchronous mount cost — that was tried and made things
   // visibly worse. The sheet's content is what determines its final box, so
@@ -548,12 +537,7 @@ function ProjectDetail({
                 aria-labelledby={`${reactId}-tab-${activeTab}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                // Nested AnimatePresence propagates the outer exit, so this
-                // 0.28s crossfade also ran when the whole sheet was being
-                // dismissed — and the outer AnimatePresence waited for it.
-                // The tab swap is only worth animating between tabs; when
-                // the sheet itself is leaving, this must not hold it open.
-                exit={isPresent ? { opacity: 0, y: -6 } : undefined}
+                exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               >
                 <p className="text-base md:text-lg leading-relaxed text-ink-muted max-w-3xl text-pretty">
@@ -596,9 +580,22 @@ function ProjectDetail({
 export function Projects() {
   const [selected, setSelected] = useState<Project | null>(null);
   const closeDetail = useCallback(() => setSelected(null), []);
-  // Whether the shared-layout morph is currently in flight, in either
-  // direction. Lifted here because the scrim it gates now lives up here too.
-  const [morphing, setMorphing] = useState(false);
+  // The scrim's mid-morph blur toggle, driven by writing the attribute
+  // directly rather than through React state.
+  //
+  // This MUST NOT re-render. `onLayoutAnimationStart` fires on the first
+  // frame of the morph, so a state update here would re-render `Projects`
+  // and with it all four tiles — every one a `motion.button` carrying a
+  // `layoutId`. Re-rendering a `layoutId` node makes Motion re-measure it
+  // and re-evaluate the shared-layout lead/follower stack, and doing that
+  // mid-flight re-promotes the tile: the morph snaps back to the tile while
+  // the sheet sits there still mounted. (That is exactly what a `useState`
+  // version of this did.) The per-component `settled` state below is fine
+  // precisely because it only ever re-renders its own element.
+  const backdropRef = useRef<HTMLDivElement>(null);
+  const setMorphing = useCallback((morphing: boolean) => {
+    backdropRef.current?.setAttribute("data-settled", morphing ? "false" : "true");
+  }, []);
   // Resolved once here rather than per-tile, so the tiles and the sheet can
   // never disagree about whether a shared-layout morph is running.
   const morph = !useCompact();
@@ -655,26 +652,37 @@ export function Projects() {
         Two AnimatePresences, deliberately — the scrim must NOT share the
         sheet's.
 
-        AnimatePresence keeps an exiting child mounted until every exit
-        animation *inside its subtree* has finished. With the scrim nested
-        under the sheet, dismissing the sheet meant: Motion instantly handed
-        the shared `layoutId` lead back to the tile (which correctly flew
-        home), while the sheet — which has no `exit` of its own on the morph
-        path — sat frozen at full opacity on a z-index:100 fixed layer,
-        waiting on the scrim's 0.28s fade, and only then blinked out. That
-        read as the sheet hanging, the tile returning behind it, and the
-        sheet popping — with none of it looking like one movement.
+        AnimatePresence only unmounts an exiting child once *every* `motion`
+        element registered against its presence context has finished exiting
+        (see PresenceChild's `presenceChildren` bookkeeping in framer-motion:
+        each one registers on mount, and one incomplete entry holds back the
+        whole removal). The scrim was one of those, with a 0.28s fade.
 
-        Split apart, the sheet has nothing left to wait for and unmounts on
-        the same frame it's dismissed, so the tile's reverse morph *is* the
-        close animation, mirroring the open. The scrim fades on its own
-        clock, over the top of that.
+        So dismissing the sheet meant: Motion instantly handed the shared
+        `layoutId` lead back to the tile, which correctly flew home, while
+        the sheet — which has no `exit` of its own on the morph path, and so
+        nothing to animate — sat frozen at full opacity on a z-index:100
+        fixed layer for the scrim's 0.28s, then blinked out. That read as
+        three separate events instead of one movement.
+
+        Split apart, the sheet's presence has only itself to wait on and it
+        leaves as soon as it is dismissed, so the tile's reverse morph *is*
+        the close animation, mirroring the open, with the scrim fading over
+        the top of it on its own clock.
+
+        (The tab panel's nested AnimatePresence is not a third gate: nested
+        AnimatePresences default to `propagate: false`, so its children
+        register against it rather than against this one.)
       */}
       <AnimatePresence>
         {selected && (
           <motion.div
+            ref={backdropRef}
             className="project-modal-backdrop"
-            data-settled={!morphing}
+            // Initial value only; `setMorphing` owns it imperatively from
+            // here on. With no morph there's no layout animation and so no
+            // callback coming — start settled, same as the sheet does.
+            data-settled={!morph}
             onClick={closeDetail}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
