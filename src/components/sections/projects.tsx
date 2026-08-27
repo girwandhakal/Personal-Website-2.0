@@ -1,6 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
+import {
+  AnimatePresence,
+  motion,
+  useAnimationControls,
+  useIsPresent,
+  useReducedMotion
+} from "motion/react";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { ArrowUpRight, X } from "lucide-react";
 
@@ -152,12 +158,14 @@ function ProjectTile({
   project,
   index,
   onOpen,
-  morph
+  morph,
+  onMorphChange
 }: {
   project: Project;
   index: number;
   onOpen: (project: Project) => void;
   morph: boolean;
+  onMorphChange: (morphing: boolean) => void;
 }) {
   const accent = ACCENT_FILLS[project.accent];
   const prefersReducedMotion = useReducedMotion();
@@ -186,8 +194,18 @@ function ProjectTile({
         ease: [0.16, 1, 0.3, 1],
         layout: prefersReducedMotion ? { duration: 0.001 } : MORPH_TRANSITION
       }}
-      onLayoutAnimationStart={() => setSettled(false)}
-      onLayoutAnimationComplete={() => setSettled(true)}
+      // The close leg of the morph belongs to the *tile*, not the sheet: once
+      // the sheet is dismissed Motion hands the shared `layoutId` lead back
+      // here and this element is what flies home. So the tile is also what
+      // tells the (now separately-mounted) scrim when to drop its blur.
+      onLayoutAnimationStart={() => {
+        setSettled(false);
+        onMorphChange(true);
+      }}
+      onLayoutAnimationComplete={() => {
+        setSettled(true);
+        onMorphChange(false);
+      }}
     >
       <div className="relative z-10 flex flex-col h-full gap-5 text-left">
         <div className="flex items-start justify-between gap-4">
@@ -230,11 +248,13 @@ function ProjectTile({
 function ProjectDetail({
   project,
   onClose,
-  morph
+  morph,
+  onMorphChange
 }: {
   project: Project;
   onClose: () => void;
   morph: boolean;
+  onMorphChange: (morphing: boolean) => void;
 }) {
   const [activeTab, setActiveTab] = useState<TabKey>("context");
   const reactId = useId();
@@ -255,6 +275,11 @@ function ProjectDetail({
   // `data-settled` rules in globals.css). With no morph there's no layout
   // animation and so no completion callback coming — start settled.
   const [settled, setSettled] = useState(!morph);
+  // True until this sheet is dismissed. Everything inside here that would
+  // otherwise animate on exit has to go instant once this flips — see the
+  // tab panel below and the comment on `Projects`' two AnimatePresences for
+  // why a single lingering exit animation used to stall the whole close.
+  const isPresent = useIsPresent();
   // NOTE: don't try deferring the tabs/panel/footer to a later commit to
   // shrink the tap's synchronous mount cost — that was tried and made things
   // visibly worse. The sheet's content is what determines its final box, so
@@ -450,17 +475,6 @@ function ProjectDetail({
   return (
     <div className="project-modal-layer">
       <motion.div
-        className="project-modal-backdrop"
-        data-settled={settled}
-        onClick={onClose}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.28, ease: "easeOut" }}
-        aria-hidden="true"
-      />
-
-      <motion.div
         ref={sheetRef}
         layoutId={morph ? `project-tile-${project.slug}` : undefined}
         role="dialog"
@@ -482,8 +496,14 @@ function ProjectDetail({
               ? MORPH_TRANSITION
               : SHEET_TRANSITION
         }
-        onLayoutAnimationStart={() => setSettled(false)}
-        onLayoutAnimationComplete={() => setSettled(true)}
+        onLayoutAnimationStart={() => {
+          setSettled(false);
+          onMorphChange(true);
+        }}
+        onLayoutAnimationComplete={() => {
+          setSettled(true);
+          onMorphChange(false);
+        }}
       >
         <div className="project-modal-scroll" ref={scrollRef}>
           <button
@@ -528,7 +548,12 @@ function ProjectDetail({
                 aria-labelledby={`${reactId}-tab-${activeTab}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -6 }}
+                // Nested AnimatePresence propagates the outer exit, so this
+                // 0.28s crossfade also ran when the whole sheet was being
+                // dismissed — and the outer AnimatePresence waited for it.
+                // The tab swap is only worth animating between tabs; when
+                // the sheet itself is leaving, this must not hold it open.
+                exit={isPresent ? { opacity: 0, y: -6 } : undefined}
                 transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
               >
                 <p className="text-base md:text-lg leading-relaxed text-ink-muted max-w-3xl text-pretty">
@@ -571,6 +596,9 @@ function ProjectDetail({
 export function Projects() {
   const [selected, setSelected] = useState<Project | null>(null);
   const closeDetail = useCallback(() => setSelected(null), []);
+  // Whether the shared-layout morph is currently in flight, in either
+  // direction. Lifted here because the scrim it gates now lives up here too.
+  const [morphing, setMorphing] = useState(false);
   // Resolved once here rather than per-tile, so the tiles and the sheet can
   // never disagree about whether a shared-layout morph is running.
   const morph = !useCompact();
@@ -603,6 +631,7 @@ export function Projects() {
               index={index}
               onOpen={setSelected}
               morph={morph}
+              onMorphChange={setMorphing}
             />
           ))}
         </div>
@@ -622,6 +651,40 @@ export function Projects() {
         </div>
       </div>
 
+      {/*
+        Two AnimatePresences, deliberately — the scrim must NOT share the
+        sheet's.
+
+        AnimatePresence keeps an exiting child mounted until every exit
+        animation *inside its subtree* has finished. With the scrim nested
+        under the sheet, dismissing the sheet meant: Motion instantly handed
+        the shared `layoutId` lead back to the tile (which correctly flew
+        home), while the sheet — which has no `exit` of its own on the morph
+        path — sat frozen at full opacity on a z-index:100 fixed layer,
+        waiting on the scrim's 0.28s fade, and only then blinked out. That
+        read as the sheet hanging, the tile returning behind it, and the
+        sheet popping — with none of it looking like one movement.
+
+        Split apart, the sheet has nothing left to wait for and unmounts on
+        the same frame it's dismissed, so the tile's reverse morph *is* the
+        close animation, mirroring the open. The scrim fades on its own
+        clock, over the top of that.
+      */}
+      <AnimatePresence>
+        {selected && (
+          <motion.div
+            className="project-modal-backdrop"
+            data-settled={!morphing}
+            onClick={closeDetail}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.28, ease: "easeOut" }}
+            aria-hidden="true"
+          />
+        )}
+      </AnimatePresence>
+
       <AnimatePresence>
         {selected && (
           <ProjectDetail
@@ -629,6 +692,7 @@ export function Projects() {
             project={selected}
             onClose={closeDetail}
             morph={morph}
+            onMorphChange={setMorphing}
           />
         )}
       </AnimatePresence>

@@ -821,11 +821,19 @@ h3 {
   align-items: flex-end;
   justify-content: center;
   padding: 0;
+  /* The scrim is a sibling now, not a child (see projects.tsx), so this
+     layer no longer has anything covering it — without this it would eat
+     every click aimed at the scrim below and outside-clicks would stop
+     closing the sheet. The sheet itself takes its clicks back. */
+  pointer-events: none;
 }
 
+/* Sibling of `.project-modal-layer`, one z-index below it, so it still sits
+   under the sheet while being mounted and unmounted on its own clock. */
 .project-modal-backdrop {
-  position: absolute;
+  position: fixed;
   inset: 0;
+  z-index: 99;
   background: color-mix(in srgb, black 22%, transparent);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
@@ -846,6 +854,7 @@ h3 {
 .project-modal {
   position: relative;
   z-index: 1;
+  pointer-events: auto;
   width: 100%;
   max-width: 840px;
   max-height: 88svh;
