@@ -725,10 +725,12 @@ h3 {
 }
 
 /* ---------------------------------------------------------------------------
-   Projects — bento grid of glass tiles that morph into a full-detail sheet.
-   The tile and the sheet share a Motion `layoutId` (project-tile-<slug>), so
-   opening one reads as the tile itself expanding into place rather than a
-   page swap — the closest a DOM can get to iOS/macOS's app-launch morph.
+   Projects — bento grid of glass tiles that open into a full-detail sheet.
+   The sheet zooms out of whichever tile was clicked (and back into it on
+   close), so opening one still reads as coming from that tile rather than as
+   a page swap — but as a single compositor transform. See projects.tsx for
+   why the Motion shared-layout (`layoutId`) morph that used to do this was
+   replaced.
    --------------------------------------------------------------------------- */
 
 .project-tile {
@@ -746,22 +748,7 @@ h3 {
   overflow: hidden;
   cursor: pointer;
   text-align: left;
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease,
-              backdrop-filter 180ms ease;
-}
-
-/* `data-settled="false"` marks the ~250ms window where this tile is
-   mid-flight through the shared `layoutId` morph into/out of the detail
-   sheet (see projects.tsx). `backdrop-filter` has to re-sample whatever's
-   drawn behind it on every frame its content changes — with the modal
-   repainting on top of it each frame while resizing, that resample is the
-   single biggest cause of dropped frames on a phone GPU. Turning it off for
-   just that window (the plain translucent background reads fine without it
-   for a quarter second) removes the stutter; the 180ms transition above
-   fades it back in once the transform settles instead of popping. */
-.project-tile[data-settled="false"] {
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms ease;
 }
 
 .project-tile:hover {
@@ -855,6 +842,12 @@ h3 {
   position: relative;
   z-index: 1;
   pointer-events: auto;
+  /* The zoom in projects.tsx animates only `transform` and `opacity`, and
+     these two make sure the browser treats it that way: its own compositor
+     layer, promoted up front rather than at the first animated frame, and a
+     centre origin, which is what the zoom's translate maths assumes. */
+  will-change: transform, opacity;
+  transform-origin: center center;
   width: 100%;
   max-width: 840px;
   max-height: 88svh;
@@ -1047,8 +1040,7 @@ h3 {
     background: color-mix(in srgb, black 45%, transparent);
   }
 
-  .project-tile,
-  .project-tile[data-settled] {
+  .project-tile {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }

@@ -40,12 +40,9 @@ const openSheet = () => {
 describe("project detail sheet", () => {
   it("opens on tile click and stays open", () => {
     openSheet();
-    // Regression guard: driving the scrim's blur flag from React state in
-    // `Projects` re-rendered every `layoutId` tile on the morph's first
-    // frame (via `onLayoutAnimationStart`), which made Motion re-measure and
-    // re-promote the tile mid-flight — the sheet snapped straight back on
-    // open while staying mounted. Anything that re-renders this whole
-    // section during the morph will fail here.
+    // The sheet's zoom is measured in a layout effect and started from
+    // animation controls; if that path throws or the open handler stops
+    // passing the tile's box through, this is what notices.
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
@@ -57,9 +54,9 @@ describe("project detail sheet", () => {
     expect(layer).not.toBeNull();
     expect(scrim).not.toBeNull();
 
-    // The whole close fix. While the scrim lived inside the layer it also
-    // lived inside the sheet's AnimatePresence, and its 0.28s exit fade held
-    // the dismissed sheet on screen. It has to stay a sibling.
+    // While the scrim lived inside the layer it also lived inside the
+    // sheet's AnimatePresence, and its exit fade held the dismissed sheet on
+    // screen for the fade's whole duration. It has to stay a sibling.
     expect(layer!.contains(scrim!)).toBe(false);
     expect(screen.getByRole("dialog").closest(".project-modal-layer")).toBe(layer);
   });

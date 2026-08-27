@@ -22,11 +22,29 @@ const ACCENT_FILLS = {
  * grid reads far less like a list than a uniform one does. */
 const SPAN_PATTERN = ["md:col-span-7", "md:col-span-5", "md:col-span-5", "md:col-span-7"];
 
-/** The tile<->sheet morph's spring, shared so open and close feel identical —
- * without this the tile's own `transition` (tuned for its scroll-in reveal)
- * silently governed the *close* leg of the shared `layoutId` animation,
- * since Motion falls back to it when no `transition.layout` is given. */
-const MORPH_TRANSITION = { type: "spring", stiffness: 320, damping: 32, mass: 0.9 } as const;
+/** The desktop sheet's zoom, anchored to the tile that was clicked.
+ *
+ * This replaced a Motion shared-layout (`layoutId`) morph. The morph looked
+ * right in principle but was structurally fragile: it is driven from JS on
+ * the main thread, re-measuring boxes every frame, and its lead/follower
+ * handoff meant the *close* leg belonged to the tile rather than the sheet.
+ * That handoff produced a sheet that sat frozen on screen while the tile flew
+ * home behind it, and made the whole animation sensitive to any stray
+ * re-render of the grid. It also applied a non-uniform scale, which visibly
+ * squashed the sheet's text on the way in.
+ *
+ * A zoom needs one measurement, at open, and then animates nothing but
+ * `transform` and `opacity` — compositor-only properties, so the GPU runs it
+ * independently of whatever the main thread is doing. The sheet owns both
+ * legs, so close is the exact reverse of open by construction. */
+const ZOOM_IN = { duration: 0.34, ease: [0.22, 1, 0.36, 1] } as const;
+/** Slightly quicker on the way out — a close that matches the open's duration
+ * reads as sluggish, since there's nothing new to look at. */
+const ZOOM_OUT = { duration: 0.24, ease: [0.4, 0, 0.2, 1] } as const;
+/** Floor on the zoom's starting scale. A tile much narrower than the sheet
+ * would otherwise start the sheet small enough that the zoom reads as a
+ * flying speck rather than an expansion. */
+const MIN_ZOOM_SCALE = 0.55;
 
 /** The mobile sheet's transition. Pure translate + fade, so it runs on the
  * compositor and can't be starved by main-thread work — see `useCompact`. */
@@ -49,23 +67,16 @@ const DEFAULT_EXIT_Y = 20;
 const SNAP_BACK = { type: "spring", stiffness: 500, damping: 40 } as const;
 
 /**
- * True on phones and touch devices, where the tile->sheet morph is dropped in
- * favour of a plain slide-up.
+ * True on phones and touch devices, which get a bottom sheet that slides up
+ * and can be swiped away, rather than the desktop zoom.
  *
- * The morph is a Motion shared-layout (`layoutId`) animation, and those are
- * driven from JavaScript on the main thread: every frame Motion re-measures
- * boxes, computes deltas, and writes transforms plus per-frame border-radius
- * corrections for the sheet and all four tiles. A desktop CPU absorbs that
- * without dropping a frame; a phone doesn't, which is the whole reason the
- * animation felt worse there. Profiling also showed the morph applies a
- * *non-uniform* scale (scaleY ~0.39 -> 1 against scaleX ~0.92 -> 1) to the
- * sheet's real content, so text visibly squashes and stretches on the way in.
+ * Both are compositor-only (transform + opacity); the split is about what the
+ * gesture should be, not about cost. A bottom sheet is the native-feeling
+ * shape on a phone and it's what swipe-to-dismiss is built around, while a
+ * zoom anchored to the clicked tile only makes sense with a pointer and a
+ * grid wide enough for the tile's position to mean something.
  *
- * translate + opacity, by contrast, are compositor-only properties: the layer
- * is rasterized once and then just moved, so the transition holds up even
- * while the main thread is busy mounting the sheet.
- *
- * Defaults to the morph so SSR and the desktop first paint are unchanged; the
+ * Defaults to the desktop path so SSR and the first paint are unchanged; the
  * media query resolves on mount, long before anyone can tap a tile.
  */
 function useCompact() {
@@ -151,54 +162,37 @@ function SummaryWithChatLink({ text, accentClass }: { text: string; accentClass:
 function ProjectTile({
   project,
   index,
-  onOpen,
-  morph,
-  onMorphChange
+  onOpen
 }: {
   project: Project;
   index: number;
-  onOpen: (project: Project) => void;
-  morph: boolean;
-  onMorphChange: (morphing: boolean) => void;
+  onOpen: (project: Project, origin: DOMRect) => void;
 }) {
   const accent = ACCENT_FILLS[project.accent];
   const prefersReducedMotion = useReducedMotion();
-  // While the shared layoutId animation is in flight (this tile closing back
-  // in from the full sheet), the tile's `backdrop-filter` blur is switched
-  // off — see the `data-settled` rule in globals.css for why.
-  const [settled, setSettled] = useState(true);
+  const ref = useRef<HTMLButtonElement>(null);
 
   return (
     <motion.button
+      ref={ref}
       type="button"
-      // Dropping the id on compact viewports is what takes the tile out of
-      // Motion's projection tree entirely, so no per-frame layout work runs
-      // for it while the sheet opens.
-      layoutId={morph ? `project-tile-${project.slug}` : undefined}
-      onClick={() => onOpen(project)}
+      // The sheet zooms out of wherever this tile happens to be, so hand its
+      // box over at click time. One `getBoundingClientRect` per open — the
+      // whole reason this is cheaper than the shared-layout morph it
+      // replaced, which re-measured every tile on every frame.
+      onClick={() => {
+        const origin = ref.current?.getBoundingClientRect();
+        if (origin) onOpen(project, origin);
+      }}
       style={{ "--tile-accent": accent } as React.CSSProperties}
       className={`project-tile ${SPAN_PATTERN[index % SPAN_PATTERN.length]}`}
-      data-settled={settled}
       initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
       whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{
         duration: 0.6,
         delay: (index % SPAN_PATTERN.length) * 0.08,
-        ease: [0.16, 1, 0.3, 1],
-        layout: prefersReducedMotion ? { duration: 0.001 } : MORPH_TRANSITION
-      }}
-      // The close leg of the morph belongs to the *tile*, not the sheet: once
-      // the sheet is dismissed Motion hands the shared `layoutId` lead back
-      // here and this element is what flies home. So the tile is also what
-      // tells the (now separately-mounted) scrim when to drop its blur.
-      onLayoutAnimationStart={() => {
-        setSettled(false);
-        onMorphChange(true);
-      }}
-      onLayoutAnimationComplete={() => {
-        setSettled(true);
-        onMorphChange(false);
+        ease: [0.16, 1, 0.3, 1]
       }}
     >
       <div className="relative z-10 flex flex-col h-full gap-5 text-left">
@@ -241,14 +235,17 @@ function ProjectTile({
 
 function ProjectDetail({
   project,
+  origin,
   onClose,
-  morph,
-  onMorphChange
+  compact,
+  onSettled
 }: {
   project: Project;
+  /** Viewport box of the tile that was clicked — the zoom's anchor. */
+  origin: DOMRect;
   onClose: () => void;
-  morph: boolean;
-  onMorphChange: (morphing: boolean) => void;
+  compact: boolean;
+  onSettled: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<TabKey>("context");
   const reactId = useId();
@@ -264,17 +261,15 @@ function ProjectDetail({
   // the exit continues the gesture downward rather than animating back up to
   // the subtle default the X button uses.
   const [exitY, setExitY] = useState(DEFAULT_EXIT_Y);
-  // False while the tile->sheet morph is in flight, true once it lands; keeps
-  // the expensive backdrop-filter blur off anything that's moving (see the
-  // `data-settled` rules in globals.css). With no morph there's no layout
-  // animation and so no completion callback coming — start settled.
-  const [settled, setSettled] = useState(!morph);
+  // The transform that puts this sheet back over the tile it came from.
+  // Computed once, on mount, and reused verbatim as the exit target so the
+  // close is the exact reverse of the open.
+  const [zoomFrom, setZoomFrom] = useState<{ x: number; y: number; scale: number } | null>(null);
   // NOTE: don't try deferring the tabs/panel/footer to a later commit to
   // shrink the tap's synchronous mount cost — that was tried and made things
-  // visibly worse. The sheet's content is what determines its final box, so
-  // mounting it a frame late moves Motion's layout target mid-flight, which
-  // costs more in re-measurement than the split saves and shows up as a jump.
-  // The whole sheet mounts in one commit, on purpose.
+  // visibly worse. The sheet's content is what determines its final box, and
+  // the zoom is measured from that box, so mounting it a frame late measures
+  // the wrong thing. The whole sheet mounts in one commit, on purpose.
 
   // `useLayoutEffect`, not `useEffect`: this has to land *before* the browser
   // paints the first frame of the open transition. `useEffect` fires after
@@ -360,13 +355,56 @@ function ProjectDetail({
   // `animate` prop because the swipe gesture below writes to the same `y`, and
   // only one of them can own it.
   useEffect(() => {
-    if (morph) return;
-    sheetControls.start({
-      opacity: 1,
-      y: 0,
-      transition: prefersReducedMotion ? { duration: 0.001 } : SHEET_TRANSITION
-    });
-  }, [morph, prefersReducedMotion, sheetControls]);
+    if (!compact) return;
+    sheetControls
+      .start({
+        opacity: 1,
+        y: 0,
+        transition: prefersReducedMotion ? { duration: 0.001 } : SHEET_TRANSITION
+      })
+      .then(onSettled);
+  }, [compact, onSettled, prefersReducedMotion, sheetControls]);
+
+  // The desktop entrance: zoom out of the tile that was clicked.
+  //
+  // `useLayoutEffect` because the measurement and the jump to the start of the
+  // zoom both have to happen before the browser paints. React flushes state
+  // updates made in a layout effect before paint, so the sheet is never
+  // painted at full size for even one frame.
+  //
+  // The sheet is measured *after* mount rather than predicted from CSS: its
+  // resting box depends on its content and the viewport, and a wrong guess
+  // would show up as the zoom landing slightly off-centre.
+  useLayoutEffect(() => {
+    if (compact) return;
+    const sheet = sheetRef.current;
+    if (!sheet) return;
+
+    const box = sheet.getBoundingClientRect();
+    if (!box.width || !box.height) return; // jsdom, or a display:none ancestor
+
+    // Uniform, so nothing in the sheet squashes on the way in — the shared
+    // layout morph's non-uniform scale is exactly what used to distort the
+    // text here.
+    const scale = Math.max(MIN_ZOOM_SCALE, Math.min(1, origin.width / box.width));
+    const from = {
+      x: origin.left + origin.width / 2 - (box.left + box.width / 2),
+      y: origin.top + origin.height / 2 - (box.top + box.height / 2),
+      scale
+    };
+
+    setZoomFrom(from);
+    sheetControls.set({ ...from, opacity: 0 });
+    sheetControls
+      .start({
+        x: 0,
+        y: 0,
+        scale: 1,
+        opacity: 1,
+        transition: prefersReducedMotion ? { duration: 0.001 } : ZOOM_IN
+      })
+      .then(onSettled);
+  }, [compact, onSettled, origin, prefersReducedMotion, sheetControls]);
 
   // Swipe-down-to-dismiss (touch only).
   //
@@ -386,7 +424,7 @@ function ProjectDetail({
   // closing out from under you. That decision is deferred to the first few px
   // of movement, since that's the earliest the direction is actually known.
   useEffect(() => {
-    if (morph) return; // desktop keeps the tile-expand morph and the X button
+    if (!compact) return; // the desktop zoom has no gesture, just the X button
     const sheet = sheetRef.current;
     const pane = scrollRef.current;
     if (!sheet || !pane) return;
@@ -459,40 +497,45 @@ function ProjectDetail({
       sheet.removeEventListener("touchend", onTouchEnd);
       sheet.removeEventListener("touchcancel", onTouchEnd);
     };
-  }, [morph, onClose, sheetControls]);
+  }, [compact, onClose, sheetControls]);
 
   return (
     <div className="project-modal-layer">
       <motion.div
         ref={sheetRef}
-        layoutId={morph ? `project-tile-${project.slug}` : undefined}
         role="dialog"
         aria-modal="true"
         aria-labelledby={`${reactId}-title`}
         className="project-modal"
-        data-settled={settled}
         style={{ "--tile-accent": accent } as React.CSSProperties}
-        // Compact: a compositor-only slide + fade, no shared layout at all.
-        // `animate` is the controls object rather than a target because the
-        // swipe gesture writes to the same `y` — see the effects above.
-        initial={morph ? undefined : { opacity: 0, y: 28 }}
-        animate={morph ? undefined : sheetControls}
-        exit={morph ? undefined : { opacity: 0, y: exitY }}
-        transition={
-          prefersReducedMotion
-            ? { duration: 0.001 }
-            : morph
-              ? MORPH_TRANSITION
-              : SHEET_TRANSITION
+        // Both paths are transform + opacity only, and both are driven
+        // through `sheetControls` rather than an `animate` target: compact
+        // because the swipe gesture writes to the same `y`, desktop because
+        // the zoom's start can only be known after measuring. See the
+        // entrance effects above.
+        //
+        // `opacity: 0` up front matters — the desktop path overwrites the
+        // whole transform in a layout effect, and this guarantees nothing is
+        // visible even if that measurement bails out.
+        initial={{ opacity: 0, y: compact ? 28 : 0 }}
+        animate={sheetControls}
+        // The exit is the open's own numbers, run backwards, so close mirrors
+        // open exactly. Critically it belongs to *this* element: the sheet
+        // animates itself out instead of handing off to the tile, which is
+        // what the shared-layout morph did and what made close feel detached.
+        exit={
+          compact
+            ? { opacity: 0, y: exitY }
+            : prefersReducedMotion
+              ? { opacity: 0, transition: { duration: 0.001 } }
+              : // An inline transition, because the close is quicker than the
+                // open and the element-level `transition` below can only
+                // carry one of the two.
+                { ...(zoomFrom ?? {}), opacity: 0, transition: ZOOM_OUT }
         }
-        onLayoutAnimationStart={() => {
-          setSettled(false);
-          onMorphChange(true);
-        }}
-        onLayoutAnimationComplete={() => {
-          setSettled(true);
-          onMorphChange(false);
-        }}
+        transition={
+          prefersReducedMotion ? { duration: 0.001 } : compact ? SHEET_TRANSITION : ZOOM_OUT
+        }
       >
         <div className="project-modal-scroll" ref={scrollRef}>
           <button
@@ -578,27 +621,33 @@ function ProjectDetail({
 }
 
 export function Projects() {
-  const [selected, setSelected] = useState<Project | null>(null);
-  const closeDetail = useCallback(() => setSelected(null), []);
-  // The scrim's mid-morph blur toggle, driven by writing the attribute
-  // directly rather than through React state.
-  //
-  // This MUST NOT re-render. `onLayoutAnimationStart` fires on the first
-  // frame of the morph, so a state update here would re-render `Projects`
-  // and with it all four tiles — every one a `motion.button` carrying a
-  // `layoutId`. Re-rendering a `layoutId` node makes Motion re-measure it
-  // and re-evaluate the shared-layout lead/follower stack, and doing that
-  // mid-flight re-promotes the tile: the morph snaps back to the tile while
-  // the sheet sits there still mounted. (That is exactly what a `useState`
-  // version of this did.) The per-component `settled` state below is fine
-  // precisely because it only ever re-renders its own element.
+  // The clicked tile's box is captured with the project, because the sheet's
+  // zoom is anchored to wherever that tile was at the moment of the click.
+  const [opened, setOpened] = useState<{ project: Project; origin: DOMRect } | null>(null);
+  const compact = useCompact();
+
+  // The scrim's blur, toggled by writing the attribute rather than through
+  // React state — a state update here would re-render the whole grid in the
+  // middle of the sheet's animation for a purely decorative effect.
   const backdropRef = useRef<HTMLDivElement>(null);
-  const setMorphing = useCallback((morphing: boolean) => {
-    backdropRef.current?.setAttribute("data-settled", morphing ? "false" : "true");
+  const setScrimBlur = useCallback((on: boolean) => {
+    backdropRef.current?.setAttribute("data-settled", on ? "true" : "false");
   }, []);
-  // Resolved once here rather than per-tile, so the tiles and the sheet can
-  // never disagree about whether a shared-layout morph is running.
-  const morph = !useCompact();
+
+  const openDetail = useCallback((project: Project, origin: DOMRect) => {
+    setOpened({ project, origin });
+  }, []);
+
+  const closeDetail = useCallback(() => {
+    // Drop the blur before the sheet starts moving again, for the same reason
+    // it's off during the open: a full-viewport backdrop-filter re-samples
+    // every frame that anything repaints on top of it, which is the single
+    // most expensive thing in this transition.
+    setScrimBlur(false);
+    setOpened(null);
+  }, [setScrimBlur]);
+
+  const onSettled = useCallback(() => setScrimBlur(true), [setScrimBlur]);
 
   return (
     <section
@@ -626,9 +675,7 @@ export function Projects() {
               key={project.slug}
               project={project}
               index={index}
-              onOpen={setSelected}
-              morph={morph}
-              onMorphChange={setMorphing}
+              onOpen={openDetail}
             />
           ))}
         </div>
@@ -658,49 +705,42 @@ export function Projects() {
         each one registers on mount, and one incomplete entry holds back the
         whole removal). The scrim was one of those, with a 0.28s fade.
 
-        So dismissing the sheet meant: Motion instantly handed the shared
-        `layoutId` lead back to the tile, which correctly flew home, while
-        the sheet — which has no `exit` of its own on the morph path, and so
-        nothing to animate — sat frozen at full opacity on a z-index:100
-        fixed layer for the scrim's 0.28s, then blinked out. That read as
-        three separate events instead of one movement.
-
-        Split apart, the sheet's presence has only itself to wait on and it
-        leaves as soon as it is dismissed, so the tile's reverse morph *is*
-        the close animation, mirroring the open, with the scrim fading over
-        the top of it on its own clock.
+        Keeping them together meant the scrim's 0.28s fade held the dismissed
+        sheet on screen for its whole duration, long after the sheet itself
+        had finished. Apart, each leaves on its own clock and the sheet's
+        close is only ever as long as the sheet's own animation.
 
         (The tab panel's nested AnimatePresence is not a third gate: nested
         AnimatePresences default to `propagate: false`, so its children
         register against it rather than against this one.)
       */}
       <AnimatePresence>
-        {selected && (
+        {opened && (
           <motion.div
             ref={backdropRef}
             className="project-modal-backdrop"
-            // Initial value only; `setMorphing` owns it imperatively from
-            // here on. With no morph there's no layout animation and so no
-            // callback coming — start settled, same as the sheet does.
-            data-settled={!morph}
+            // Initial value only — `setScrimBlur` owns it from here on. The
+            // blur starts off and fades in once the sheet has landed.
+            data-settled="false"
             onClick={closeDetail}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.28, ease: "easeOut" }}
+            transition={{ duration: 0.24, ease: "easeOut" }}
             aria-hidden="true"
           />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {selected && (
+        {opened && (
           <ProjectDetail
-            key={selected.slug}
-            project={selected}
+            key={opened.project.slug}
+            project={opened.project}
+            origin={opened.origin}
             onClose={closeDetail}
-            morph={morph}
-            onMorphChange={setMorphing}
+            compact={compact}
+            onSettled={onSettled}
           />
         )}
       </AnimatePresence>
