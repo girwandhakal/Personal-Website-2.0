@@ -662,11 +662,6 @@ export function Projects() {
               Projects
             </h2>
           </Reveal>
-          <Reveal delay={0.06}>
-            <p className="text-base md:text-lg text-ink-muted max-w-xl">
-              Tap a project to open the full build — the problem, the decisions, and what shipped.
-            </p>
-          </Reveal>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
