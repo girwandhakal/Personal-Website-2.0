@@ -42,13 +42,13 @@ export const projects: Project[] = [
       { label: "Standing infra cost", value: "~$0" }
     ],
     context:
-      "A portfolio is a one-way pitch: recruiters skim a list of bullet points and leave without ever asking the follow-up question they actually have. I wanted this site to answer back — to let a visitor ask \"has he shipped anything with LangGraph?\" and get a real, grounded answer instead of another paragraph they have to Ctrl+F through.",
+      "Nobody reads a portfolio top to bottom. They skim, half-form a question like \"has he shipped anything with LangGraph?\", and leave without asking it. I wanted the site to be able to take that question.",
     approach:
-      "The first draft did what you'd expect: dump my whole profile and project files into the system prompt. That worked until the prompt got expensive and started drifting off-topic. I planned a full RAG rebuild on Supabase/pgvector, but for a knowledge base this small — about a hundred chunks — a vector database was solving a scale problem I didn't have. I replaced it with a two-stage pipeline instead: a fast Groq call classifies the question into a category plus extracted tools/projects, then a scored SQL search over a Prisma/SQLite `KnowledgeChunk` table ranks chunks by tag, alias, and keyword overlap. The harder half was the wrapper around it: a five-layer defense-in-depth pipeline (fingerprint/IP ban check, a Python microservice doing PII and secret detection with Presidio, a rate limiter, an injection-pattern filter, and a strict server-only system prompt) sits in front of the model, and every message that does get logged is AES-256-GCM encrypted with a key generated client-side and held only in the visitor's session — so even I can't read raw transcripts off the database.",
+      "The first version stuffed my whole profile into the system prompt. It worked, then it got expensive and started wandering off topic. I planned a proper RAG rebuild on Supabase and pgvector before I counted the knowledge base: about a hundred chunks. Embeddings would have been overkill. What shipped instead is a fast Groq call that classifies the question and pulls out any tools or projects it names, then a scored SQL query over a Prisma/SQLite table that ranks chunks on tag, alias, and keyword overlap. Most of the work went into the wrapper. Five layers sit in front of the model: a ban check on fingerprint and IP, a Python service running Presidio for PII and secrets, a rate limiter, an injection filter, and a server-only system prompt. Anything logged is encrypted AES-256-GCM with a key that never leaves the visitor's session, so I can't read transcripts off my own database either.",
     outcome:
-      "It's live on this site right now — try it from any project card. Visitors get an iMessage-style thread that answers from grounded context instead of hallucinating, abusive or injected input gets caught before it ever reaches the model, and the whole thing runs on SQLite with no vector database or standing server cost.",
+      "It's live on this page. Ask it something from any project card and you get an iMessage-style thread answering from my notes instead of inventing things. Injected or abusive input gets caught before the model sees it. No vector database, no standing server cost.",
     learnings:
-      "The lesson that stuck: reach for the complex tool once you've measured that the simple one actually falls over, not before. Classification-plus-keyword-scoring matched the relevance I was getting from the pgvector plan, at a fraction of the moving parts and cost — the embeddings would have been solving a problem I only had on paper."
+      "I almost built the pgvector version because it sounded like the right answer. Keyword scoring over a hundred chunks matched it on relevance for a fraction of the moving parts. Now I make the simple version fail before I reach past it."
   },
   {
     slug: "clearpath",
@@ -68,13 +68,13 @@ export const projects: Project[] = [
       { label: "Core question answered", value: "Cheapest route through a bill" }
     ],
     context:
-      "A medical bill and its Explanation of Benefits rarely agree, and almost nobody reads either one closely enough to notice. Patients end up either overpaying a provider directly or missing coverage they were already entitled to — and by the time they'd want to fix it, the bill's already been paid.",
+      "A medical bill and its Explanation of Benefits almost never line up, and almost nobody checks. You overpay the provider, or you miss coverage you already had, and either way you find out after the money is gone.",
     approach:
-      "ClearPath reconciles the bill against the EOB line-by-line, then layers in a patient's real financial picture through the Plaid SDK so a recommendation isn't just \"here's what's owed\" but \"here's what you can actually afford to pay and when.\" That meant building out 20+ REST-style API routes in Next.js on top of Prisma/SQLite — one set for parsing and reconciling claims and insurance data, another for cash-flow analysis and cost estimation, and an OpenAI-backed layer that turns the reconciled numbers into a plain-language scenario a patient can actually act on.",
+      "ClearPath matches the bill to the EOB line by line, then pulls the patient's account data through Plaid so the advice isn't limited to what's owed. It can say what they can pay, and when. That came out to 20+ API routes on Next.js and Prisma: one group parsing and reconciling claims and insurance data, one running cash-flow analysis and cost estimates, and an OpenAI layer that turns the reconciled numbers into something a patient can read once and act on.",
     outcome:
-      "The result is a tool where a patient can see, before paying anything, which payment path costs them the least — split the balance, ask about a hardship plan, or pay in full — instead of guessing from a confusing paper statement.",
+      "Before paying anything, a patient can compare the routes open to them. Split the balance, ask about a hardship plan, or pay in full, with the cost of each spelled out instead of guessed at from a paper statement.",
     learnings:
-      "Reconciliation is where all the real complexity lives, not the AI layer on top of it. Billing and EOB data formats are inconsistent enough between providers that the unglamorous work — normalizing and matching line items correctly — mattered more to the end result than the model generating the final recommendation."
+      "I expected the AI layer to be the hard part. It wasn't close. Every provider formats bills differently, and getting line items to match correctly is where the project lived. The model was the last ten percent."
   },
   {
     slug: "southern-company-fleet-analytics",
@@ -94,13 +94,13 @@ export const projects: Project[] = [
       { label: "Assistant grounding", value: "Live telemetry" }
     ],
     context:
-      "Southern Company's network infrastructure fleet — thousands of devices spread across a service territory — ages unevenly, and lifecycle planning was happening without a clear, visual read on which devices were actually at risk of failing soonest.",
+      "Southern Company runs thousands of network devices across its service territory, and they don't age at the same rate. Lifecycle planning was happening off spreadsheets, with no clear read on which devices were closest to failing.",
     approach:
-      "In hackathon time, that meant picking the smallest system that still felt real: a Streamlit app in front of a scikit-learn predictive risk model trained on fleet data, a 3D geographic map (Plotly) plotting 1,000+ devices by location and risk score, and a GPT-4o assistant wired directly into the live telemetry rather than a static document — so asking it about a specific device returns an answer grounded in that device's actual numbers.",
+      "Hackathon scope, so we built the smallest version that still worked end to end. A scikit-learn model scores failure risk from fleet data, a Plotly map plots 1,000+ devices in 3D by location and score, and a GPT-4o assistant reads from the same live telemetry feeding the map. Ask it about one device and it answers from that device's numbers.",
     outcome:
-      "The platform placed 2nd at the UA Innovate Hackathon, turning what had been a spreadsheet-shaped lifecycle question into something a planner could point at a map and immediately see.",
+      "It took 2nd at UA Innovate. A lifecycle question that had lived in spreadsheets became a map a planner could point at.",
     learnings:
-      "Under a hard deadline, grounding the assistant in the same live data driving the map was worth more than any extra feature — it's the difference between a chatbot that answers questions about the fleet and one that just answers questions in general."
+      "Wiring the assistant into the same live data as the map was worth more than the features we cut to do it. An assistant that can quote the device in front of you gets used. One reading off a static document gets ignored."
   },
   {
     slug: "speech-act-analysis",
@@ -120,12 +120,12 @@ export const projects: Project[] = [
       { label: "Status", value: "Submitted for peer review" }
     ],
     context:
-      "The research question was about childhood language development, but the honest first obstacle was the data itself: 60,000+ child utterances pulled from multiple longitudinal speech corpora, each with its own transcription conventions and noise, that had to be cleaned and modeled before any linguistic question could be asked of it.",
+      "The paper was about how children's language develops. The first obstacle was the data. 60,000+ child utterances pulled from several longitudinal corpora, each with its own transcription conventions and its own noise, none of it ready to model.",
     approach:
-      "I built the computational pipeline that cleans and models that dataset, and separately fine-tuned Google's FLAN-T5 on 90K utterances to improve transcription quality. Partway through, results looked too good — classification reports that clean are usually a sign something's leaking, not a sign the model is great. I audited the train/test splits and found exactly that: overlap between corpora sources meant the model had effectively seen its own test set. I rebuilt the evaluation sets to enforce a clean held-out split before trusting any number again.",
+      "I built the pipeline that cleans and models that dataset, and fine-tuned Google's FLAN-T5 on 90K utterances to improve transcription quality. Partway through, the numbers got suspiciously good. Classification reports that tidy usually mean something is leaking. I went back through the train/test splits and found overlap between corpus sources: the model had already seen its own test set. I rebuilt the evaluation sets around a clean held-out split before trusting another number.",
     outcome:
-      "The corrected pipeline produced results that actually hold up under a real held-out split, the FLAN-T5 fine-tune cut word error rate from 17.2 to 14.4, and the resulting paper — my first as lead author — is now submitted for peer review.",
+      "The corrected pipeline produces results that survive a real held-out split, the FLAN-T5 fine-tune cut word error rate from 17.2 to 14.4, and the paper is under peer review with my name first on it.",
     learnings:
-      "A model that looks unusually good is a bug report, not a result. The leakage audit was the single highest-leverage thing I did on this project — it's cheap to run and it's the difference between a number you can publish and one you can't."
+      "Good numbers deserve suspicion before celebration. The leakage audit cost an afternoon and decided whether any of the results were worth publishing."
   }
 ];
