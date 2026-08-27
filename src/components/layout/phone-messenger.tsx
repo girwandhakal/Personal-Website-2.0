@@ -89,7 +89,6 @@ export function PhoneMessenger() {
   const [showNotification, setShowNotification] = useState(true);
   const [dynamicSuggestions, setDynamicSuggestions] = useState<string[]>([]);
   const [isFocused, setIsFocused] = useState(false);
-  const [isDockHovered, setIsDockHovered] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
   const phoneFrameRef = useRef<HTMLDivElement>(null);
@@ -386,7 +385,7 @@ export function PhoneMessenger() {
 
       {/* Docked Button Container (Fixed Bottom Right) */}
       <div
-        className="phone-dock-root hidden md:flex flex-col items-end gap-3"
+        className="phone-dock-root hidden md:flex flex-col items-end"
         style={{
           position: "fixed",
           right: "24px",
@@ -396,46 +395,30 @@ export function PhoneMessenger() {
           pointerEvents: isOpen ? "none" : "auto",
         }}
       >
-        {/* Discoverability nudge: shown on first load alongside the bounce
-            and notification dot, then again on hover for repeat visitors —
-            rather than a permanent label competing with the page. */}
-        <AnimatePresence>
-          {!isOpen && (showNotification || isDockHovered) && (
-            <motion.div
-              key="dock-label"
-              className="phone-dock-label"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              transition={{ duration: 0.25, delay: showNotification ? 0.6 : 0, ease: [0.16, 1, 0.3, 1] }}
-            >
-              Chat with my AI twin
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         <AnimatePresence>
           {!isOpen && (
             <motion.button
               key="docked"
               onClick={() => { setIsOpen(true); setShowNotification(false); }}
-              onMouseEnter={() => setIsDockHovered(true)}
-              onMouseLeave={() => setIsDockHovered(false)}
-              onFocus={() => setIsDockHovered(true)}
-              onBlur={() => setIsDockHovered(false)}
               initial={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={prefersReducedMotion ? undefined : { scale: 0.85, opacity: 0, y: 30, transition: { duration: 0.2 } }}
               whileHover={prefersReducedMotion ? undefined : { y: -4, scale: 1.02, transition: { duration: 0.2 } }}
               whileTap={{ scale: 0.96 }}
               aria-label="Open chat messenger"
-              className="phone-dock-glass"
               style={{
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 cursor: "pointer",
                 outline: "none",
+                // The button is nothing but a hit target now: no pedestal, no
+                // padding, no chrome of its own, so what shows is the phone
+                // and its own drop shadow and nothing else. Stated explicitly
+                // rather than left to the UA's default button styling.
+                background: "transparent",
+                border: "none",
+                padding: 0,
               }}
             >
               {/* Inner motion div to handle the infinite bounce independently of exit animations */}
@@ -448,14 +431,16 @@ export function PhoneMessenger() {
                   borderRadius: "24px",
                   background: "linear-gradient(160deg, #1e293b 0%, #000000 100%)",
                   border: "3px solid #2a2a2e",
-                boxShadow: showNotification 
-                  ? "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5), 0 0 28px rgba(10, 132, 255, 0.35)"
-                  : "0 20px 40px rgba(0,0,0,0.6), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5)",
+                // Just the bezel's own surface detail — a top highlight and
+                // an edge line, both inset. No outer drop shadow and no
+                // notification glow: those cast outward from the phone, and
+                // the ask was a clean device image, not one sitting in a
+                // pool of shadow.
+                boxShadow: "inset 0 1px 1px rgba(255,255,255,0.15), inset 0 0 0 1px rgba(0,0,0,0.5)",
                 position: "relative",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                transition: "box-shadow 0.8s ease-in-out",
               }}>
                 {/* Dynamic Island */}
                 <div style={{
@@ -878,34 +863,6 @@ export function PhoneMessenger() {
       {/* Embedded Styles */}
       <style jsx global>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-        /* A frosted pedestal for the docked phone, built from the same glass
-           tokens as the nav — so it reads as this site's chrome cradling a
-           (deliberately dark-bezeled, realistic) phone, not a foreign
-           widget dropped on the page. */
-        .phone-dock-glass {
-          padding: 14px 14px 10px;
-          border-radius: var(--radius-lg, 26px);
-          border: 1px solid var(--glass-border);
-          background: var(--glass-bg-strong);
-          backdrop-filter: var(--glass-blur);
-          -webkit-backdrop-filter: var(--glass-blur);
-          box-shadow: var(--glass-shadow);
-        }
-
-        .phone-dock-label {
-          padding: 8px 16px;
-          border-radius: var(--radius-pill, 999px);
-          border: 1px solid var(--glass-border);
-          background: var(--glass-bg-strong);
-          backdrop-filter: var(--glass-blur);
-          -webkit-backdrop-filter: var(--glass-blur);
-          box-shadow: var(--glass-shadow);
-          color: var(--ink);
-          font-size: 13px;
-          font-weight: 600;
-          white-space: nowrap;
-        }
 
         .ios-typing-dot {
           width: 7px;
