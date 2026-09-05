@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { Volume2, VolumeX } from "lucide-react";
 import { signalIntroReveal } from "@/lib/intro-reveal";
 
 /**
@@ -21,7 +22,10 @@ import { signalIntroReveal } from "@/lib/intro-reveal";
  *   the server and client markup identical (branching markup on a client-only
  *   preference is a hydration mismatch), and it lets reduced-motion and Save-Data
  *   opt out cleanly — both simply leave the poster frame showing.
- * - The audio track is stripped from the encodes rather than just muted.
+ * - The film carries its own audio, but browsers refuse to autoplay sound without a
+ *   prior gesture. So it asks for sound first and falls back to muted the moment
+ *   that's refused — the film always plays either way — and offers a toggle, since
+ *   the tap on it is itself the gesture that makes sound allowed.
  * - Playback pauses when the film scrolls out of view, so it isn't decoding frames
  *   behind the rest of the page.
  */
@@ -76,6 +80,9 @@ export function CinemaIntro() {
   const introRef = useRef<HTMLElement>(null);
   const cancelTravelRef = useRef<(() => void) | null>(null);
   const travelledRef = useRef(false);
+  const [soundOn, setSoundOn] = useState(false);
+  // Only offer the control while the film is actually running with audio to control.
+  const [filmRunning, setFilmRunning] = useState(false);
 
   // Scrim only ramps up as the hero slides over the film — zero across the intro.
   const { scrollYProgress } = useScroll({ target: introRef, offset: ["start start", "end start"] });
@@ -93,6 +100,11 @@ export function CinemaIntro() {
   }, [reduced]);
 
   // Start playback, unless the visitor has opted out of motion or is saving data.
+  //
+  // Sound is asked for first: a visitor the browser already trusts (enough media
+  // engagement, or a prior gesture this session) gets the film as it was cut. Where
+  // that's refused — the common case on a cold visit — it falls back to muted so the
+  // film still plays, and the toggle becomes the way in.
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -101,9 +113,41 @@ export function CinemaIntro() {
       video.pause(); // the poster frame stands in
       return;
     }
-    video.muted = true; // belt and braces: React may not reflect this into the markup
-    attemptPlay(video);
+
+    let cancelled = false;
+    video.muted = false;
+    const withSound = video.play() as Promise<void> | undefined;
+
+    if (withSound && typeof withSound.then === "function") {
+      withSound.then(() => {
+        if (cancelled) return;
+        setSoundOn(true);
+        setFilmRunning(true);
+      }).catch(() => {
+        if (cancelled) return;
+        video.muted = true; // React may not reflect this into markup, so set it here
+        setSoundOn(false);
+        setFilmRunning(true);
+        attemptPlay(video);
+      });
+    } else {
+      // No promise to inspect (older browsers): assume only muted autoplay is allowed.
+      video.muted = true;
+      setSoundOn(false);
+      setFilmRunning(true);
+      attemptPlay(video);
+    }
+
+    return () => { cancelled = true; };
   }, [reduced]);
+
+  const toggleSound = useCallback(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = !video.muted;
+    setSoundOn(!video.muted);
+    if (video.paused && !video.ended) attemptPlay(video);
+  }, []);
 
   // Travel when the film finishes, not on a wall clock, so the two stay in step even
   // if playback starts late. Never fires if the film isn't running at all.
@@ -112,6 +156,7 @@ export function CinemaIntro() {
     if (!video || reduced) return;
 
     const onEnded = () => {
+      setFilmRunning(false); // nothing left to hear; retire the sound control
       if (travelledRef.current) return;
       goToHero();
     };
@@ -121,7 +166,11 @@ export function CinemaIntro() {
       if (travelledRef.current || !video.duration) return;
       if (video.currentTime >= video.duration - 0.15) goToHero();
     };
-    const stop = () => {
+    const stop = (event: Event) => {
+      const target = event.target;
+      // Reaching for the film's own sound control isn't taking over the page — it
+      // shouldn't cancel the pending travel or bring the rest of the page in early.
+      if (target instanceof Element && target.closest(".intro-sound")) return;
       travelledRef.current = true; // visitor took over
       signalIntroReveal(); // they're on their way down; let the rest come in
       cancelTravelRef.current?.();
@@ -189,6 +238,20 @@ export function CinemaIntro() {
       </div>
 
       <section ref={introRef} className="intro-section" aria-label="Introduction">
+        {filmRunning && <motion.button
+          type="button"
+          className="intro-sound"
+          onClick={toggleSound}
+          aria-pressed={soundOn}
+          aria-label={soundOn ? "Mute the intro film" : "Play the intro film's sound"}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, delay: 1.2, ease: "easeOut" }}
+        >
+          {soundOn ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
+          <span>{soundOn ? "Sound on" : "Sound off"}</span>
+        </motion.button>}
+
         <motion.button
           type="button"
           className="intro-cue"
