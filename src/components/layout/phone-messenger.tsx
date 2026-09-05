@@ -5,7 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowUp, MessageSquare, X } from "lucide-react";
 import { checkAndRedactSensitiveInfo, checkProfanity } from "@/lib/safety";
 import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
-import { useIntroRevealed } from "@/lib/intro-reveal";
+import { useIntroOnScreen } from "@/lib/intro-reveal";
 
 interface Message {
   sender: "user" | "assistant" | "system";
@@ -94,9 +94,10 @@ function visibleUpToTag(text: string, tag: string): string {
 
 export function PhoneMessenger() {
   const [isOpen, setIsOpen] = useState(false);
-  // The opening film gets the first screen to itself; the launcher joins once the
-  // film has ended or the visitor has scrolled on.
-  const introRevealed = useIntroRevealed();
+  // The opening film gets the screen to itself: the launcher stays away while the
+  // film is showing and steps back out of the way if the visitor scrolls up to it
+  // again, rather than only being withheld on the first pass.
+  const filmOnScreen = useIntroOnScreen();
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "assistant",
@@ -445,7 +446,7 @@ export function PhoneMessenger() {
     {/* Not rendered at all until the intro hands off, rather than hidden with CSS:
         an invisible button over the film would still be tabbable and clickable. */}
     <AnimatePresence>
-      {introRevealed && <motion.button
+      {!filmOnScreen && <motion.button
         ref={launchRef}
         type="button"
         className="chat-launcher"
