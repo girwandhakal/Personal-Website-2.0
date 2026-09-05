@@ -39,3 +39,6 @@ htmlcov/
 
 .agents/
 .gemini/
+.agent/
+.impeccable/
+.codex/
