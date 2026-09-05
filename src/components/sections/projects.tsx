@@ -7,20 +7,22 @@ import { ArrowUpRight, X } from "lucide-react";
 import { GithubIcon } from "@/components/ui/social-icons";
 import { projects, type Project } from "@/content/projects";
 import { Reveal } from "@/components/motion/reveal";
+import { ProjectArt } from "@/components/ui/project-art";
+import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 
 /**
  * Every fill clears 4.5:1 against the white label text it sits behind, same
  * rule the rest of the site follows — see globals.css's palette comment.
  */
 const ACCENT_FILLS = {
-  orange: "var(--navy)",
-  crimson: "var(--rose)",
-  white: "var(--blue)"
+  orange: "var(--accent)",
+  crimson: "var(--accent)",
+  white: "var(--accent)"
 } as const;
 
 /** Bento span pattern: wide/narrow/narrow/wide, repeating — an asymmetric
  * grid reads far less like a list than a uniform one does. */
-const SPAN_PATTERN = ["md:col-span-7", "md:col-span-5", "md:col-span-5", "md:col-span-7"];
+
 
 /** The desktop sheet's zoom, anchored to the tile that was clicked.
  *
@@ -159,78 +161,24 @@ function SummaryWithChatLink({ text, accentClass }: { text: string; accentClass:
   );
 }
 
-function ProjectTile({
-  project,
-  index,
-  onOpen
-}: {
-  project: Project;
-  index: number;
-  onOpen: (project: Project, origin: DOMRect) => void;
+const shortTitles: Record<string, string> = {
+  "ai-persona-chatbot": "AI Persona",
+  "clearpath": "ClearPath",
+  "speech-act-analysis": "Speech research",
+  "southern-company-fleet-analytics": "Fleet analytics"
+};
+
+function ProjectTile({ project, index, onOpen }: {
+  project: Project; index: number; onOpen: (project: Project, origin: DOMRect) => void;
 }) {
-  const accent = ACCENT_FILLS[project.accent];
-  const prefersReducedMotion = useReducedMotion();
   const ref = useRef<HTMLButtonElement>(null);
-
-  return (
-    <motion.button
-      ref={ref}
-      type="button"
-      // The sheet zooms out of wherever this tile happens to be, so hand its
-      // box over at click time. One `getBoundingClientRect` per open — the
-      // whole reason this is cheaper than the shared-layout morph it
-      // replaced, which re-measured every tile on every frame.
-      onClick={() => {
-        const origin = ref.current?.getBoundingClientRect();
-        if (origin) onOpen(project, origin);
-      }}
-      style={{ "--tile-accent": accent } as React.CSSProperties}
-      className={`project-tile ${SPAN_PATTERN[index % SPAN_PATTERN.length]}`}
-      initial={prefersReducedMotion ? false : { opacity: 0, y: 28 }}
-      whileInView={prefersReducedMotion ? undefined : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{
-        duration: 0.6,
-        delay: (index % SPAN_PATTERN.length) * 0.08,
-        ease: [0.16, 1, 0.3, 1]
-      }}
-    >
-      <div className="relative z-10 flex flex-col h-full gap-5 text-left">
-        <div className="flex items-start justify-between gap-4">
-          <span
-            className="inline-flex items-center justify-center w-9 h-9 rounded-full text-xs font-semibold shrink-0"
-            style={{ background: "var(--tile-accent)", color: "#fff" }}
-            aria-hidden="true"
-          >
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <span className="project-tile-open">
-            <ArrowUpRight size={18} aria-hidden="true" />
-          </span>
-        </div>
-
-        <div className="flex flex-col gap-2.5">
-          <h3 className="text-2xl md:text-3xl font-medium tracking-tighter leading-[1.05] text-ink">
-            {project.title}
-          </h3>
-          <p className="text-sm md:text-base text-ink-muted leading-relaxed line-clamp-3">
-            {project.summary}
-          </p>
-        </div>
-
-        <div className="mt-auto flex flex-wrap gap-1.5 pt-1">
-          {project.tech.slice(0, 3).map((t) => (
-            <span key={t} className="project-tile-chip">
-              {t}
-            </span>
-          ))}
-          {project.tech.length > 3 && (
-            <span className="project-tile-chip project-tile-chip--muted">+{project.tech.length - 3}</span>
-          )}
-        </div>
-      </div>
-    </motion.button>
-  );
+  return <button ref={ref} type="button" className="project-tile" aria-label={`Open ${project.title}`} onClick={() => {
+    const origin = ref.current?.getBoundingClientRect();
+    if (origin) onOpen(project, origin);
+  }}>
+    <span className="project-tile-heading"><span>{shortTitles[project.slug] ?? project.title}</span><ArrowUpRight size={19} aria-hidden="true" /></span>
+    <ProjectArt kind={project.slug} />
+  </button>;
 }
 
 function ProjectDetail({
@@ -304,13 +252,15 @@ function ProjectDetail({
     const isInsideScrollPane = (node: EventTarget | null) =>
       node instanceof Node && (scrollPane()?.contains(node) ?? false);
 
+    // Not just this sheet's own pane: the "try it here" link below can open the AI
+    // chat without closing this sheet, and its scroll region needs to keep working.
     const onWheel = (e: WheelEvent) => {
-      if (!isInsideScrollPane(e.target)) e.preventDefault();
+      if (!isInsideScrollPane(e.target) && !isInsideOverlayScrollRegion(e.target)) e.preventDefault();
     };
     window.addEventListener("wheel", onWheel, { passive: false });
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isInsideScrollPane(e.target)) e.preventDefault();
+      if (!isInsideScrollPane(e.target) && !isInsideOverlayScrollRegion(e.target)) e.preventDefault();
     };
     window.addEventListener("touchmove", onTouchMove, { passive: false });
 
@@ -324,13 +274,24 @@ function ProjectDetail({
     // `preventScroll` stops the browser from scrolling any ancestor to bring
     // the (already fully on-screen, fixed-position) close button into view —
     // without it that scroll-into-view could itself move the real page.
+    const previousFocus = document.activeElement as HTMLElement | null;
     const focusFrame = requestAnimationFrame(() => {
       closeRef.current?.focus({ preventScroll: true });
     });
 
     const SCROLL_KEYS = new Set(["ArrowUp", "ArrowDown", "PageUp", "PageDown", "Home", "End", " "]);
     const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Tab") {
+        const nodes = Array.from(sheetRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]):not([tabindex="-1"]), a[href], [tabindex="0"]') ?? []);
+        const first = nodes[0], last = nodes[nodes.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+        if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+      }
       if (e.key === "Escape") {
+        // The AI chat can be open on top of this sheet (see the "try it here" link
+        // below) with its own Escape handler; if it's open, let Escape close that
+        // first instead of closing both at once.
+        if (document.querySelector(".chat-panel")) return;
         onClose();
         return;
       }
@@ -345,6 +306,7 @@ function ProjectDetail({
 
     return () => {
       cancelAnimationFrame(focusFrame);
+      previousFocus?.focus({ preventScroll: true });
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("wheel", onWheel);
       window.removeEventListener("touchmove", onTouchMove);
@@ -558,7 +520,15 @@ function ProjectDetail({
             </p>
           </header>
 
-          <div role="tablist" aria-label={`${project.title} details`} className="project-tabs mt-6">
+          <div role="tablist" aria-label={`${project.title} details`} className="project-tabs mt-6" onKeyDown={(event) => {
+            const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
+            if (!keys.includes(event.key)) return;
+            event.preventDefault();
+            const index = TABS.findIndex(tab => tab.key === activeTab);
+            const next = event.key === "Home" ? 0 : event.key === "End" ? TABS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length;
+            setActiveTab(TABS[next].key);
+            document.getElementById(`${reactId}-tab-${TABS[next].key}`)?.focus();
+          }}>
             {TABS.map((tab) => (
               <ProjectTabButton
                 key={tab.key}
@@ -620,6 +590,16 @@ function ProjectDetail({
   );
 }
 
+// Featured display order (speech-act-analysis reads better ahead of the fleet-analytics
+// case study). Derived by slug rather than a hardcoded index reorder, so a project list
+// shorter than this can't crash on an undefined index, and any project not named here
+// still shows up — appended — rather than silently dropping out of the grid.
+const FEATURED_ORDER = ["ai-persona-chatbot", "clearpath", "speech-act-analysis", "southern-company-fleet-analytics"];
+const orderedProjects = FEATURED_ORDER
+  .map((slug) => projects.find((p) => p.slug === slug))
+  .filter((p): p is Project => Boolean(p))
+  .concat(projects.filter((p) => !FEATURED_ORDER.includes(p.slug)));
+
 export function Projects() {
   // The clicked tile's box is captured with the project, because the sheet's
   // zoom is anchored to wherever that tile was at the moment of the click.
@@ -651,21 +631,21 @@ export function Projects() {
 
   return (
     <section
-      className="section-band bg-[var(--surface)] border-t border-ink/15"
+      className="projects-section section-inner"
       id="projects"
       aria-labelledby="projects-title"
     >
-      <div className="section-inner flex flex-col gap-10">
-        <div className="flex flex-col items-center gap-4 text-center">
+      <div className="projects-content">
+        <div className="section-heading">
           <Reveal>
             <h2 className="text-ink" id="projects-title">
-              Projects
+              Selected work
             </h2>
           </Reveal>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
-          {projects.map((project, index) => (
+        <div className="project-grid">
+          {orderedProjects.map((project, index) => (
             <ProjectTile
               key={project.slug}
               project={project}
@@ -675,15 +655,15 @@ export function Projects() {
           ))}
         </div>
 
-        <div className="pt-6 flex flex-wrap justify-center gap-4 border-t border-ink/15">
+        <div className="projects-more">
           <Reveal>
             <a
               href="https://github.com/girwandhakal"
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex items-center gap-3 text-lg font-medium text-ink/75 hover:text-ink transition-all bg-ink/5 hover:bg-ink/10 px-8 py-4 rounded-full"
+              className="text-link"
             >
-              <span>View more projects on GitHub</span>
+              <span>More on GitHub</span>
               <GithubIcon aria-hidden="true" size={20} className="opacity-70 group-hover:opacity-100 transition-opacity" />
             </a>
           </Reveal>

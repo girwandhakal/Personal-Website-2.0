@@ -1,68 +1,15 @@
 "use client";
 
-import { Mail } from "lucide-react";
-
-import { Reveal } from "@/components/motion/reveal";
-import { ContactForm } from "@/components/sections/contact-form";
-import { GithubIcon, LinkedinIcon } from "@/components/ui/social-icons";
+import { ArrowUpRight } from "lucide-react";
+import { ContactForm } from "./contact-form";
 import { profile } from "@/content/profile";
 
-// The /assets/icons SVGs were stroked with a near-white hex, which disappears on
-// the light background. These render inline so they inherit `currentColor` and
-// flip to white on the accent hover fill — an <img> cannot do that.
-const SOCIAL_ICONS = { github: GithubIcon, linkedin: LinkedinIcon, mail: Mail } as const;
-
 export function Contact() {
-  const triggerChat = () => {
-    if (typeof window !== "undefined") {
-      window.dispatchEvent(new Event("open-ai-chat"));
-    }
-  };
-
-  return (
-    <section
-      className="contact-section section-band border-t border-ink/15"
-      id="contact"
-      aria-labelledby="contact-title"
-    >
-      <div className="section-inner flex flex-col items-center text-center gap-12">
-        <Reveal>
-          <h2 id="contact-title">Contact</h2>
-          
-          <div className="social-row flex justify-center gap-8 mt-10">
-            {profile.socials.map(({ label, href, icon }) => {
-              const Icon = SOCIAL_ICONS[icon as keyof typeof SOCIAL_ICONS] ?? Mail;
-              return (
-                <a key={label} href={href} aria-label={label}>
-                  <Icon aria-hidden="true" size={24} strokeWidth={2} />
-                </a>
-              );
-            })}
-          </div>
-
-          <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4 w-full max-w-xl mx-auto">
-            <p className="text-foreground/80 text-lg font-medium m-0">Need a response right away?</p>
-            
-            <button 
-              onClick={triggerChat}
-              className="group flex items-center gap-2 px-6 py-2.5 rounded-full text-foreground font-medium transition-all duration-300 border border-ink/10 bg-(--surface)/78 [backdrop-filter:blur(20px)_saturate(180%)] shadow-[inset_0_1px_0_rgba(255,255,255,0.85),inset_0_0_0_1px_rgba(255,255,255,0.4),0_10px_30px_-10px_rgba(24,48,89,0.25),0_2px_8px_rgba(24,48,89,0.08)] hover:-translate-y-0.5 hover:bg-(--ink) hover:text-(--surface) hover:border-(--ink) active:translate-y-0"
-              aria-label="Message AI Bot"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-bot transition-transform duration-300 group-hover:rotate-12 group-hover:scale-110">
-                <rect width="18" height="14" x="3" y="8" rx="2"/>
-                <path d="M12 5a3 3 0 1 0-3 3"/>
-                <line x1="9" x2="9" y1="13" y2="15"/>
-                <line x1="15" x2="15" y1="13" y2="15"/>
-              </svg>
-              Chat
-            </button>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.1} className="w-full max-w-xl mx-auto">
-          <ContactForm />
-        </Reveal>
-      </div>
-    </section>
-  );
+  return <section className="contact-section section-inner section-space" id="contact" aria-labelledby="contact-title">
+    <div className="contact-intro"><h2 id="contact-title">Let's talk.</h2>
+      <a className="contact-email text-link" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={22} aria-hidden="true" /></a>
+      <div className="contact-socials">{profile.socials.filter(s => s.icon !== "mail").map(s => <a className="text-link" key={s.label} href={s.href} target="_blank" rel="noopener noreferrer">{s.label}<ArrowUpRight size={16} aria-hidden="true" /></a>)}</div>
+    </div>
+    <ContactForm />
+  </section>;
 }

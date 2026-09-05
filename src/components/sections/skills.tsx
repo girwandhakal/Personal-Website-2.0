@@ -1,21 +1,9 @@
-import { Reveal } from "@/components/motion/reveal";
 import { profile } from "@/content/profile";
+import { SkillsSphere } from "./skills-sphere";
 
 export function Skills() {
-  return (
-    <section className="skills-section section-band border-t border-ink/15" id="skills" aria-labelledby="skills-title">
-      <div className="section-inner flex flex-col items-center text-center gap-12">
-        <Reveal>
-          <h2 id="skills-title">Skills &amp; Toolkit</h2>
-        </Reveal>
-        <Reveal className="skill-cloud justify-center max-w-4xl" delay={0.08}>
-          {profile.skills.map((skill, index) => (
-            <span key={skill} style={{ "--i": index } as React.CSSProperties}>
-              {skill}
-            </span>
-          ))}
-        </Reveal>
-      </div>
-    </section>
-  );
+  return <section className="skills-section section-inner section-space" id="skills" aria-labelledby="skills-title">
+    <h2 id="skills-title">Toolkit</h2>
+    <div className="toolkit-body"><SkillsSphere skills={profile.skills} /></div>
+  </section>;
 }

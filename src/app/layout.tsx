@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit } from "next/font/google";
+import { Manrope } from "next/font/google";
 
 import { siteMetadata } from "@/lib/metadata";
 import "@/styles/globals.css";
 
-const outfit = Outfit({
+const manrope = Manrope({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-primary"
@@ -13,13 +13,13 @@ const outfit = Outfit({
 export const metadata: Metadata = siteMetadata;
 
 export const viewport: Viewport = {
-  themeColor: "#f6f4f3",
-  colorScheme: "light"
+  themeColor: "#111416",
+  colorScheme: "dark"
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en" className={outfit.variable}>
+    <html lang="en" className={manrope.variable}>
       <body>{children}</body>
     </html>
   );
