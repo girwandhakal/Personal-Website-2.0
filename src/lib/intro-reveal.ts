@@ -22,6 +22,39 @@ export function signalIntroReveal() {
  * a deep link, a restored scroll position, or a page with no intro on it. Scrolling
  * counts too, so this can't get stuck if the film never reaches its end.
  */
+/**
+ * Whether the opening film currently owns the screen.
+ *
+ * Unlike the reveal above this is reversible — scrolling back up to the film hides
+ * whatever sits on top of it again. Coverage is measured against the viewport
+ * rather than using the element's own intersection ratio: the intro is exactly a
+ * screen tall, so its ratio barely moves until it has almost gone.
+ */
+export function useIntroOnScreen() {
+  // Assume the film has the screen until an observation says otherwise, so nothing
+  // flashes over it on the first paint.
+  const [onScreen, setOnScreen] = useState(true);
+
+  useEffect(() => {
+    const section = document.querySelector(".intro-section");
+    if (!section || typeof IntersectionObserver === "undefined") {
+      setOnScreen(false);
+      return;
+    }
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        const covered = entry.intersectionRect.height / Math.max(1, window.innerHeight);
+        setOnScreen(covered > 0.5);
+      },
+      { threshold: [0, 0.15, 0.3, 0.45, 0.5, 0.55, 0.7, 0.85, 1] }
+    );
+    io.observe(section);
+    return () => io.disconnect();
+  }, []);
+
+  return onScreen;
+}
+
 export function useIntroRevealed() {
   const [revealed, setRevealed] = useState(false);
 
