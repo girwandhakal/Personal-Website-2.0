@@ -40,6 +40,17 @@ function attemptPlay(video: HTMLVideoElement) {
   if (played && typeof played.catch === "function") played.catch(() => { /* blocked by policy */ });
 }
 
+/**
+ * The hero listens for this to run its entrance. It is broadcast when the film ends
+ * and when the visitor takes over, rather than leaving the hero to rely purely on a
+ * viewport threshold — on a short screen, or once dynamic viewport units shift under
+ * a mobile URL bar, that threshold is easy to never quite satisfy.
+ */
+export const HERO_REVEAL_EVENT = "hero:reveal";
+function signalHeroReveal() {
+  window.dispatchEvent(new Event(HERO_REVEAL_EVENT));
+}
+
 /** Eased programmatic scroll. Returns a cancel handle. */
 function travelTo(to: number, duration: number) {
   const root = document.documentElement;
@@ -84,6 +95,7 @@ export function CinemaIntro() {
     const hero = document.getElementById("hero");
     if (!hero) return;
     travelledRef.current = true;
+    signalHeroReveal();
     const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height"), 10) || 88;
     const target = hero.getBoundingClientRect().top + window.scrollY - navHeight - 8;
     cancelTravelRef.current?.();
@@ -121,6 +133,7 @@ export function CinemaIntro() {
     };
     const stop = () => {
       travelledRef.current = true; // visitor took over
+      signalHeroReveal(); // they're on their way down; let the hero come in
       cancelTravelRef.current?.();
       cancelTravelRef.current = null;
     };
@@ -162,20 +175,27 @@ export function CinemaIntro() {
 
   return (
     <>
+      {/* The backdrop box spans exactly the intro + hero and clips its contents; the
+          media inside is what pins to the viewport. Previously the pinned layer was
+          the box itself, held in place with a negative margin — that collapses its
+          margin box, so the release constraint never binds and it stayed stuck to the
+          viewport over the sections below. */}
       <div className="cinema-backdrop" aria-hidden="true">
-        <video
-          ref={videoRef}
-          className="cinema-video"
-          poster="/media/intro-poster.jpg"
-          muted
-          playsInline
-          preload="auto"
-          tabIndex={-1}
-        >
-          <source src="/media/intro.webm" type="video/webm" />
-          <source src="/media/intro.mp4" type="video/mp4" />
-        </video>
-        <motion.div className="cinema-scrim" style={{ opacity: scrimOpacity }} />
+        <div className="cinema-media">
+          <video
+            ref={videoRef}
+            className="cinema-video"
+            poster="/media/intro-poster.jpg"
+            muted
+            playsInline
+            preload="auto"
+            tabIndex={-1}
+          >
+            <source src="/media/intro.webm" type="video/webm" />
+            <source src="/media/intro.mp4" type="video/mp4" />
+          </video>
+          <motion.div className="cinema-scrim" style={{ opacity: scrimOpacity }} />
+        </div>
       </div>
 
       <section ref={introRef} className="intro-section" aria-label="Introduction">

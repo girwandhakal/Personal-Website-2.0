@@ -1,28 +1,50 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { profile } from "@/content/profile";
 import { AIPreview } from "./ai-preview";
+import { HERO_REVEAL_EVENT } from "./cinema-intro";
 
 /**
- * The hero sits below the intro film, so it is off screen while the film plays.
- * Its two halves animate in when they come into view — which happens either
- * because the film ended and the page travelled down on its own, or because the
- * visitor scrolled there first. Both paths land on the same reveal.
+ * The hero sits below the intro film, so it's off screen while the film plays and
+ * only animates in once it's been sent for.
+ *
+ * Two triggers, deliberately: the intro broadcasts when the film ends or when the
+ * visitor takes over, and an observer on the section itself covers arriving by any
+ * other route. Relying on the viewport threshold alone was fragile on mobile, where
+ * dynamic viewport units shift under the URL bar and the section can sit just shy of
+ * the threshold. If neither mechanism is available, it reveals immediately rather
+ * than risk staying invisible.
  */
 
-const RISE = {
-  initial: { opacity: 0, y: 26 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, amount: 0.35 }
-} as const;
-
 const EASE = [0.16, 1, 0.3, 1] as const;
+const HIDDEN = { opacity: 0, y: 26 };
+const SHOWN = { opacity: 1, y: 0 };
 
 export function Hero() {
-  return <section className="hero-section section-inner" id="hero" aria-labelledby="hero-title">
-    <motion.div className="hero-copy" {...RISE} transition={{ duration: 0.85, ease: EASE }}>
+  const sectionRef = useRef<HTMLElement>(null);
+  const [revealed, setRevealed] = useState(false);
+
+  useEffect(() => {
+    const reveal = () => setRevealed(true);
+    window.addEventListener(HERO_REVEAL_EVENT, reveal);
+
+    if (typeof IntersectionObserver === "undefined") {
+      reveal();
+      return () => window.removeEventListener(HERO_REVEAL_EVENT, reveal);
+    }
+    const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) reveal(); }, { threshold: 0.12 });
+    if (sectionRef.current) io.observe(sectionRef.current);
+    return () => {
+      window.removeEventListener(HERO_REVEAL_EVENT, reveal);
+      io.disconnect();
+    };
+  }, []);
+
+  return <section ref={sectionRef} className="hero-section section-inner" id="hero" aria-labelledby="hero-title">
+    <motion.div className="hero-copy" initial={HIDDEN} animate={revealed ? SHOWN : HIDDEN} transition={{ duration: 0.85, ease: EASE }}>
       <h1 id="hero-title"><span>Girwan</span><span>Dhakal</span></h1>
       <p className="hero-subtitle">ML Engineer &amp; Researcher</p>
       <div className="hero-actions">
@@ -30,7 +52,7 @@ export function Hero() {
         <a className="button button-secondary" href={profile.resumeHref} target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight size={20} aria-hidden="true" /></a>
       </div>
     </motion.div>
-    <motion.div className="hero-preview" {...RISE} transition={{ duration: 0.95, delay: 0.18, ease: EASE }}>
+    <motion.div className="hero-preview" initial={HIDDEN} animate={revealed ? SHOWN : HIDDEN} transition={{ duration: 0.95, delay: 0.18, ease: EASE }}>
       <AIPreview />
     </motion.div>
   </section>;

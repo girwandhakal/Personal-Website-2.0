@@ -9,6 +9,9 @@ const links = [{ label: "Work", href: "#projects" }, { label: "About", href: "#a
 export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
+  // Over the intro film the bar is transparent so the film fills the whole window;
+  // it only takes on a background once the page has scrolled off it.
+  const [scrolled, setScrolled] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
 
@@ -20,6 +23,7 @@ export function SiteNav() {
         if (section && section.getBoundingClientRect().top < 170) next = link.href;
       }
       setActive(next);
+      setScrolled(window.scrollY > 24);
     };
     window.addEventListener("scroll", update, { passive: true });
     update();
@@ -40,7 +44,7 @@ export function SiteNav() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  return <header className="site-nav-shell">
+  return <header className="site-nav-shell" data-scrolled={scrolled}>
     <a className="brand-lockup" href="#hero" aria-label="Girwan Dhakal home" onClick={() => setOpen(false)}>GD<span className="brand-dot" aria-hidden="true" /></a>
     <nav className="site-nav" aria-label="Primary navigation">
       {links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href ? "location" : undefined}>{link.label}</a>)}

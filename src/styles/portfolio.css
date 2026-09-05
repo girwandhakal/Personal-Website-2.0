@@ -68,7 +68,17 @@ input, textarea { caret-color: var(--accent); }
 .button-secondary:hover { background: #2b343d; border-color: #758698; }
 .icon-button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface-raised); }
 
-.site-nav-shell { height: var(--nav-height); width: 100%; display: flex; align-items: center; justify-content: space-between; padding-inline: max(56px, calc((100vw - 1480px) / 2)); position: sticky; top: 0; z-index: 50; background: var(--surface); }
+/* Transparent over the intro film so it fills the whole window; a soft top wash
+   keeps the links legible against a bright frame. Once scrolled off the film it
+   takes on a blurred bar. */
+.site-nav-shell { height: var(--nav-height); width: 100%; display: flex; align-items: center; justify-content: space-between; padding-inline: max(56px, calc((100vw - 1480px) / 2)); position: sticky; top: 0; z-index: 50; background: linear-gradient(to bottom, #0b0e1199, #0b0e1130 62%, transparent); transition: background .35s ease, backdrop-filter .35s ease; }
+.site-nav-shell[data-scrolled="true"] { background: #111416d9; -webkit-backdrop-filter: blur(16px) saturate(150%); }
+/* Guarded so the build's minifier keeps the unprefixed property: left as a plain
+   sibling declaration it collapsed to the -webkit- form only, which Chromium and
+   Safari alias but Firefox does not implement. */
+@supports (backdrop-filter: blur(1px)) {
+  .site-nav-shell[data-scrolled="true"] { backdrop-filter: blur(16px) saturate(150%); }
+}
 .brand-lockup { display: inline-flex; align-items: baseline; gap: 3px; font-size: 22px; font-weight: 600; letter-spacing: -.04em; padding-block: 12px; }
 .brand-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); transition: transform .35s var(--ease-out); }
 .brand-lockup:hover .brand-dot { transform: translateY(-5px); }
@@ -90,22 +100,20 @@ input, textarea { caret-color: var(--accent); }
    scrolls up over it. The film itself is ungraded — the only thing on top of it is a
    legibility scrim, and that is held at zero for the whole intro. */
 .cinema { position: relative; }
-/* The negative margin removes the pinned layer's own layout space so the sections
-   that follow start at the top of .cinema and ride over it. */
-.cinema-backdrop {
-  position: sticky; top: var(--nav-height); z-index: 0;
-  height: calc(100dvh - var(--nav-height));
-  margin-bottom: calc(-1 * (100dvh - var(--nav-height)));
-  overflow: hidden; pointer-events: none; background: var(--surface);
-}
+/* Absolute so the box ends exactly where .cinema does, and clipped so nothing can
+   paint over the sections below it. `clip` (not `hidden`) matters: it doesn't create
+   a scroll container, so the sticky child still pins against the viewport. */
+.cinema-backdrop { position: absolute; inset: 0; z-index: 0; overflow: clip; pointer-events: none; background: var(--surface); }
+/* The film fills the whole window, nav included — the nav goes transparent over it. */
+.cinema-media { position: sticky; top: 0; height: 100dvh; overflow: hidden; }
 .cinema-video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 42%; display: block; }
 /* Fades in only as the hero slides over the film, so white text keeps its contrast. */
 .cinema-scrim { position: absolute; inset: 0; background: linear-gradient(105deg, #0b0e11 0%, #0b0e11 44%, #0b0e11cc 76%, #0b0e11a1 100%); }
 
-.intro-section { position: relative; z-index: 1; min-height: calc(100dvh - var(--nav-height)); }
-.intro-cue { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: inline-flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 18px 4px; background: none; border: 0; color: #dfe6ee; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 1px 12px #0009; transition: color .25s; }
+.intro-section { position: relative; z-index: 1; min-height: 100dvh; margin-top: calc(-1 * var(--nav-height)); padding-top: var(--nav-height); }
+.intro-cue { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: inline-flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 18px 4px; background: none; border: 0; color: #fff; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 2px 16px #000c, 0 0 4px #0009; transition: color .25s; }
 .intro-cue:hover { color: #fff; }
-.intro-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, #dfe6eeaa); }
+.intro-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, #fff); box-shadow: 0 0 10px #0009; }
 
 .hero-preview { position: relative; z-index: 1; min-width: 0; }
 .ai-preview { perspective: 1500px; min-width: 0; padding: 15px 28px 0 18px; }
