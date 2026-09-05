@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowUp, MessageSquare, X } from "lucide-react";
 import { checkAndRedactSensitiveInfo, checkProfanity } from "@/lib/safety";
 import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
+import { useIntroRevealed } from "@/lib/intro-reveal";
 
 interface Message {
   sender: "user" | "assistant" | "system";
@@ -93,6 +94,9 @@ function visibleUpToTag(text: string, tag: string): string {
 
 export function PhoneMessenger() {
   const [isOpen, setIsOpen] = useState(false);
+  // The opening film gets the first screen to itself; the launcher joins once the
+  // film has ended or the visitor has scrolled on.
+  const introRevealed = useIntroRevealed();
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "assistant",
@@ -438,7 +442,22 @@ export function PhoneMessenger() {
   };
 
   return <>
-    <button ref={launchRef} type="button" className="chat-launcher" aria-label="Open AI chat" aria-expanded={isOpen} onClick={() => setIsOpen(true)}><MessageSquare size={18} aria-hidden="true" /><span>Ask my AI</span></button>
+    {/* Not rendered at all until the intro hands off, rather than hidden with CSS:
+        an invisible button over the film would still be tabbable and clickable. */}
+    <AnimatePresence>
+      {introRevealed && <motion.button
+        ref={launchRef}
+        type="button"
+        className="chat-launcher"
+        aria-label="Open AI chat"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(true)}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: .45, ease: [.16, 1, .3, 1] }}
+      ><MessageSquare size={18} aria-hidden="true" /><span>Ask my AI</span></motion.button>}
+    </AnimatePresence>
     <AnimatePresence>
       {isOpen && <>
         <motion.div className="chat-backdrop" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOpen(false)} />
