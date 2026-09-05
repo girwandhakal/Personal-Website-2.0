@@ -121,9 +121,17 @@ input, textarea { caret-color: var(--accent); }
 .cinema-scrim { position: absolute; inset: 0; background: linear-gradient(105deg, #0b0e11 0%, #0b0e11 44%, #0b0e11cc 76%, #0b0e11a1 100%); }
 
 .intro-section { position: relative; z-index: 1; min-height: 100dvh; margin-top: calc(-1 * var(--nav-height)); padding-top: var(--nav-height); }
-/* Sits opposite the chat launcher's eventual corner so the two never trade places. */
-.intro-sound { position: absolute; left: 24px; bottom: 26px; display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 8px 14px; border: 1px solid #ffffff3d; border-radius: 999px; background: #0b0e1159; -webkit-backdrop-filter: blur(10px); color: #fff; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; text-shadow: 0 1px 10px #000a; transition: background .25s, border-color .25s; }
-.intro-sound:hover { background: #0b0e1199; border-color: #ffffff7a; }
+/* Icon-only, sitting opposite the chat launcher's eventual corner so the two never
+   trade places. The wrapper only ever plays the one-time mount fade-in; the button
+   inside it owns the resting-dim / hover-prominent opacity on its own, so the two
+   animations can never fight over the same property. Rests dim so it doesn't
+   compete with the film, and comes to full strength on hover; on touch (no hover to
+   speak of) a tap drives that same prominent state via [data-active], then it's
+   faded back out again in JS a couple of seconds later. */
+.intro-sound-wrap { position: absolute; left: 24px; bottom: 26px; }
+.intro-sound { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffffff3d; border-radius: 999px; background: #0b0e1159; -webkit-backdrop-filter: blur(10px); color: #fff; opacity: .55; transition: opacity .3s ease, background .25s, border-color .25s; }
+.intro-sound svg { filter: drop-shadow(0 1px 6px #0009); }
+.intro-sound:hover, .intro-sound:focus-visible, .intro-sound[data-active="true"] { opacity: 1; background: #0b0e1199; border-color: #ffffff7a; }
 @supports (backdrop-filter: blur(1px)) {
   .intro-sound { backdrop-filter: blur(10px); }
 }

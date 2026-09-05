@@ -83,6 +83,11 @@ export function CinemaIntro() {
   const [soundOn, setSoundOn] = useState(false);
   // Only offer the control while the film is actually running with audio to control.
   const [filmRunning, setFilmRunning] = useState(false);
+  // The icon rests dim and comes to full strength on hover — but touch has no
+  // hover, so a tap drives the same "prominent" state directly, then lets it fade
+  // back out on its own after a couple of seconds rather than staying lit forever.
+  const [justTapped, setJustTapped] = useState(false);
+  const tapFadeRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Scrim only ramps up as the hero slides over the film — zero across the intro.
   const { scrollYProgress } = useScroll({ target: introRef, offset: ["start start", "end start"] });
@@ -147,7 +152,13 @@ export function CinemaIntro() {
     video.muted = !video.muted;
     setSoundOn(!video.muted);
     if (video.paused && !video.ended) attemptPlay(video);
+
+    setJustTapped(true);
+    if (tapFadeRef.current) clearTimeout(tapFadeRef.current);
+    tapFadeRef.current = setTimeout(() => setJustTapped(false), 1500);
   }, []);
+
+  useEffect(() => () => { if (tapFadeRef.current) clearTimeout(tapFadeRef.current); }, []);
 
   // Travel when the film finishes, not on a wall clock, so the two stay in step even
   // if playback starts late. Never fires if the film isn't running at all.
@@ -238,19 +249,28 @@ export function CinemaIntro() {
       </div>
 
       <section ref={introRef} className="intro-section" aria-label="Introduction">
-        {filmRunning && <motion.button
-          type="button"
-          className="intro-sound"
-          onClick={toggleSound}
-          aria-pressed={soundOn}
-          aria-label={soundOn ? "Mute the intro film" : "Play the intro film's sound"}
+        {/* The mount fade-in lives on this wrapper, not the button itself: Framer
+            leaves an inline opacity behind once an `animate` finishes, which would
+            outrank the button's own CSS opacity (dim at rest, full on hover/active)
+            forever afterward — inline style beats any stylesheet rule regardless of
+            specificity. Splitting them onto separate elements avoids that outright. */}
+        {filmRunning && <motion.div
+          className="intro-sound-wrap"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.9, delay: 1.2, ease: "easeOut" }}
         >
-          {soundOn ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
-          <span>{soundOn ? "Sound on" : "Sound off"}</span>
-        </motion.button>}
+          <button
+            type="button"
+            className="intro-sound"
+            data-active={justTapped}
+            onClick={toggleSound}
+            aria-pressed={soundOn}
+            aria-label={soundOn ? "Mute the intro film" : "Play the intro film's sound"}
+          >
+            {soundOn ? <Volume2 size={17} aria-hidden="true" /> : <VolumeX size={17} aria-hidden="true" />}
+          </button>
+        </motion.div>}
       </section>
     </>
   );
