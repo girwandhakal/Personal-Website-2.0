@@ -111,9 +111,6 @@ input, textarea { caret-color: var(--accent); }
 .cinema-scrim { position: absolute; inset: 0; background: linear-gradient(105deg, #0b0e11 0%, #0b0e11 44%, #0b0e11cc 76%, #0b0e11a1 100%); }
 
 .intro-section { position: relative; z-index: 1; min-height: 100dvh; margin-top: calc(-1 * var(--nav-height)); padding-top: var(--nav-height); }
-.intro-cue { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: inline-flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 18px 4px; background: none; border: 0; color: #fff; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; text-shadow: 0 2px 16px #000c, 0 0 4px #0009; transition: color .25s; }
-.intro-cue:hover { color: #fff; }
-.intro-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, #fff); box-shadow: 0 0 10px #0009; }
 /* Sits opposite the chat launcher's eventual corner so the two never trade places. */
 .intro-sound { position: absolute; left: 24px; bottom: 26px; display: inline-flex; align-items: center; gap: 9px; min-height: 44px; padding: 8px 14px; border: 1px solid #ffffff3d; border-radius: 999px; background: #0b0e1159; -webkit-backdrop-filter: blur(10px); color: #fff; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; text-shadow: 0 1px 10px #000a; transition: background .25s, border-color .25s; }
 .intro-sound:hover { background: #0b0e1199; border-color: #ffffff7a; }

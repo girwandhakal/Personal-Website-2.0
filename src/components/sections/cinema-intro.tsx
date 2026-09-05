@@ -251,18 +251,6 @@ export function CinemaIntro() {
           {soundOn ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />}
           <span>{soundOn ? "Sound on" : "Sound off"}</span>
         </motion.button>}
-
-        <motion.button
-          type="button"
-          className="intro-cue"
-          onClick={goToHero}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.6, ease: "easeOut" }}
-        >
-          <span className="intro-cue-line" aria-hidden="true" />
-          Enter
-        </motion.button>
       </section>
     </>
   );
