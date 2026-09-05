@@ -5,7 +5,7 @@ import { ArrowUpRight } from "lucide-react";
 import { motion } from "motion/react";
 import { profile } from "@/content/profile";
 import { AIPreview } from "./ai-preview";
-import { HERO_REVEAL_EVENT } from "./cinema-intro";
+import { useIntroRevealed } from "@/lib/intro-reveal";
 
 /**
  * The hero sits below the intro film, so it's off screen while the film plays and
@@ -25,22 +25,20 @@ const SHOWN = { opacity: 1, y: 0 };
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const [revealed, setRevealed] = useState(false);
+  const introRevealed = useIntroRevealed();
+  // Second route: arriving at the section by any means reveals it, so it can't be
+  // left invisible if the intro's signal never comes.
+  const [inView, setInView] = useState(false);
+  const revealed = introRevealed || inView;
 
   useEffect(() => {
-    const reveal = () => setRevealed(true);
-    window.addEventListener(HERO_REVEAL_EVENT, reveal);
-
     if (typeof IntersectionObserver === "undefined") {
-      reveal();
-      return () => window.removeEventListener(HERO_REVEAL_EVENT, reveal);
+      setInView(true);
+      return;
     }
-    const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) reveal(); }, { threshold: 0.12 });
+    const io = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) setInView(true); }, { threshold: 0.12 });
     if (sectionRef.current) io.observe(sectionRef.current);
-    return () => {
-      window.removeEventListener(HERO_REVEAL_EVENT, reveal);
-      io.disconnect();
-    };
+    return () => io.disconnect();
   }, []);
 
   return <section ref={sectionRef} className="hero-section section-inner" id="hero" aria-labelledby="hero-title">

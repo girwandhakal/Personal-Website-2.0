@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { signalIntroReveal } from "@/lib/intro-reveal";
 
 /**
  * The opening: the intro film plays full-bleed behind the first screen, and once
@@ -38,17 +39,6 @@ const TRAVEL_MS = 1600;
 function attemptPlay(video: HTMLVideoElement) {
   const played = video.play() as Promise<void> | undefined;
   if (played && typeof played.catch === "function") played.catch(() => { /* blocked by policy */ });
-}
-
-/**
- * The hero listens for this to run its entrance. It is broadcast when the film ends
- * and when the visitor takes over, rather than leaving the hero to rely purely on a
- * viewport threshold — on a short screen, or once dynamic viewport units shift under
- * a mobile URL bar, that threshold is easy to never quite satisfy.
- */
-export const HERO_REVEAL_EVENT = "hero:reveal";
-function signalHeroReveal() {
-  window.dispatchEvent(new Event(HERO_REVEAL_EVENT));
 }
 
 /** Eased programmatic scroll. Returns a cancel handle. */
@@ -95,7 +85,7 @@ export function CinemaIntro() {
     const hero = document.getElementById("hero");
     if (!hero) return;
     travelledRef.current = true;
-    signalHeroReveal();
+    signalIntroReveal();
     const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height"), 10) || 88;
     const target = hero.getBoundingClientRect().top + window.scrollY - navHeight - 8;
     cancelTravelRef.current?.();
@@ -133,7 +123,7 @@ export function CinemaIntro() {
     };
     const stop = () => {
       travelledRef.current = true; // visitor took over
-      signalHeroReveal(); // they're on their way down; let the hero come in
+      signalIntroReveal(); // they're on their way down; let the rest come in
       cancelTravelRef.current?.();
       cancelTravelRef.current = null;
     };
