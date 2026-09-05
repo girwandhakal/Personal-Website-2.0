@@ -42,3 +42,6 @@ htmlcov/
 .agent/
 .impeccable/
 .codex/
+
+# raw video source (optimized encodes live in public/media)
+/Intro-video.mp4.mp4
