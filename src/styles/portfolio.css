@@ -79,7 +79,7 @@ input, textarea { caret-color: var(--accent); }
 .site-nav .nav-resume { color: var(--accent); margin-left: 8px; }
 .mobile-nav-toggle, .mobile-menu { display: none; }
 
-.hero-section { display: grid; grid-template-columns: 40% 60%; align-items: center; min-height: 555px; padding-top: 45px; padding-bottom: 76px; gap: 0; }
+.hero-section { position: relative; display: grid; grid-template-columns: 40% 60%; align-items: center; min-height: 555px; padding-top: 45px; padding-bottom: 76px; gap: 0; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-copy h1 { font-size: clamp(76px, 8.6vw, 142px); line-height: .99; letter-spacing: -.04em; font-weight: 400; }
 .hero-copy h1 span { display: block; animation: name-arrive 1s var(--ease-out) both; }
@@ -88,7 +88,48 @@ input, textarea { caret-color: var(--accent); }
 .hero-actions { display: flex; gap: 16px; margin-top: 34px; }
 @keyframes name-arrive { from { transform: translateY(20px); clip-path: inset(0 0 0 0); opacity: .7; } to { transform: translateY(0); opacity: 1; } }
 
-.ai-preview { perspective: 1500px; min-width: 0; padding: 15px 28px 0 18px; }
+/* Hero portrait — a presence behind the interface, not a photo dropped into it.
+   Position/scale/strength are vars so the composition can be tuned in one place. */
+.hero-portrait {
+  --portrait-x: 33%;
+  --portrait-y: 54%;
+  --portrait-w: min(34%, 380px);
+  --portrait-strength: .8;
+  position: absolute; inset: 0; z-index: 0; pointer-events: none;
+}
+/* Narrower than the source frame on purpose — cropping the sides drops most of the
+   bright out-of-focus office, which otherwise survives the grade as a pale halo. */
+/* Base strength lives here, not on the scroll layer: that one's opacity is driven
+   by a Motion value (1 -> 0 through the hero), which would override this outright.
+   Nested opacity multiplies, so the two compose instead of fighting. */
+.hero-portrait-anchor { position: absolute; left: var(--portrait-x); top: var(--portrait-y); width: var(--portrait-w); aspect-ratio: 0.66; opacity: var(--portrait-strength); transform: translate(-50%, -50%); }
+.hero-portrait-fade { position: absolute; inset: 0; will-change: opacity; }
+.hero-portrait-scroll { position: absolute; inset: 0; will-change: transform; }
+/* The mask is what keeps it from reading as a rectangle pasted on the page. The
+   ellipse is deliberately tight and centred on the face: the crown of the head and
+   the shoulders dissolve into the charcoal rather than meeting a container edge,
+   which is both the low-key portrait look and the only way to avoid a hard line
+   (the source photo has content right up to its own top edge). */
+.hero-portrait-media {
+  position: absolute; inset: 0; isolation: isolate;
+  -webkit-mask-image: radial-gradient(50% 38% at 46% 32%, #000 20%, #000c 44%, #0005 64%, transparent 84%);
+  mask-image: radial-gradient(50% 38% at 46% 32%, #000 20%, #000c 44%, #0005 64%, transparent 84%);
+}
+.hero-portrait-img { object-fit: cover; object-position: 50% 18%; }
+/* Permanently blurred plate; the sharp copy cross-fades over it for the focus pull. */
+.hero-portrait-img-soft { filter: grayscale(1) contrast(1.16) brightness(.66) blur(20px); transform: scale(1.06); }
+.hero-portrait-sharp { position: absolute; inset: 0; filter: grayscale(1) contrast(1.2) brightness(.7); }
+.hero-portrait-tint { position: absolute; inset: 0; pointer-events: none; }
+/* Duotone: `screen` lifts the blacks to cool slate, `multiply` pulls the whites
+   down to warm silver — the site's own two ends of the ramp. */
+.hero-portrait-tint-shadow { background: #1e2836; mix-blend-mode: screen; }
+.hero-portrait-tint-highlight { background: #e8ecef; mix-blend-mode: multiply; }
+.hero-portrait-tint-accent { background: linear-gradient(155deg, #b7c7da55, transparent 62%); mix-blend-mode: soft-light; }
+.hero-portrait-tint-scan { background: linear-gradient(170deg, #7ea9c9, #416b9a 65%, #1c3350); mix-blend-mode: color; }
+.hero-portrait-scanlines { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, #b7c7da2e 0 1px, transparent 1px 4px); mix-blend-mode: screen; }
+.hero-portrait-sweep { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: linear-gradient(to bottom, transparent 42%, #7fb4de26 46%, #cfe3f7a6 50%, #7fb4de26 54%, transparent 58%); }
+
+.ai-preview { position: relative; z-index: 1; perspective: 1500px; min-width: 0; padding: 15px 28px 0 18px; }
 .ai-preview-stack { position: relative; transform-style: preserve-3d; }
 .preview-layer { position: absolute; inset: 0; border-radius: 13px; pointer-events: none; }
 .preview-layer-back { background: #9ca2a8; transform: translate(32px, -30px) scale(.975); }
@@ -263,6 +304,9 @@ summary::-webkit-details-marker { display: none; }
   .section-inner { width: calc(100% - 64px); }
   .site-nav-shell { padding-inline: 32px; }
   .hero-section { grid-template-columns: 39% 61%; min-height: 530px; }
+  /* Tighter column gap here, so pull the portrait left of the panel's edge to keep
+     the fade from being cut off mid-cheek. */
+  .hero-portrait { --portrait-x: 30%; --portrait-w: min(31%, 330px); }
   .hero-copy h1 { font-size: 9vw; }
   .hero-subtitle { font-size: 15px; }
   .hero-actions { gap: 10px; }
@@ -286,6 +330,9 @@ summary::-webkit-details-marker { display: none; }
   .site-nav a { font-size: 12px; }
   .site-nav .nav-resume { margin-left: 0; }
   .hero-section { grid-template-columns: 1fr; padding-top: 28px; padding-bottom: 42px; gap: 72px; min-height: auto; }
+  /* Stacked layout: the middle belongs to the AI panel, so the portrait moves up
+     into the negative space beside the name rather than hiding behind the panel. */
+  .hero-portrait { --portrait-x: 70%; --portrait-y: 20%; --portrait-w: min(58vw, 250px); --portrait-strength: .38; }
   .hero-copy h1 { font-size: clamp(76px, 15vw, 112px); line-height: .98; }
   .hero-subtitle { margin-top: 22px; font-size: 17px; }
   .hero-actions { margin-top: 24px; gap: 12px; }
@@ -339,4 +386,8 @@ summary::-webkit-details-marker { display: none; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
   .button:hover, .text-link:hover svg, .button:hover svg { transform: none; }
+  /* Drop the hero portrait's machine-vision pass entirely. Done here rather than in
+     the component so the browser resolves it at first paint — conditioning the
+     markup on the preference would desync server and client rendering. */
+  .hero-portrait-tint-scan, .hero-portrait-scanlines, .hero-portrait-sweep { display: none !important; }
 }
