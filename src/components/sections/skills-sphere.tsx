@@ -25,7 +25,7 @@ const REST_THRESHOLD = 0.00006;
 const MIN_ZOOM = 0.62;
 const MAX_ZOOM = 1.85;
 
-export function SkillsSphere({ skills }: { skills: string[] }) {
+export function SkillsSphere({ skills }: { skills: readonly string[] }) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const innerRef = useRef<HTMLDivElement>(null);
   const tagRefs = useRef<Array<HTMLSpanElement | null>>([]);
