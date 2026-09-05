@@ -88,6 +88,23 @@ input, textarea { caret-color: var(--accent); }
 .hero-actions { display: flex; gap: 16px; margin-top: 34px; }
 @keyframes name-arrive { from { transform: translateY(20px); clip-path: inset(0 0 0 0); opacity: .7; } to { transform: translateY(0); opacity: 1; } }
 
+/* The opening: the portrait alone, behind an aperture that opens, before the page
+   travels down to the hero. Sized off viewport height so it always fits the fold. */
+.intro-section { position: relative; overflow: hidden; min-height: calc(100dvh - var(--nav-height)); }
+/* Absolutely placed rather than in flow: most of this frame is transparent once the
+   mask is applied, so letting its full box drive layout would push the cue off the
+   fold. The extra Y offset centres the *visible* face, which sits above the frame's
+   own midpoint, in the viewport. */
+.intro-aperture { position: absolute; left: 50%; top: 50%; height: min(86vh, 760px); max-width: 84vw; aspect-ratio: .72; transform: translate(-50%, -32%); will-change: clip-path; }
+.intro-media {
+  position: absolute; inset: 0; isolation: isolate;
+  -webkit-mask-image: radial-gradient(46% 38% at 50% 32%, #000 24%, #000d 48%, #0005 68%, transparent 88%);
+  mask-image: radial-gradient(46% 38% at 50% 32%, #000 24%, #000d 48%, #0005 68%, transparent 88%);
+}
+.intro-cue { position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%); display: inline-flex; flex-direction: column; align-items: center; gap: 12px; padding: 8px 18px 4px; background: none; border: 0; color: var(--ink-muted); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; transition: color .25s; }
+.intro-cue:hover { color: var(--ink); }
+.intro-cue-line { width: 1px; height: 40px; background: linear-gradient(to bottom, transparent, var(--line-strong)); }
+
 /* Hero portrait — a presence behind the interface, not a photo dropped into it.
    Position/scale/strength are vars so the composition can be tuned in one place. */
 .hero-portrait {
@@ -115,19 +132,22 @@ input, textarea { caret-color: var(--accent); }
   -webkit-mask-image: radial-gradient(50% 38% at 46% 32%, #000 20%, #000c 44%, #0005 64%, transparent 84%);
   mask-image: radial-gradient(50% 38% at 46% 32%, #000 20%, #000c 44%, #0005 64%, transparent 84%);
 }
-.hero-portrait-img { object-fit: cover; object-position: 50% 18%; }
+.portrait-img { object-fit: cover; object-position: 50% 18%; }
 /* Permanently blurred plate; the sharp copy cross-fades over it for the focus pull. */
-.hero-portrait-img-soft { filter: grayscale(1) contrast(1.16) brightness(.66) blur(20px); transform: scale(1.06); }
-.hero-portrait-sharp { position: absolute; inset: 0; filter: grayscale(1) contrast(1.2) brightness(.7); }
-.hero-portrait-tint { position: absolute; inset: 0; pointer-events: none; }
+.portrait-img-soft { filter: grayscale(1) contrast(1.16) brightness(.66) blur(20px); transform: scale(1.06); }
+.portrait-sharp { position: absolute; inset: 0; filter: grayscale(1) contrast(1.2) brightness(.7); }
+.portrait-tint { position: absolute; inset: 0; pointer-events: none; }
 /* Duotone: `screen` lifts the blacks to cool slate, `multiply` pulls the whites
    down to warm silver — the site's own two ends of the ramp. */
-.hero-portrait-tint-shadow { background: #1e2836; mix-blend-mode: screen; }
-.hero-portrait-tint-highlight { background: #e8ecef; mix-blend-mode: multiply; }
-.hero-portrait-tint-accent { background: linear-gradient(155deg, #b7c7da55, transparent 62%); mix-blend-mode: soft-light; }
-.hero-portrait-tint-scan { background: linear-gradient(170deg, #7ea9c9, #416b9a 65%, #1c3350); mix-blend-mode: color; }
-.hero-portrait-scanlines { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, #b7c7da2e 0 1px, transparent 1px 4px); mix-blend-mode: screen; }
-.hero-portrait-sweep { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: linear-gradient(to bottom, transparent 42%, #7fb4de26 46%, #cfe3f7a6 50%, #7fb4de26 54%, transparent 58%); }
+.portrait-tint-shadow { background: #1e2836; mix-blend-mode: screen; }
+.portrait-tint-highlight { background: #e8ecef; mix-blend-mode: multiply; }
+.portrait-tint-accent { background: linear-gradient(155deg, #b7c7da55, transparent 62%); mix-blend-mode: soft-light; }
+/* White centre is a no-op under multiply, so this darkens purely outward from the
+   face — killing the pale halo the blurred office leaves around the head. */
+.portrait-vignette { background: radial-gradient(58% 50% at 50% 32%, #fff 24%, #9aa2aa 52%, #2a3138 78%, #10151a 100%); mix-blend-mode: multiply; }
+.portrait-scan { background: linear-gradient(170deg, #7ea9c9, #416b9a 65%, #1c3350); mix-blend-mode: color; }
+.portrait-scanlines { position: absolute; inset: 0; pointer-events: none; background: repeating-linear-gradient(to bottom, #b7c7da2e 0 1px, transparent 1px 4px); mix-blend-mode: screen; }
+.portrait-sweep { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: screen; background: linear-gradient(to bottom, transparent 42%, #7fb4de26 46%, #cfe3f7a6 50%, #7fb4de26 54%, transparent 58%); }
 
 .ai-preview { position: relative; z-index: 1; perspective: 1500px; min-width: 0; padding: 15px 28px 0 18px; }
 .ai-preview-stack { position: relative; transform-style: preserve-3d; }
@@ -389,5 +409,5 @@ summary::-webkit-details-marker { display: none; }
   /* Drop the hero portrait's machine-vision pass entirely. Done here rather than in
      the component so the browser resolves it at first paint — conditioning the
      markup on the preference would desync server and client rendering. */
-  .hero-portrait-tint-scan, .hero-portrait-scanlines, .hero-portrait-sweep { display: none !important; }
+  .portrait-scan, .portrait-scanlines, .portrait-sweep { display: none !important; }
 }
