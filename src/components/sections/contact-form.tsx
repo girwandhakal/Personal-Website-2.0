@@ -38,8 +38,15 @@ export function ContactForm() {
         setFormState("idle");
         if (formRef.current) formRef.current.reset();
       }, 4000);
+    } else if (formState === "error") {
+      // Don't touch the fields (the user may want to retry without retyping), but
+      // don't leave the error message on screen forever either.
+      timeout = setTimeout(() => {
+        setFormState("idle");
+        setErrorMessage("");
+      }, 6000);
     }
-    
+
     return () => clearTimeout(timeout);
   }, [formState]);
 

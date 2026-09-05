@@ -37,6 +37,7 @@ export function SkillsSphere({ skills }: { skills: string[] }) {
   const pointersRef = useRef(new Map<number, { x: number; y: number }>());
   const pinchRef = useRef<{ distance: number; zoom: number } | null>(null);
   const visibleRef = useRef(true);
+  const needsPaintRef = useRef(true); // starts true so the initial layout still paints once under reduced motion / at rest
   const reduced = useReducedMotion();
 
   // Lay out points whenever the container is (re)sized, so radius always matches the rendered box.
@@ -46,8 +47,13 @@ export function SkillsSphere({ skills }: { skills: string[] }) {
     const measure = () => {
       radiusRef.current = el.clientWidth * 0.4;
       pointsRef.current = fibonacciSphere(skills.length, radiusRef.current);
+      needsPaintRef.current = true;
     };
     measure();
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", measure);
+      return () => window.removeEventListener("resize", measure);
+    }
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
@@ -57,6 +63,10 @@ export function SkillsSphere({ skills }: { skills: string[] }) {
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      visibleRef.current = true;
+      return;
+    }
     const io = new IntersectionObserver(([entry]) => { visibleRef.current = entry.isIntersecting; }, { threshold: .05 });
     io.observe(el);
     return () => io.disconnect();
@@ -83,30 +93,39 @@ export function SkillsSphere({ skills }: { skills: string[] }) {
       const points = pointsRef.current;
       const radius = radiusRef.current;
       if (points.length && radius && visibleRef.current) {
-        let yaw = 0, pitch = 0;
-        if (dragRef.current.active) {
-          yaw = velocityRef.current.yaw;
-          pitch = velocityRef.current.pitch;
-        } else {
-          yaw = velocityRef.current.yaw + (reduced ? 0 : AUTO_SPIN);
-          pitch = velocityRef.current.pitch;
-          velocityRef.current.yaw *= FRICTION;
-          velocityRef.current.pitch *= FRICTION;
-          if (Math.abs(velocityRef.current.yaw) < REST_THRESHOLD) velocityRef.current.yaw = 0;
-          if (Math.abs(velocityRef.current.pitch) < REST_THRESHOLD) velocityRef.current.pitch = 0;
-        }
-        if (yaw !== 0 || pitch !== 0) applyRotation(points, yaw, pitch);
+        let yaw = velocityRef.current.yaw;
+        let pitch = velocityRef.current.pitch;
+        if (!dragRef.current.active) yaw += reduced ? 0 : AUTO_SPIN;
 
-        const order = points.map((_, index) => index).sort((a, b) => points[a].z - points[b].z);
-        for (const index of order) {
-          const p = points[index];
-          const tag = tagRefs.current[index];
-          if (!tag) continue;
-          const depth = (p.z + radius) / (radius * 2);
-          const scale = .48 + depth * .78;
-          tag.style.transform = `translate3d(calc(-50% + ${p.x.toFixed(2)}px), calc(-50% + ${p.y.toFixed(2)}px), 0) scale(${scale.toFixed(3)})`;
-          tag.style.opacity = (.24 + depth * .76).toFixed(3);
-          tag.style.zIndex = String(Math.round(depth * 1000));
+        // Decay every frame, dragging or not: while actively dragging this just gets
+        // overwritten by the next pointermove anyway, but if the pointer stops moving
+        // without being released, this is what stops the sphere from spinning forever
+        // at whatever the last recorded per-frame delta was.
+        velocityRef.current.yaw *= FRICTION;
+        velocityRef.current.pitch *= FRICTION;
+        if (Math.abs(velocityRef.current.yaw) < REST_THRESHOLD) velocityRef.current.yaw = 0;
+        if (Math.abs(velocityRef.current.pitch) < REST_THRESHOLD) velocityRef.current.pitch = 0;
+
+        if (yaw !== 0 || pitch !== 0) {
+          applyRotation(points, yaw, pitch);
+          needsPaintRef.current = true;
+        }
+
+        // Skip the sort + per-tag style writes once the sphere is fully at rest — no
+        // rotation this frame means nothing on screen would change.
+        if (needsPaintRef.current) {
+          const order = points.map((_, index) => index).sort((a, b) => points[a].z - points[b].z);
+          for (const index of order) {
+            const p = points[index];
+            const tag = tagRefs.current[index];
+            if (!tag) continue;
+            const depth = (p.z + radius) / (radius * 2);
+            const scale = .48 + depth * .78;
+            tag.style.transform = `translate3d(calc(-50% + ${p.x.toFixed(2)}px), calc(-50% + ${p.y.toFixed(2)}px), 0) scale(${scale.toFixed(3)})`;
+            tag.style.opacity = (.24 + depth * .76).toFixed(3);
+            tag.style.zIndex = String(Math.round(depth * 1000));
+          }
+          needsPaintRef.current = false;
         }
       }
       frame = requestAnimationFrame(tick);

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { ArrowUp, MessageSquare, X } from "lucide-react";
 import { checkAndRedactSensitiveInfo, checkProfanity } from "@/lib/safety";
+import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 
 interface Message {
   sender: "user" | "assistant" | "system";
@@ -145,7 +146,10 @@ export function PhoneMessenger() {
       if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
     };
     const onScroll = (event: WheelEvent | TouchEvent) => {
-      if (!(event.target instanceof Node) || !phoneFrameRef.current?.contains(event.target)) event.preventDefault();
+      // Not just "inside my own panel": a project detail sheet can still be open
+      // underneath (its "try it here" link opens the chat without closing it), and
+      // its own scroll region needs to keep scrolling normally too.
+      if (!isInsideOverlayScrollRegion(event.target)) event.preventDefault();
     };
     window.addEventListener("keydown", onKey);
     window.addEventListener("wheel", onScroll, { passive: false });

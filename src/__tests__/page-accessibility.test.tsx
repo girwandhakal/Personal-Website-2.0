@@ -44,7 +44,9 @@ describe("homepage", () => {
   });
 
   it("keeps mobile navigation reachable and offsets anchor jumps", () => {
-    const css = readFileSync(join(process.cwd(), "src/styles/globals.css"), "utf8");
+    // globals.css only @imports Tailwind and portfolio.css now; the actual rules
+    // (and the anchor-offset one this test cares about) live in portfolio.css.
+    const css = readFileSync(join(process.cwd(), "src/styles/portfolio.css"), "utf8");
 
     expect(css).toContain("scroll-padding-top");
     expect(css).not.toContain(".site-nav {\n    display: none;");

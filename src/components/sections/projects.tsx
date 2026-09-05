@@ -8,6 +8,7 @@ import { GithubIcon } from "@/components/ui/social-icons";
 import { projects, type Project } from "@/content/projects";
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectArt } from "@/components/ui/project-art";
+import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 
 /**
  * Every fill clears 4.5:1 against the white label text it sits behind, same
@@ -251,13 +252,15 @@ function ProjectDetail({
     const isInsideScrollPane = (node: EventTarget | null) =>
       node instanceof Node && (scrollPane()?.contains(node) ?? false);
 
+    // Not just this sheet's own pane: the "try it here" link below can open the AI
+    // chat without closing this sheet, and its scroll region needs to keep working.
     const onWheel = (e: WheelEvent) => {
-      if (!isInsideScrollPane(e.target)) e.preventDefault();
+      if (!isInsideScrollPane(e.target) && !isInsideOverlayScrollRegion(e.target)) e.preventDefault();
     };
     window.addEventListener("wheel", onWheel, { passive: false });
 
     const onTouchMove = (e: TouchEvent) => {
-      if (!isInsideScrollPane(e.target)) e.preventDefault();
+      if (!isInsideScrollPane(e.target) && !isInsideOverlayScrollRegion(e.target)) e.preventDefault();
     };
     window.addEventListener("touchmove", onTouchMove, { passive: false });
 
@@ -285,6 +288,10 @@ function ProjectDetail({
         if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
       }
       if (e.key === "Escape") {
+        // The AI chat can be open on top of this sheet (see the "try it here" link
+        // below) with its own Escape handler; if it's open, let Escape close that
+        // first instead of closing both at once.
+        if (document.querySelector(".chat-panel")) return;
         onClose();
         return;
       }
@@ -583,6 +590,16 @@ function ProjectDetail({
   );
 }
 
+// Featured display order (speech-act-analysis reads better ahead of the fleet-analytics
+// case study). Derived by slug rather than a hardcoded index reorder, so a project list
+// shorter than this can't crash on an undefined index, and any project not named here
+// still shows up — appended — rather than silently dropping out of the grid.
+const FEATURED_ORDER = ["ai-persona-chatbot", "clearpath", "speech-act-analysis", "southern-company-fleet-analytics"];
+const orderedProjects = FEATURED_ORDER
+  .map((slug) => projects.find((p) => p.slug === slug))
+  .filter((p): p is Project => Boolean(p))
+  .concat(projects.filter((p) => !FEATURED_ORDER.includes(p.slug)));
+
 export function Projects() {
   // The clicked tile's box is captured with the project, because the sheet's
   // zoom is anchored to wherever that tile was at the moment of the click.
@@ -628,7 +645,7 @@ export function Projects() {
         </div>
 
         <div className="project-grid">
-          {[projects[0], projects[1], projects[3], projects[2]].map((project, index) => (
+          {orderedProjects.map((project, index) => (
             <ProjectTile
               key={project.slug}
               project={project}
