@@ -189,8 +189,11 @@ export function CinemaIntro() {
     };
 
     const inputs = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
-    // A deep link or a restored scroll position means they're not here for the intro.
-    if (window.location.hash || window.scrollY > 4) travelledRef.current = true;
+    // Only the actual scroll position proves the visitor is already past the intro.
+    // A stale hash can remain in the URL after reloading from an in-page link while
+    // the browser still starts at the top. Treating the hash alone as proof used to
+    // suppress the handoff at the end of an otherwise normally playing film.
+    if (window.scrollY > 4) travelledRef.current = true;
 
     video.addEventListener("ended", onEnded);
     video.addEventListener("timeupdate", onTime);
@@ -241,7 +244,16 @@ export function CinemaIntro() {
             preload="auto"
             tabIndex={-1}
           >
-            <source src="/media/intro.webm" type="video/webm" />
+            <source
+              src="/media/intro-mobile.mp4"
+              type="video/mp4"
+              media="(max-width: 767px)"
+            />
+            <source
+              src="/media/intro.webm"
+              type="video/webm"
+              media="(min-width: 768px)"
+            />
             <source src="/media/intro.mp4" type="video/mp4" />
           </video>
           <motion.div className="cinema-scrim" style={{ opacity: scrimOpacity }} />
@@ -258,7 +270,7 @@ export function CinemaIntro() {
           className="intro-sound-wrap"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.9, delay: 1.2, ease: "easeOut" }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
         >
           <button
             type="button"

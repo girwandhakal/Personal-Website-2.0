@@ -19,8 +19,9 @@ export function signalIntroReveal() {
  *
  * Starts false on the server and on the first client render so hydration matches,
  * then resolves immediately for anyone who never saw the intro in the first place:
- * a deep link, a restored scroll position, or a page with no intro on it. Scrolling
- * counts too, so this can't get stuck if the film never reaches its end.
+ * an already-applied deep link, a restored scroll position, or a page with no intro
+ * on it. Scrolling counts too, so this can't get stuck if the film never reaches
+ * its end. The hash alone is not enough because it can be stale after a reload.
  */
 /**
  * Whether the opening film currently owns the screen.
@@ -60,7 +61,7 @@ export function useIntroRevealed() {
 
   useEffect(() => {
     // Already past the intro, or there isn't one here.
-    if (window.location.hash || window.scrollY > 4 || !document.querySelector(".cinema")) {
+    if (window.scrollY > 4 || !document.querySelector(".cinema")) {
       setRevealed(true);
       return;
     }

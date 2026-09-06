@@ -4,6 +4,8 @@ export const profile = {
   headline: "Girwan Dhakal",
   subheadline:
     "Accelerated Master’s student at The University of Alabama building agentic AI in production — retrieval agents, LLM data pipelines, and machine learning research that reaches peer review.",
+  about:
+    "I’m a rising senior at The University of Alabama, graduating in May 2027 and majoring in computer science. My experience spans machine learning research, data science, analytics, and product engineering, from language-model pipelines and retrieval agents to production data systems. I build with Python, TypeScript, React, FastAPI, PyTorch, SQL, cloud platforms, and the practical tools needed to take an idea from prototype to deployment. I’m strongest at turning ambiguous problems into clear systems, learning unfamiliar domains quickly, and communicating technical decisions with engineers and stakeholders. I like using AI to build products that solve real problems, improve how people work, and create measurable value.",
   email: "girwandhakal@gmail.com",
   location: "Alabama, USA",
   resumeHref: "https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing",
