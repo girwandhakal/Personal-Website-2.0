@@ -36,7 +36,8 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-height) + 20px); scrollbar-gutter: stable; background: var(--surface); scrollbar-color: #58636e var(--surface); }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-height) + 20px); -ms-overflow-style: none; scrollbar-width: none; background: var(--surface); }
+html::-webkit-scrollbar { display: none; }
 body { margin: 0; min-width: 320px; color: var(--ink); background: var(--surface); font-family: var(--font-primary), sans-serif; font-size: 16px; font-weight: 400; line-height: 1.6; -webkit-font-smoothing: antialiased; }
 button, input, textarea { font: inherit; }
 button, summary { cursor: pointer; }
@@ -130,7 +131,9 @@ input, textarea { caret-color: var(--accent); }
    compete with the film, and comes to full strength on hover; on touch (no hover to
    speak of) a tap drives that same prominent state via [data-active], then it's
    faded back out again in JS a couple of seconds later. */
-.intro-sound-wrap { position: absolute; left: 24px; bottom: 26px; }
+/* The source watermark is centered at 92.03% x / 83.2% y. Subtracting the
+   control radius places the desktop button directly over that mark. */
+.intro-sound-wrap { position: absolute; right: calc(7.97vw - 22px); bottom: calc(16.8dvh - 22px); }
 .intro-sound { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffffff3d; border-radius: 999px; background: #0b0e1159; -webkit-backdrop-filter: blur(10px); color: #fff; opacity: .55; transition: opacity .3s ease, background .25s, border-color .25s; }
 .intro-sound svg { filter: drop-shadow(0 1px 6px #0009); }
 .intro-sound:hover, .intro-sound:focus-visible, .intro-sound[data-active="true"] { opacity: 1; background: #0b0e1199; border-color: #ffffff7a; }
@@ -336,6 +339,7 @@ summary::-webkit-details-marker { display: none; }
 }
 @media (max-width: 767px) {
   :root { --nav-height: 76px; }
+  .intro-sound-wrap { left: 24px; right: auto; bottom: calc(26px + var(--safe-bottom)); }
   .section-inner { width: calc(100% - 40px); }
   .site-nav-shell { padding-inline: 20px; }
   .site-nav { gap: 22px; }
