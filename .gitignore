@@ -45,3 +45,5 @@ htmlcov/
 
 # raw video source (optimized encodes live in public/media)
 /Intro-video.mp4.mp4
+/intro-video-2.mp4
+/intro-mobile-review.mp4

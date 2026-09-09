@@ -239,23 +239,12 @@ export function CinemaIntro() {
             ref={videoRef}
             className="cinema-video"
             poster="/media/intro-poster.jpg"
+            src="/media/intro.mp4"
             muted
             playsInline
             preload="auto"
             tabIndex={-1}
-          >
-            <source
-              src="/media/intro-mobile.mp4"
-              type="video/mp4"
-              media="(max-width: 767px)"
-            />
-            <source
-              src="/media/intro.webm"
-              type="video/webm"
-              media="(min-width: 768px)"
-            />
-            <source src="/media/intro.mp4" type="video/mp4" />
-          </video>
+          />
           <motion.div className="cinema-scrim" style={{ opacity: scrimOpacity }} />
         </div>
       </div>
