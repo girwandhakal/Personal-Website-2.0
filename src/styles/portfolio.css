@@ -92,7 +92,9 @@ input, textarea { caret-color: var(--accent); }
 .site-nav .nav-resume { color: var(--accent); margin-left: 8px; }
 .mobile-nav-toggle, .mobile-menu { display: none; }
 
-.hero-section { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; min-height: 555px; padding-top: 45px; padding-bottom: 76px; gap: 0; }
+/* Fills the full screen below the nav on first load, so the video reads as a
+   proper full-bleed opening and Relevant Projects isn't peeking in above the fold. */
+.hero-section { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; min-height: calc(100dvh - var(--nav-height)); padding-top: 45px; padding-bottom: 76px; gap: 0; }
 .hero-copy { position: relative; z-index: 2; }
 .hero-copy h1 { font-size: clamp(76px, 8.6vw, 142px); line-height: .99; letter-spacing: -.04em; font-weight: 400; }
 .hero-copy h1 span { display: block; }
@@ -302,7 +304,7 @@ summary::-webkit-details-marker { display: none; }
 @media (max-width: 1099px) {
   .section-inner { width: calc(100% - 64px); }
   .site-nav-shell { padding-inline: 32px; }
-  .hero-section { grid-template-columns: 1fr; min-height: 530px; }
+  .hero-section { grid-template-columns: 1fr; min-height: calc(100dvh - var(--nav-height)); }
   .hero-copy h1 { font-size: 9vw; }
   .hero-subtitle { font-size: 15px; }
   .hero-actions { gap: 10px; }

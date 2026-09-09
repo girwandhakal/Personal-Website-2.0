@@ -6,6 +6,28 @@ import { ArrowUp, MessageSquare, X } from "lucide-react";
 import { checkAndRedactSensitiveInfo, checkProfanity } from "@/lib/safety";
 import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 
+/**
+ * True once the hero has scrolled out of view. The launcher waits for this
+ * rather than showing over the hero, where it would sit on top of the intro
+ * film and its own "About me" button.
+ */
+function useHeroPassed() {
+  const [heroPassed, setHeroPassed] = useState(false);
+
+  useEffect(() => {
+    const hero = document.getElementById("hero");
+    if (!hero || typeof IntersectionObserver === "undefined") {
+      setHeroPassed(true);
+      return;
+    }
+    const io = new IntersectionObserver(([entry]) => setHeroPassed(!entry.isIntersecting), { threshold: 0 });
+    io.observe(hero);
+    return () => io.disconnect();
+  }, []);
+
+  return heroPassed;
+}
+
 interface Message {
   sender: "user" | "assistant" | "system";
   content: string;
@@ -93,6 +115,7 @@ function visibleUpToTag(text: string, tag: string): string {
 
 export function PhoneMessenger() {
   const [isOpen, setIsOpen] = useState(false);
+  const heroPassed = useHeroPassed();
   const [messages, setMessages] = useState<Message[]>([
     {
       sender: "assistant",
@@ -438,17 +461,23 @@ export function PhoneMessenger() {
   };
 
   return <>
-    <motion.button
-      ref={launchRef}
-      type="button"
-      className="chat-launcher"
-      aria-label="Open AI chat"
-      aria-expanded={isOpen}
-      onClick={() => setIsOpen(true)}
-      initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: .45, ease: [.16, 1, .3, 1] }}
-    ><MessageSquare size={18} aria-hidden="true" /><span>Ask my AI</span></motion.button>
+    {/* Not rendered at all over the hero, rather than hidden with CSS: an
+        invisible button there would still be tabbable and clickable, and it
+        would sit on top of the hero's own "About me" button and the film. */}
+    <AnimatePresence>
+      {heroPassed && <motion.button
+        ref={launchRef}
+        type="button"
+        className="chat-launcher"
+        aria-label="Open AI chat"
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen(true)}
+        initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: .45, ease: [.16, 1, .3, 1] }}
+      ><MessageSquare size={18} aria-hidden="true" /><span>Ask my AI</span></motion.button>}
+    </AnimatePresence>
     <AnimatePresence>
       {isOpen && <>
         <motion.div className="chat-backdrop" aria-hidden="true" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsOpen(false)} />
