@@ -45,13 +45,23 @@ function attemptPlay(video: HTMLVideoElement) {
   if (played && typeof played.catch === "function") played.catch(() => { /* blocked by policy */ });
 }
 
-/** Eased programmatic scroll. Returns a cancel handle. */
-function travelTo(to: number, duration: number) {
+/**
+ * Eased programmatic scroll. Returns a cancel handle.
+ *
+ * `programmaticRef`, while set, marks the resulting `scroll` events as ours rather
+ * than the visitor's — see the takeover listener below, which would otherwise read
+ * this scroll's own motion as the visitor taking over and cancel it mid-flight.
+ */
+function travelTo(to: number, duration: number, programmaticRef?: { current: boolean }) {
   const root = document.documentElement;
   const previousBehavior = root.style.scrollBehavior;
   // `html { scroll-behavior: smooth }` would fight a per-frame scrollTo.
   root.style.scrollBehavior = "auto";
-  const restore = () => { root.style.scrollBehavior = previousBehavior; };
+  if (programmaticRef) programmaticRef.current = true;
+  const restore = () => {
+    root.style.scrollBehavior = previousBehavior;
+    if (programmaticRef) programmaticRef.current = false;
+  };
 
   if (duration <= 0) {
     window.scrollTo(0, to);
@@ -80,6 +90,9 @@ export function CinemaIntro() {
   const introRef = useRef<HTMLElement>(null);
   const cancelTravelRef = useRef<(() => void) | null>(null);
   const travelledRef = useRef(false);
+  // Set for the duration of our own programmatic scroll, so the takeover listener
+  // below can tell it apart from the visitor actually scrolling.
+  const programmaticScrollRef = useRef(false);
   const [soundOn, setSoundOn] = useState(false);
   // Only offer the control while the film is actually running with audio to control.
   const [filmRunning, setFilmRunning] = useState(false);
@@ -101,7 +114,7 @@ export function CinemaIntro() {
     const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--nav-height"), 10) || 88;
     const target = hero.getBoundingClientRect().top + window.scrollY - navHeight - 8;
     cancelTravelRef.current?.();
-    cancelTravelRef.current = travelTo(Math.max(0, target), reduced ? 0 : TRAVEL_MS);
+    cancelTravelRef.current = travelTo(Math.max(0, target), reduced ? 0 : TRAVEL_MS, programmaticScrollRef);
   }, [reduced]);
 
   // Start playback, unless the visitor has opted out of motion or is saving data.
@@ -177,18 +190,27 @@ export function CinemaIntro() {
       if (travelledRef.current || !video.duration) return;
       if (video.currentTime >= video.duration - 0.15) goToHero();
     };
-    const stop = (event: Event) => {
-      const target = event.target;
-      // Reaching for the film's own sound control isn't taking over the page — it
-      // shouldn't cancel the pending travel or bring the rest of the page in early.
-      if (target instanceof Element && target.closest(".intro-sound")) return;
+    // Only an actual, visitor-driven scroll counts as taking over — a tap, a wheel
+    // nudge that doesn't move the page, or reaching for the sound control must never
+    // cancel the pending hand-off; the film ending is what commits to it. This used
+    // to key off the raw input gesture (wheel/touchstart/keydown/pointerdown), which
+    // fired on a mere tap on the film with nothing having scrolled at all — tapping
+    // it to reach for sound, say — and permanently suppressed the end-of-film travel.
+    // Watching the resulting `scroll` event instead means only motion that actually
+    // happened counts, and `programmaticScrollRef` tells our own travel's scroll
+    // apart from the visitor's so it can't cancel itself mid-flight.
+    let lastScrollY = window.scrollY;
+    const onScroll = () => {
+      if (programmaticScrollRef.current) { lastScrollY = window.scrollY; return; }
+      if (Math.abs(window.scrollY - lastScrollY) < 1) return;
+      lastScrollY = window.scrollY;
+      if (travelledRef.current) return;
       travelledRef.current = true; // visitor took over
       signalIntroReveal(); // they're on their way down; let the rest come in
       cancelTravelRef.current?.();
       cancelTravelRef.current = null;
     };
 
-    const inputs = ["wheel", "touchstart", "keydown", "pointerdown"] as const;
     // Only the actual scroll position proves the visitor is already past the intro.
     // A stale hash can remain in the URL after reloading from an in-page link while
     // the browser still starts at the top. Treating the hash alone as proof used to
@@ -197,11 +219,11 @@ export function CinemaIntro() {
 
     video.addEventListener("ended", onEnded);
     video.addEventListener("timeupdate", onTime);
-    inputs.forEach((type) => window.addEventListener(type, stop, { passive: true }));
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("timeupdate", onTime);
-      inputs.forEach((type) => window.removeEventListener(type, stop));
+      window.removeEventListener("scroll", onScroll);
       cancelTravelRef.current?.();
       cancelTravelRef.current = null;
     };
