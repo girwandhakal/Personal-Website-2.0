@@ -60,7 +60,7 @@ export function Hero() {
   return <section ref={sectionRef} className="hero-section section-inner" id="hero" aria-labelledby="hero-title">
     <motion.div className="hero-copy" initial={HIDDEN} animate={revealed ? SHOWN : HIDDEN} transition={{ duration: 0.85, ease: EASE }}>
       <h1 id="hero-title"><span>Girwan</span><span>Dhakal</span></h1>
-      <p className="hero-subtitle">ML Engineer &amp; Researcher</p>
+      <p className="hero-subtitle">Aspiring AI/ML Engineer</p>
       <div className="hero-actions">
         <button className="button button-primary" type="button" onClick={() => setAboutOpen(true)}>
           About me <ArrowUpRight size={20} aria-hidden="true" />
