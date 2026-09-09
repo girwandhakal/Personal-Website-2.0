@@ -3,16 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
 import { profile } from "@/content/profile";
-import { useIntroOnScreen } from "@/lib/intro-reveal";
 
 const links = [{ label: "Work", href: "#projects" }, { label: "About", href: "#about" }, { label: "Contact", href: "#contact" }];
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState("");
-  const filmOnScreen = useIntroOnScreen();
-  // Over the intro film the bar is transparent so the film fills the whole window;
-  // it only takes on a background once the page has scrolled off it.
+  // Over the hero (with the film looping behind it) the bar is transparent so the
+  // film reads full-bleed; it only takes on a background once the page has
+  // scrolled off the hero.
   const [scrolled, setScrolled] = useState(false);
   const toggle = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -56,18 +55,14 @@ export function SiteNav() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  useEffect(() => {
-    if (filmOnScreen) setOpen(false);
-  }, [filmOnScreen]);
-
   return <header className="site-nav-shell" data-scrolled={scrolled}>
     <a className="brand-lockup" href="#hero" aria-label="Girwan Dhakal home" onClick={() => setOpen(false)}>GD<span className="brand-dot" aria-hidden="true" /></a>
     <nav className="site-nav" aria-label="Primary navigation">
       {links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href ? "location" : undefined}>{link.label}</a>)}
       <a className="nav-resume" href={profile.resumeHref} target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight size={16} aria-hidden="true" /></a>
     </nav>
-    {!filmOnScreen && <button ref={toggle} type="button" className="mobile-nav-toggle icon-button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>}
-    {open && !filmOnScreen && <div ref={panel} className="mobile-menu" id="mobile-menu">
+    <button ref={toggle} type="button" className="mobile-nav-toggle icon-button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
+    {open && <div ref={panel} className="mobile-menu" id="mobile-menu">
       {links.map(link => <a key={link.href} href={link.href} onClick={() => setOpen(false)}>{link.label}<ArrowUpRight size={22} aria-hidden="true" /></a>)}
       <a href={profile.resumeHref} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>Résumé<ArrowUpRight size={22} aria-hidden="true" /></a>
     </div>}

@@ -15,7 +15,7 @@ export default function HomePage() {
     <a className="skip-link" href="#main-content">Skip to content</a>
     <SiteNav />
     <main id="main-content">
-      {/* The film is pinned behind both of these, so the hero's name lands over it. */}
+      {/* The film loops behind the hero as its permanent backdrop. */}
       <div className="cinema"><CinemaIntro /><Hero /></div>
       <Projects /><About /><Resume /><Skills /><Contact /></main>
     <footer className="site-footer section-inner"><span>© 2026 Girwan Dhakal</span><a className="text-link" href="#hero">Back to top <ArrowUpRight size={16} aria-hidden="true" /></a></footer>

@@ -639,7 +639,7 @@ export function Projects() {
         <div className="section-heading">
           <Reveal>
             <h2 className="text-ink" id="projects-title">
-              Selected work
+              Relevant Projects
             </h2>
           </Reveal>
         </div>
