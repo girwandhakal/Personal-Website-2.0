@@ -93,9 +93,13 @@ input, textarea { caret-color: var(--accent); }
 .mobile-nav-toggle, .mobile-menu { display: none; }
 
 /* Fills the full screen below the nav on first load, so the video reads as a
-   proper full-bleed opening and Relevant Projects isn't peeking in above the fold. */
-.hero-section { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; min-height: calc(100dvh - var(--nav-height)); padding-top: 45px; padding-bottom: 76px; gap: 0; }
-.hero-copy { position: relative; z-index: 2; }
+   proper full-bleed opening and Relevant Projects isn't peeking in above the fold.
+   `pointer-events: none` here (re-enabled on .hero-copy, its only interactive
+   content) keeps this empty grid box from intercepting clicks meant for the
+   sound control sitting on the film behind it — it fills the section's full
+   width/height even where nothing is visibly painted. */
+.hero-section { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; min-height: calc(100dvh - var(--nav-height)); padding-top: 45px; padding-bottom: 76px; gap: 0; pointer-events: none; }
+.hero-copy { position: relative; z-index: 2; pointer-events: auto; }
 .hero-copy h1 { font-size: clamp(76px, 8.6vw, 142px); line-height: .99; letter-spacing: -.04em; font-weight: 400; }
 .hero-copy h1 span { display: block; }
 .hero-subtitle { font-size: clamp(15px, 1.48vw, 23px); color: var(--ink-muted); margin-top: 26px; }
@@ -123,6 +127,22 @@ input, textarea { caret-color: var(--accent); }
   background: linear-gradient(to bottom, #11141600, #111416cc 58%, var(--surface) 94%);
 }
 .cinema-scrim { position: absolute; inset: 0; background: linear-gradient(105deg, #0b0e1199 0%, #0b0e1180 44%, #0b0e1166 76%, #0b0e1140 100%); }
+
+/* Bottom-right of the hero. The wrapper only ever plays the one-time mount
+   fade-in; the button inside it owns the resting-dim / hover-prominent opacity
+   on its own, so the two animations can never fight over the same property.
+   Rests dim so it doesn't compete with the film, and comes to full strength on
+   hover; on touch (no hover to speak of) a tap drives that same prominent state
+   via [data-active], then it's faded back out again in JS a couple of seconds
+   later. `.cinema-backdrop` itself is decorative and pointer-events:none, so
+   this re-enables clicks just for the control sitting on top of it. */
+.intro-sound-wrap { position: absolute; right: 64px; bottom: 66px; z-index: 3; pointer-events: auto; }
+.intro-sound { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #ffffff3d; border-radius: 999px; background: #0b0e1159; -webkit-backdrop-filter: blur(10px); color: #fff; opacity: .55; transition: opacity .3s ease, background .25s, border-color .25s; }
+.intro-sound svg { filter: drop-shadow(0 1px 6px #0009); }
+.intro-sound:hover, .intro-sound:focus-visible, .intro-sound[data-active="true"] { opacity: 1; background: #0b0e1199; border-color: #ffffff7a; }
+@supports (backdrop-filter: blur(1px)) {
+  .intro-sound { backdrop-filter: blur(10px); }
+}
 
 .hero-preview { position: relative; z-index: 1; min-width: 0; }
 .ai-preview { perspective: 1500px; min-width: 0; padding: 15px 28px 0 18px; }
@@ -330,6 +350,7 @@ summary::-webkit-details-marker { display: none; }
   /* The video reads as the top half of the screen, with the name/copy starting
      at that halfway line and below rather than centered over the whole section. */
   .hero-section { grid-template-columns: 1fr; align-items: end; padding-top: 28px; padding-bottom: 42px; gap: 72px; min-height: calc(100dvh - var(--nav-height)); }
+  .intro-sound-wrap { right: 20px; bottom: 22px; }
   .hero-copy h1 { font-size: clamp(76px, 15vw, 112px); line-height: .98; }
   .hero-subtitle { margin-top: 22px; font-size: 17px; }
   .hero-actions { margin-top: 24px; gap: 12px; }
