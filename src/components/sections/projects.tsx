@@ -2,12 +2,13 @@
 
 import { AnimatePresence, motion, useAnimationControls, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
-import { ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, Hammer, Lightbulb, Target, Trophy, X } from "lucide-react";
 
 import { GithubIcon } from "@/components/ui/social-icons";
 import { projects, type Project } from "@/content/projects";
-import { Reveal } from "@/components/motion/reveal";
 import { ProjectArt } from "@/components/ui/project-art";
+import { ScrollStackDeck, type StackDeckItem } from "@/components/layouts/scroll-stack-deck";
+import { DiscreteTabs } from "@/components/layouts/discrete-tabs";
 import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 
 /**
@@ -19,10 +20,6 @@ const ACCENT_FILLS = {
   crimson: "var(--accent)",
   white: "var(--accent)"
 } as const;
-
-/** Bento span pattern: wide/narrow/narrow/wide, repeating — an asymmetric
- * grid reads far less like a list than a uniform one does. */
-
 
 /** The desktop sheet's zoom, anchored to the tile that was clicked.
  *
@@ -96,46 +93,13 @@ function useCompact() {
 }
 
 const TABS = [
-  { key: "context", label: "The Problem" },
-  { key: "approach", label: "The Build" },
-  { key: "outcome", label: "The Outcome" },
-  { key: "learnings", label: "What I Learned" }
+  { id: "context", title: "The Problem", icon: Target },
+  { id: "approach", title: "The Build", icon: Hammer },
+  { id: "outcome", title: "The Outcome", icon: Trophy },
+  { id: "learnings", title: "What I Learned", icon: Lightbulb }
 ] as const;
 
-type TabKey = (typeof TABS)[number]["key"];
-
-/** A single tab trigger, styled as its own standalone glass pill rather than
- * one of several buttons sharing a single segmented-control surface — each
- * button owns its own background, border, and active state. */
-function ProjectTabButton({
-  label,
-  isActive,
-  onSelect,
-  tabId,
-  panelId
-}: {
-  label: string;
-  isActive: boolean;
-  onSelect: () => void;
-  tabId: string;
-  panelId: string;
-}) {
-  return (
-    <button
-      id={tabId}
-      role="tab"
-      type="button"
-      aria-selected={isActive}
-      aria-controls={panelId}
-      tabIndex={isActive ? 0 : -1}
-      onClick={onSelect}
-      className="project-tab"
-      data-active={isActive}
-    >
-      {label}
-    </button>
-  );
-}
+type TabKey = (typeof TABS)[number]["id"];
 
 /** Renders a project's `try it here` sentence with the phrase wired to open
  * the on-site chat instead of just being prose. */
@@ -168,18 +132,8 @@ const shortTitles: Record<string, string> = {
   "southern-company-fleet-analytics": "Fleet analytics"
 };
 
-function ProjectTile({ project, index, onOpen }: {
-  project: Project; index: number; onOpen: (project: Project, origin: DOMRect) => void;
-}) {
-  const ref = useRef<HTMLButtonElement>(null);
-  return <button ref={ref} type="button" className="project-tile" aria-label={`Open ${project.title}`} onClick={() => {
-    const origin = ref.current?.getBoundingClientRect();
-    if (origin) onOpen(project, origin);
-  }}>
-    <span className="project-tile-heading"><span>{shortTitles[project.slug] ?? project.title}</span><ArrowUpRight size={19} aria-hidden="true" /></span>
-    <ProjectArt kind={project.slug} />
-  </button>;
-}
+/** Card colours, from the deck's original pastel set — dark ink on each. */
+const CARD_COLORS = ["#C9DFF5", "#F7E0C8", "#DDD4F2", "#C8EBD8", "#F2D4E4"];
 
 function ProjectDetail({
   project,
@@ -520,26 +474,14 @@ function ProjectDetail({
             </p>
           </header>
 
-          <div role="tablist" aria-label={`${project.title} details`} className="project-tabs mt-6" onKeyDown={(event) => {
-            const keys = ["ArrowRight", "ArrowLeft", "Home", "End"];
-            if (!keys.includes(event.key)) return;
-            event.preventDefault();
-            const index = TABS.findIndex(tab => tab.key === activeTab);
-            const next = event.key === "Home" ? 0 : event.key === "End" ? TABS.length - 1 : (index + (event.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length;
-            setActiveTab(TABS[next].key);
-            document.getElementById(`${reactId}-tab-${TABS[next].key}`)?.focus();
-          }}>
-            {TABS.map((tab) => (
-              <ProjectTabButton
-                key={tab.key}
-                label={tab.label}
-                isActive={activeTab === tab.key}
-                onSelect={() => setActiveTab(tab.key)}
-                tabId={`${reactId}-tab-${tab.key}`}
-                panelId={`${reactId}-panel-${tab.key}`}
-              />
-            ))}
-          </div>
+          <DiscreteTabs
+            className="mt-7"
+            tabs={[...TABS]}
+            active={activeTab}
+            onChange={(id) => setActiveTab(id as TabKey)}
+            idPrefix={reactId}
+            ariaLabel={`${project.title} details`}
+          />
 
           <div className="min-h-32 py-6">
             <AnimatePresence mode="wait">
@@ -629,45 +571,32 @@ export function Projects() {
 
   const onSettled = useCallback(() => setScrimBlur(true), [setScrimBlur]);
 
+  const deckItems: StackDeckItem[] = orderedProjects.map((project, index) => ({
+    id: project.slug,
+    tabTitle: `${String(index + 1).padStart(2, "0")} · ${shortTitles[project.slug] ?? project.title}`,
+    title: project.title,
+    description: project.summary,
+    meta: project.timeline,
+    visual: <ProjectArt kind={project.slug} />,
+    color: CARD_COLORS[index % CARD_COLORS.length]
+  }));
+
+  const openFromDeck = useCallback((item: StackDeckItem, origin: DOMRect) => {
+    const project = orderedProjects.find((p) => p.slug === item.id);
+    if (project) openDetail(project, origin);
+  }, [openDetail]);
+
   return (
-    <section
-      className="projects-section section-inner"
-      id="projects"
-      aria-labelledby="projects-title"
-    >
-      <div className="projects-content">
-        <div className="section-heading">
-          <Reveal>
-            <h2 className="text-ink" id="projects-title">
-              Relevant Projects
-            </h2>
-          </Reveal>
-        </div>
+    <section className="projects-section" id="projects" aria-labelledby="projects-title">
+      <div className="section-inner section-label-row">
+        <h2 id="projects-title" className="section-label">Selected work</h2>
+        <a href="https://github.com/girwandhakal" target="_blank" rel="noopener noreferrer" className="text-link section-label-hint">
+          More on GitHub <GithubIcon aria-hidden="true" size={16} />
+        </a>
+      </div>
 
-        <div className="project-grid">
-          {orderedProjects.map((project, index) => (
-            <ProjectTile
-              key={project.slug}
-              project={project}
-              index={index}
-              onOpen={openDetail}
-            />
-          ))}
-        </div>
-
-        <div className="projects-more">
-          <Reveal>
-            <a
-              href="https://github.com/girwandhakal"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-link"
-            >
-              <span>More on GitHub</span>
-              <GithubIcon aria-hidden="true" size={20} className="opacity-70 group-hover:opacity-100 transition-opacity" />
-            </a>
-          </Reveal>
-        </div>
+      <div className="section-inner deck-frame">
+        <ScrollStackDeck items={deckItems} onOpen={openFromDeck} />
       </div>
 
       {/*

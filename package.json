@@ -15,12 +15,14 @@
     "@prisma/client": "^6.19.3",
     "@tailwindcss/postcss": "latest",
     "bad-words": "^4.0.0",
+    "clsx": "^2.1.1",
     "lucide-react": "latest",
     "motion": "latest",
     "next": "latest",
     "prisma": "^6.19.3",
     "react": "latest",
     "react-dom": "latest",
+    "tailwind-merge": "^3.7.0",
     "tailwindcss": "latest"
   },
   "devDependencies": {

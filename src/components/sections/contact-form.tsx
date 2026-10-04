@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowUpRight, Check, Loader2 } from "lucide-react";
 import { useState, type FormEvent, useEffect, useRef } from "react";
+
+import { SaveButton } from "@/components/layouts/save-button";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -99,9 +100,10 @@ export function ContactForm() {
     <label>Name<input name="name" autoComplete="name" required disabled={formState === "submitting"} /></label>
     <label>Email<input name="email" type="email" autoComplete="email" required disabled={formState === "submitting"} /></label>
     <label>Message<textarea name="message" rows={3} required disabled={formState === "submitting"} /></label>
-    <button className="button button-primary" type="submit" disabled={formState === "submitting" || formState === "success"}>
-      {formState === "submitting" ? <>Sending<Loader2 size={18} className="animate-spin" aria-hidden="true" /></> : formState === "success" ? <>Sent<Check size={18} aria-hidden="true" /></> : <>Send message<ArrowUpRight size={18} aria-hidden="true" /></>}
-    </button>
+    <SaveButton
+      status={formState === "submitting" ? "loading" : formState}
+      labels={{ idle: "Send message", loading: "Sending", success: "Sent", error: "Try again" }}
+    />
     <p className="contact-form-status" role="status" aria-label="Contact form status" data-error={formState === "error"}>{formState === "error" ? errorMessage : formState === "success" ? "Thanks. Your message is on its way." : ""}</p>
   </form>;
 }

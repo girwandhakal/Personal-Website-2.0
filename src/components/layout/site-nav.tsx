@@ -1,70 +1,97 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, Menu, X } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowUpRight, Briefcase, FileText, Layers, Mail, Menu, Sparkles, User, Wrench } from "lucide-react";
+
+import { GooeyNavbar, type GooeyNavItem } from "@/components/layouts/gooey-navbar";
+import { BottomMenu, bottomMenuRow, type BottomMenuItem } from "@/components/layouts/bottom-menu";
+import { GithubIcon, LinkedinIcon } from "@/components/ui/social-icons";
 import { profile } from "@/content/profile";
 
-const links = [{ label: "Work", href: "#projects" }, { label: "About", href: "#about" }, { label: "Contact", href: "#contact" }];
+const links: GooeyNavItem[] = [
+  { label: "Work", link: "#projects" },
+  { label: "About", link: "#about" },
+  { label: "Experience", link: "#experience" },
+  { label: "Toolkit", link: "#skills" },
+  { label: "Contact", link: "#contact" }
+];
+
+function scrollToSection(href: string) {
+  const el = document.querySelector(href);
+  if (!el) { window.location.href = `/${href}`; return; }
+  el.scrollIntoView({ block: "start" });
+  window.history.pushState(null, "", href);
+}
+
+const github = profile.socials.find((s) => s.icon === "github")?.href ?? "https://github.com/girwandhakal";
+const linkedin = profile.socials.find((s) => s.icon === "linkedin")?.href ?? "https://www.linkedin.com/in/gdhakal";
 
 export function SiteNav() {
-  const [open, setOpen] = useState(false);
-  const [active, setActive] = useState("");
-  // Over the hero (with the film looping behind it) the bar is transparent so the
-  // film reads full-bleed; it only takes on a background once the page has
-  // scrolled off the hero.
+  const [active, setActive] = useState(-1);
+  // Over the hero (with the film looping behind it) the bar is transparent so
+  // the film reads full-bleed; it takes on a background once scrolled off it.
   const [scrolled, setScrolled] = useState(false);
-  const toggle = useRef<HTMLButtonElement>(null);
-  const panel = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let navHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 88;
     const update = () => {
-      let next = "";
-      for (const link of links) {
-        const section = document.querySelector(link.href);
-        if (section && section.getBoundingClientRect().top < 170) next = link.href;
-      }
+      const navHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 88;
+      let next = -1;
+      links.forEach((link, i) => {
+        const section = document.querySelector(link.link);
+        if (section && section.getBoundingClientRect().top < navHeight + 120) next = i;
+      });
+      // The last section may never reach the trigger line at the page bottom.
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) next = links.length - 1;
       setActive(next);
       const hero = document.getElementById("hero");
       setScrolled(hero ? hero.getBoundingClientRect().bottom <= navHeight : window.scrollY > 24);
     };
-    const onResize = () => {
-      navHeight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-height")) || 88;
-      update();
-    };
     window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", onResize);
+    window.addEventListener("resize", update);
     update();
     return () => {
       window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", update);
     };
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") { setOpen(false); toggle.current?.focus(); }
-      if (event.key !== "Tab") return;
-      const targets = [toggle.current, ...Array.from(panel.current?.querySelectorAll<HTMLAnchorElement>("a") ?? [])].filter(Boolean) as HTMLElement[];
-      const first = targets[0], last = targets[targets.length - 1];
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  const select = useCallback((index: number, item: GooeyNavItem) => {
+    setActive(index);
+    scrollToSection(item.link);
+  }, []);
 
-  return <header className="site-nav-shell" data-scrolled={scrolled}>
-    <a className="brand-lockup" href="#hero" aria-label="Girwan Dhakal home" onClick={() => setOpen(false)}>GD<span className="brand-dot" aria-hidden="true" /></a>
-    <nav className="site-nav" aria-label="Primary navigation">
-      {links.map(link => <a key={link.href} href={link.href} aria-current={active === link.href ? "location" : undefined}>{link.label}</a>)}
+  const dockItems: BottomMenuItem[] = [
+    { id: "work", label: "Work", icon: Briefcase, onSelect: () => scrollToSection("#projects"), active: active === 0 },
+    { id: "experience", label: "Experience", icon: Layers, onSelect: () => scrollToSection("#experience"), active: active === 2 },
+    { id: "ai", label: "Ask my AI", icon: Sparkles, onSelect: () => window.dispatchEvent(new Event("open-ai-chat")) },
+    { id: "contact", label: "Contact", icon: Mail, onSelect: () => scrollToSection("#contact"), active: active === 4 },
+    {
+      id: "more",
+      label: "More",
+      icon: Menu,
+      panel: (close) => (
+        <div className="w-[236px] space-y-0.5 p-1.5">
+          <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#about"); }}><User size={18} aria-hidden="true" />About</button>
+          <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#skills"); }}><Wrench size={18} aria-hidden="true" />Toolkit &amp; education</button>
+          <div className="my-1 border-t border-border" />
+          <a className={bottomMenuRow} href={profile.resumeHref} target="_blank" rel="noopener noreferrer" onClick={close}><FileText size={18} aria-hidden="true" />Résumé<ArrowUpRight size={15} className="ml-auto" aria-hidden="true" /></a>
+          <a className={bottomMenuRow} href={github} target="_blank" rel="noopener noreferrer" onClick={close}><GithubIcon size={18} aria-hidden="true" />GitHub<ArrowUpRight size={15} className="ml-auto" aria-hidden="true" /></a>
+          <a className={bottomMenuRow} href={linkedin} target="_blank" rel="noopener noreferrer" onClick={close}><LinkedinIcon size={18} aria-hidden="true" />LinkedIn<ArrowUpRight size={15} className="ml-auto" aria-hidden="true" /></a>
+        </div>
+      )
+    }
+  ];
+
+  return <>
+    <header className="site-nav-shell" data-scrolled={scrolled}>
+      <a className="brand-lockup" href="#hero" aria-label="Girwan Dhakal home">GD<span className="brand-dot" aria-hidden="true" /></a>
+      <div className="site-nav-center">
+        <GooeyNavbar items={links} activeIndex={active} onSelect={select} ariaLabel="Primary navigation" />
+      </div>
       <a className="nav-resume" href={profile.resumeHref} target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight size={16} aria-hidden="true" /></a>
-    </nav>
-    <button ref={toggle} type="button" className="mobile-nav-toggle icon-button" aria-label={open ? "Close menu" : "Open menu"} aria-expanded={open} aria-controls="mobile-menu" onClick={() => setOpen(!open)}>{open ? <X size={22} /> : <Menu size={22} />}</button>
-    {open && <div ref={panel} className="mobile-menu" id="mobile-menu">
-      {links.map(link => <a key={link.href} href={link.href} onClick={() => setOpen(false)}>{link.label}<ArrowUpRight size={22} aria-hidden="true" /></a>)}
-      <a href={profile.resumeHref} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>Résumé<ArrowUpRight size={22} aria-hidden="true" /></a>
-    </div>}
-  </header>;
+    </header>
+    <div className="mobile-dock">
+      <BottomMenu items={dockItems} ariaLabel="Mobile navigation" />
+    </div>
+  </>;
 }
