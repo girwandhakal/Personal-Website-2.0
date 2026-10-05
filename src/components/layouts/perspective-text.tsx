@@ -22,18 +22,20 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
-// Tilts up out of the floor, holds flat and unscaled (transZ 0) from 0.34 to
-// 0.66 so the whole paragraph can be read, then tips away overhead.
+// Tilts up out of the floor, holds flat and unscaled (transZ 0) for the middle
+// half of the scroll so the whole paragraph can be read, then tips away.
 const KEYFRAMES = [
-  { p: 0.0, rotX: 42, transY: 520, transZ: -30, opacity: 0.0 },
-  { p: 0.12, rotX: 30, transY: 200, transZ: -14, opacity: 1.0 },
-  { p: 0.34, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
-  { p: 0.66, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
-  { p: 0.88, rotX: -24, transY: -180, transZ: 30, opacity: 1.0 },
-  { p: 1.0, rotX: -36, transY: -320, transZ: 50, opacity: 0.0 }
+  { p: 0.0, rotX: 36, transY: 360, transZ: -24, opacity: 0.0 },
+  { p: 0.08, rotX: 24, transY: 150, transZ: -12, opacity: 1.0 },
+  { p: 0.24, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
+  { p: 0.76, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
+  { p: 0.92, rotX: -20, transY: -140, transZ: 24, opacity: 1.0 },
+  { p: 1.0, rotX: -30, transY: -260, transZ: 40, opacity: 0.0 }
 ];
 
-const LERP = 0.06;
+// How much of the remaining distance the text closes each frame. High enough
+// that it keeps up with a quick scroll instead of trailing behind it.
+const LERP = 0.14;
 
 function interpolate(p: number) {
   const c = Math.max(0, Math.min(1, p));

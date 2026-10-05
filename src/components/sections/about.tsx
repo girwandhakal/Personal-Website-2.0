@@ -7,7 +7,7 @@ export function About() {
       <h2 id="about-title" className="section-label">About</h2>
       <span className="section-label-hint" aria-hidden="true">Keep scrolling</span>
     </div>
-    <PerspectiveText height="280vh" textClassName="about-perspective">
+    <PerspectiveText height="160vh" textClassName="about-perspective">
       <p>{profile.about}</p>
     </PerspectiveText>
   </section>;
