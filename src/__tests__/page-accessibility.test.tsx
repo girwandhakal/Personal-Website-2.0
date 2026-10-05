@@ -17,7 +17,7 @@ describe("homepage", () => {
     expect(screen.getByRole("link", { name: /skip to content/i })).toHaveAttribute("href", "#main-content");
     // The looping intro film stays the hero's backdrop.
     expect(document.querySelector("video.cinema-video")).toHaveAttribute("src", "/media/intro.mp4");
-    for (const name of [/selected work/i, /^about$/i, /experience/i, /toolkit/i, /let's talk/i]) {
+    for (const name of [/selected work/i, /^about$/i, /experience/i, /^skills$/i, /^education$/i, /let's talk/i]) {
       expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
     expect(screen.getByRole("status", { name: /contact form status/i })).toBeInTheDocument();

@@ -1,6 +1,7 @@
 import { SiteNav } from "@/components/layout/site-nav";
 import { About } from "@/components/sections/about";
 import { Contact } from "@/components/sections/contact";
+import { Education } from "@/components/sections/education";
 import { Hero } from "@/components/sections/hero";
 import { CinemaIntro } from "@/components/sections/cinema-intro";
 import { Projects } from "@/components/sections/projects";
@@ -17,7 +18,7 @@ export default function HomePage() {
     <main id="main-content">
       {/* The film loops behind the hero as its permanent backdrop. */}
       <div className="cinema"><CinemaIntro /><Hero /></div>
-      <Projects /><About /><Resume /><Skills /><Contact /></main>
+      <Projects /><About /><Resume /><Skills /><Education /><Contact /></main>
     <footer className="site-footer section-inner"><span>© 2026 Girwan Dhakal</span><a className="text-link" href="#hero">Back to top <ArrowUpRight size={16} aria-hidden="true" /></a></footer>
     <PhoneMessenger />
   </MotionProvider>;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { ArrowUpRight, Briefcase, FileText, Layers, Mail, Menu, Sparkles, User, Wrench } from "lucide-react";
+import { ArrowUpRight, Briefcase, FileText, GraduationCap, Layers, Mail, Menu, Sparkles, User, Wrench } from "lucide-react";
 
 import { GooeyNavbar, type GooeyNavItem } from "@/components/layouts/gooey-navbar";
 import { BottomMenu, bottomMenuRow, type BottomMenuItem } from "@/components/layouts/bottom-menu";
@@ -12,7 +12,7 @@ const links: GooeyNavItem[] = [
   { label: "Work", link: "#projects" },
   { label: "About", link: "#about" },
   { label: "Experience", link: "#experience" },
-  { label: "Toolkit", link: "#skills" },
+  { label: "Skills", link: "#skills" },
   { label: "Contact", link: "#contact" }
 ];
 
@@ -72,7 +72,8 @@ export function SiteNav() {
       panel: (close) => (
         <div className="w-[236px] space-y-0.5 p-1.5">
           <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#about"); }}><User size={18} aria-hidden="true" />About</button>
-          <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#skills"); }}><Wrench size={18} aria-hidden="true" />Toolkit &amp; education</button>
+          <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#skills"); }}><Wrench size={18} aria-hidden="true" />Skills</button>
+          <button type="button" className={bottomMenuRow} onClick={() => { close(); scrollToSection("#education"); }}><GraduationCap size={18} aria-hidden="true" />Education</button>
           <div className="my-1 border-t border-border" />
           <a className={bottomMenuRow} href={profile.resumeHref} target="_blank" rel="noopener noreferrer" onClick={close}><FileText size={18} aria-hidden="true" />Résumé<ArrowUpRight size={15} className="ml-auto" aria-hidden="true" /></a>
           <a className={bottomMenuRow} href={github} target="_blank" rel="noopener noreferrer" onClick={close}><GithubIcon size={18} aria-hidden="true" />GitHub<ArrowUpRight size={15} className="ml-auto" aria-hidden="true" /></a>

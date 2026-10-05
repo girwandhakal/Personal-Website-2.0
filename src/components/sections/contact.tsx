@@ -25,7 +25,6 @@ export function Contact() {
       </div>
 
       <div className="contact-form-col">
-        <p className="contact-lede">Have a role, a research idea, or a problem that needs an AI system? Send a note — it lands straight in my inbox.</p>
         <ContactForm />
       </div>
     </div>
