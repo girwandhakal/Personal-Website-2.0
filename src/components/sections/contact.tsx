@@ -3,7 +3,6 @@
 import { ArrowUpRight } from "lucide-react";
 
 import { ContactForm } from "./contact-form";
-import { HolographicCard } from "@/components/layouts/holographic-card";
 import { StackedOutlineText } from "@/components/layouts/stacked-outline-text";
 import { profile } from "@/content/profile";
 
@@ -13,16 +12,7 @@ export function Contact() {
     <StackedOutlineText text="LET'S TALK" className="contact-outline" />
 
     <div className="section-inner contact-grid">
-      <div className="contact-card-col">
-        <HolographicCard
-          image="/media/portrait-tall.jpg"
-          imageAlt="Portrait of Girwan Dhakal"
-          ariaLabel="Girwan Dhakal — contact card"
-          topLeft={<span className="contact-card-mark">GD</span>}
-          topRight={<span className="font-serif text-base leading-none text-white/50">’27</span>}
-          bottomLeft={<span className="truncate uppercase tracking-wide">Girwan Dhakal</span>}
-          bottomRight={<span className="truncate font-serif text-base leading-none text-white/50">AI / ML</span>}
-        />
+      <div className="contact-info-col">
         <div className="contact-links">
           <a className="contact-email text-link" href={`mailto:${profile.email}`}>{profile.email}<ArrowUpRight size={20} aria-hidden="true" /></a>
           <div className="contact-socials">

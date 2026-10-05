@@ -20,7 +20,6 @@ describe("homepage", () => {
     for (const name of [/selected work/i, /^about$/i, /experience/i, /toolkit/i, /let's talk/i]) {
       expect(screen.getByRole("heading", { level: 2, name })).toBeInTheDocument();
     }
-    expect(screen.getByRole("link", { name: /get in touch/i })).toHaveAttribute("href", "#contact");
     expect(screen.getByRole("status", { name: /contact form status/i })).toBeInTheDocument();
   });
 

@@ -101,15 +101,9 @@ body { overflow-x: clip; }
    intercepting clicks meant for the sound control on the film behind it. */
 .hero-section { position: relative; display: grid; grid-template-columns: 1fr; align-items: center; min-height: calc(100dvh - var(--nav-height)); padding-top: 45px; padding-bottom: 76px; pointer-events: none; }
 .hero-copy { position: relative; z-index: 2; pointer-events: auto; }
-.hero-eyebrow { display: inline-flex; align-items: center; gap: 10px; padding: 7px 14px 7px 12px; margin-bottom: 28px; border-radius: 999px; font-size: 13px; color: #e1e6ea; background: #0b0e1173; border: 1px solid #ffffff24; -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px); }
-.hero-eyebrow-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px #b7c7da2e; }
 .hero-copy h1 { font-size: clamp(76px, 8.6vw, 142px); line-height: .99; letter-spacing: -.04em; font-weight: 400; }
 .hero-copy h1 span { display: block; }
 .hero-subtitle { font-size: clamp(15px, 1.48vw, 23px); color: var(--ink-muted); margin-top: 26px; }
-.hero-actions { display: flex; align-items: center; gap: 22px; margin-top: 36px; }
-.hero-work-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-size: 15px; color: #dfe5ea; }
-.hero-work-link svg { transition: transform .35s var(--ease-out); }
-.hero-work-link:hover svg { transform: translateY(3px); }
 
 /* The opening film loops as the hero's permanent backdrop — the hero's copy
    sits on top of it from the first paint. The film itself is ungraded — the
@@ -198,20 +192,18 @@ body { overflow-x: clip; }
 
 /* ---------- Toolkit & education: Magnified Bento + 3D Book ---------- */
 .skills-section { border-top: 1px solid var(--line); }
+.education-list { display: grid; gap: 28px; align-content: center; }
+.education-heading { font-size: 13px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }
+.education-item { padding-top: 22px; border-top: 1px solid var(--line); }
+.education-degree { font-size: clamp(18px, 1.6vw, 22px); font-weight: 500; letter-spacing: -.02em; line-height: 1.35; }
+.education-meta { font-size: 14px; color: var(--ink-muted); margin-top: 4px; }
 .skills-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(28px, 4vw, 56px); align-items: center; }
-.education-shelf { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.education-book { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.education-caption { text-align: center; margin-top: 4px; }
-.education-caption h3 { font-size: 17px; letter-spacing: -.02em; }
-.education-caption p { font-size: 13px; color: var(--ink-muted); margin-top: 4px; }
-.education-caption span { display: block; font-size: 12px; color: var(--ink-dim); margin-top: 2px; }
 
 /* ---------- Contact: Stacked Outline Text + Holographic card + Save Button ---------- */
 .contact-section { border-top: 1px solid var(--line); }
 .contact-outline { min-height: clamp(220px, 30vw, 380px); }
 .contact-grid { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: clamp(36px, 6vw, 96px); align-items: start; margin-top: clamp(16px, 3vw, 40px); }
-.contact-card-col { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
-.contact-card-mark { font-size: 18px; font-weight: 700; letter-spacing: -.04em; }
+.contact-info-col { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
 .contact-links { display: grid; gap: 4px; }
 .contact-email { font-size: clamp(16px, 1.6vw, 21px); color: var(--ink); }
 .contact-socials { display: flex; flex-wrap: wrap; gap: 4px 22px; font-size: 14px; }
@@ -281,19 +273,13 @@ body { overflow-x: clip; }
      at that halfway line and below rather than centered over the whole section. */
   .hero-section { align-items: end; padding-top: 28px; padding-bottom: 116px; }
   .intro-sound-wrap { right: 20px; top: calc(var(--nav-height) + 12px); bottom: auto; }
-  .hero-eyebrow { font-size: 12px; margin-bottom: 20px; }
-  .hero-copy h1 { font-size: clamp(64px, 17vw, 112px); line-height: .98; }
+    .hero-copy h1 { font-size: clamp(64px, 17vw, 112px); line-height: .98; }
   .hero-subtitle { margin-top: 18px; font-size: 17px; }
-  .hero-actions { margin-top: 26px; gap: 16px; flex-wrap: wrap; }
-  .section-space { padding-block: 64px; }
+    .section-space { padding-block: 64px; }
   .section-label-hint { display: none; }
   /* The tilt magnifies the paragraph; keep its widest (nearest) lines on screen. */
   .about-perspective { padding-inline: 44px; font-size: 17px; }
-  .education-shelf { gap: 0; }
-  .contact-grid { grid-template-columns: 1fr; }
-  .contact-card-col { align-items: center; }
-  .contact-links { justify-items: center; text-align: center; }
-  .contact-socials { justify-content: center; }
+    .contact-grid { grid-template-columns: 1fr; }
   .site-footer { align-items: flex-start; gap: 15px; font-size: 11px; }
   .project-modal-layer { padding: 0; align-items: flex-end; }
   .project-modal { max-height: 92svh; border-radius: 24px 24px 0 0; }
