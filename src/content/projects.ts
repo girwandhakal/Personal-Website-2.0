@@ -51,6 +51,32 @@ export const projects: Project[] = [
       "I almost built the pgvector version because it sounded like the right answer. Keyword scoring over a hundred chunks matched it on relevance for a fraction of the moving parts. Now I make the simple version fail before I reach past it."
   },
   {
+    slug: "cueframe",
+    title: "Cueframe: AI Presentation Script & Teleprompter",
+    summary:
+      "A slide-aware script writer and teleprompter for presenters who want to sound like themselves. Drop in a PDF or PowerPoint, and Cueframe drafts a spoken script for every slide, lets you edit it, then scrolls it privately at your speaking pace while the room sees only your slides.",
+    impact:
+      "Built a local-first Next.js app with an OpenAI pipeline that writes four slides per call, three calls at a time; Firestore sync that re-reads only what changed; and per-call token reservations that keep AI spending inside daily limits.",
+    tech: ["Next.js", "TypeScript", "OpenAI API", "Lexical", "Firebase", "IndexedDB", "pdf.js", "Playwright"],
+    links: [{ label: "View Github", href: "https://github.com/girwandhakal/PresentationPrompter" }],
+    accent: "orange",
+    role: "Solo build — product, AI pipeline, sync, UI",
+    timeline: "2026 · built for an invite-only pilot",
+    stats: [
+      { label: "Formats imported", value: "PDF, PPTX, images" },
+      { label: "Sync cost, unchanged account", value: "1 read" },
+      { label: "Script text on the audience screen", value: "None" }
+    ],
+    context:
+      "Most presenter tools either read your slides back to you or grade your delivery. Neither helps the person who prepares carefully and then loses their place halfway through slide nine. I wanted something that starts from the deck you already made, writes a script that sounds spoken rather than pasted, and keeps it off the screen everyone else is watching.",
+    approach:
+      "Everything lives in the browser first. pdf.js renders PDFs, PowerPoint files are parsed straight from their XML, and projects, slide images and script versions sit in IndexedDB. Sign-in is optional. With it, a Firestore and Storage mirror keeps a per-device cursor, so opening an unchanged account costs one read, and an outbox resends any write that didn't land. The AI starts reading slides the moment they're imported and pre-fills the talk's goal and audience. Generation plans a word budget per slide from your speaking rate, outlines the arc, then writes four slides per model call, three calls at a time, using structured outputs that reject a script attached to the wrong slide. The presenter window scrolls at your words per minute with a reading line at eye level. The audience window gets slide images and nothing else, which an end-to-end test checks.",
+    outcome:
+      "The whole loop works: import, setup, generate, edit in a rich-text editor with reversible AI rewrites, present, then review your pace against the plan slide by slide. It's built for a free, invite-only pilot on Vercel and Firebase. Daily AI allowances reserve each call's worst-case token cost up front, so simultaneous requests can't overspend. CI runs lint, types, unit tests, security-rules tests and Playwright journeys fully offline against a demo AI, so a pull request never spends API credit.",
+    learnings:
+      "I ran blind, order-swapped comparisons between pipeline variants on a set of test decks. The heaviest variant, with a model reviewing and repairing every draft, won 13 of 15 head-to-heads, but it doubled token use and tripled latency. Then user feedback showed the real complaint wasn't false claims but how slides got paraphrased. I cut the review passes and fixed the writing instructions instead. An eval tells you which variant wins, not whether you were measuring the right problem."
+  },
+  {
     slug: "clearpath",
     title: "ClearPath: AI Medical Financial Assistant",
     summary:

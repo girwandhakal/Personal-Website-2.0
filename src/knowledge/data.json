@@ -119,5 +119,16 @@
     "tools": ["Python", "PyTorch", "Scikit-learn", "Jupyter Notebook", "SLURM"],
     "aliases": ["speech act", "speech act analysis", "language research", "late talker"],
     "priority": 8
+  },
+  {
+    "title": "Project: Cueframe AI Presentation Script & Teleprompter",
+    "content": "Cueframe (repo: PresentationPrompter) turns an existing slide deck (PDF, PowerPoint, or slide images) into a private, slide-aware script and teleprompter, built for prepared, introverted presenters who want to sound natural and stay oriented. Girwan built it solo in 2026 with Next.js, TypeScript, Lexical, the OpenAI Responses API, Firebase, and IndexedDB. It is local-first: decks and scripts live in IndexedDB, with optional Google sign-in mirroring to Firestore and Storage using a per-device sync cursor (an unchanged account costs one read) and an outbox that retries unconfirmed writes. The AI pipeline analyzes slides on import to suggest a goal, audience, and key message, plans a word budget per slide from the presenter's speaking rate, outlines the narrative, then writes four slides per model call, three calls at a time, with structured outputs that reject scripts attached to the wrong slide. The presenter view scrolls at the presenter's words per minute; the audience window receives only slide images, which an end-to-end test verifies. Daily AI allowances reserve each call's worst-case token cost so concurrent calls can't overspend. Girwan ran blind, counterbalanced comparisons of pipeline variants: a heavier review-and-repair variant won 13 of 15 comparisons but doubled tokens and tripled latency, and after user feedback showed paraphrasing was the real issue, he cut the review passes and improved the writing instructions instead. CI runs lint, typecheck, unit tests, Firestore security-rules tests, and Playwright journeys offline against a demo AI. It is built for a free, invite-only pilot.",
+    "sourcePath": "src/knowledge/projects.json",
+    "category": "project",
+    "projectName": "Cueframe",
+    "tags": ["project", "ai", "presentations", "teleprompter", "llm", "local-first"],
+    "tools": ["Next.js", "TypeScript", "OpenAI API", "Lexical", "Firebase", "Firestore", "IndexedDB", "pdf.js", "Playwright", "LLM"],
+    "aliases": ["cueframe", "presentationprompter", "presentation prompter", "teleprompter", "presentation app"],
+    "priority": 9
   }
 ]

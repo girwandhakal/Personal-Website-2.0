@@ -1,4 +1,4 @@
-import { Database, FileText, MessageSquare, ScanLine, Network, AudioLines } from "lucide-react";
+import { Database, FileText, MessageSquare, ScanLine, Network, AudioLines, Presentation } from "lucide-react";
 
 /** Abstract project illustrations, not product screenshots or measured data. */
 export function ProjectArt({ kind }: { kind: string }) {
@@ -13,6 +13,12 @@ export function ProjectArt({ kind }: { kind: string }) {
       <span className="art-document"><FileText /><span /><span /><span /><span /><strong /></span>
       <span className="art-document art-document-front"><ScanLine /><span /><span /><span /><span /><strong /></span>
       <span className="art-match"><span /><span /><span /></span>
+    </span>;
+  }
+  if (kind === "cueframe") {
+    return <span className="project-art art-cueframe" aria-hidden="true">
+      <span className="art-slide"><Presentation /><span /><span /><strong /></span>
+      <span className="art-prompter"><span /><span /><span className="art-reading-line" /><span /><span /><span /></span>
     </span>;
   }
   if (kind.includes("speech") || kind.includes("language")) {

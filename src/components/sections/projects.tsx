@@ -127,6 +127,7 @@ function SummaryWithChatLink({ text, accentClass }: { text: string; accentClass:
 
 const shortTitles: Record<string, string> = {
   "ai-persona-chatbot": "AI Persona",
+  "cueframe": "Cueframe",
   "clearpath": "ClearPath",
   "speech-act-analysis": "Speech research",
   "southern-company-fleet-analytics": "Fleet analytics"
@@ -536,7 +537,7 @@ function ProjectDetail({
 // case study). Derived by slug rather than a hardcoded index reorder, so a project list
 // shorter than this can't crash on an undefined index, and any project not named here
 // still shows up — appended — rather than silently dropping out of the grid.
-const FEATURED_ORDER = ["ai-persona-chatbot", "clearpath", "speech-act-analysis", "southern-company-fleet-analytics"];
+const FEATURED_ORDER = ["ai-persona-chatbot", "cueframe", "clearpath", "speech-act-analysis", "southern-company-fleet-analytics"];
 const orderedProjects = FEATURED_ORDER
   .map((slug) => projects.find((p) => p.slug === slug))
   .filter((p): p is Project => Boolean(p))
