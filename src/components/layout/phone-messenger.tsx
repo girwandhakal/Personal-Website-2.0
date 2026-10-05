@@ -9,7 +9,7 @@ import { isInsideOverlayScrollRegion } from "@/lib/overlay-scroll";
 /**
  * True once the hero has scrolled out of view. The launcher waits for this
  * rather than showing over the hero, where it would sit on top of the intro
- * film and its own "About me" button.
+ * film — the nav stays hidden there for the same reason.
  */
 function useHeroPassed() {
   const [heroPassed, setHeroPassed] = useState(false);
@@ -463,7 +463,7 @@ export function PhoneMessenger() {
   return <>
     {/* Not rendered at all over the hero, rather than hidden with CSS: an
         invisible button there would still be tabbable and clickable, and it
-        would sit on top of the hero's own "About me" button and the film. */}
+        would sit on top of the film. */}
     <AnimatePresence>
       {heroPassed && <motion.button
         ref={launchRef}
