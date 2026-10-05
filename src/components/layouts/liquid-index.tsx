@@ -11,7 +11,8 @@
  * Changes from the original: items come from props with an optional meta
  * line; the badge is the gradient itself (no photo underneath); the first row
  * starts active and the last one hovered stays active, so the detail is never
- * blank; keyboard focus drives the same state as hover.
+ * blank; keyboard focus drives the same state as hover; an item may carry a
+ * logo, which replaces the gradient with the logo on a white tile.
  */
 
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -30,6 +31,8 @@ export type LiquidIndexItem = {
   icon: LucideIcon;
   seed: number;
   colors: [number, number, number][];
+  /** Shown on a white tile in place of the gradient badge. */
+  logo?: { src: string; alt: string };
 };
 
 function useIsPhone() {
@@ -95,6 +98,21 @@ export function LiquidIndex({ items }: { items: LiquidIndexItem[] }) {
               </motion.span>
             </AnimatePresence>
           </div>
+          <AnimatePresence initial={false} mode="sync">
+            {current.logo && (
+              <motion.div
+                key={current.logo.src}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={fade}
+                className={isPhone ? "absolute inset-0 z-[3] flex items-center justify-center bg-white p-3" : "absolute inset-0 z-[3] flex items-center justify-center bg-white p-6"}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={current.logo.src} alt={current.logo.alt} draggable={false} className="max-h-full w-full object-contain" />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </div>
 

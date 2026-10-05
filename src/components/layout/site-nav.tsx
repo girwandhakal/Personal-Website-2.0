@@ -28,8 +28,8 @@ const linkedin = profile.socials.find((s) => s.icon === "linkedin")?.href ?? "ht
 
 export function SiteNav() {
   const [active, setActive] = useState(-1);
-  // Over the hero (with the film looping behind it) the bar is transparent so
-  // the film reads full-bleed; it takes on a background once scrolled off it.
+  // Over the hero the nav stays out of the way entirely so nothing covers the
+  // film; it slides in once the page has scrolled past the hero.
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -91,7 +91,7 @@ export function SiteNav() {
       </div>
       <a className="nav-resume" href={profile.resumeHref} target="_blank" rel="noopener noreferrer">Résumé <ArrowUpRight size={16} aria-hidden="true" /></a>
     </header>
-    <div className="mobile-dock">
+    <div className="mobile-dock" data-hidden={!scrolled}>
       <BottomMenu items={dockItems} ariaLabel="Mobile navigation" />
     </div>
   </>;
