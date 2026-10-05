@@ -162,6 +162,36 @@ describe("POST /api/chat", () => {
     expect(JSON.parse(streamingCall[1].body).model).toBe("some-future-model");
   });
 
+  it("says the database is unreachable instead of a generic error when Postgres is down", async () => {
+    const { Prisma } = await import("@prisma/client");
+    prismaMock.bannedFingerprint.findUnique.mockRejectedValue(
+      new Prisma.PrismaClientInitializationError("Can't reach database server", "6.19.3")
+    );
+    global.fetch = vi.fn() as unknown as typeof fetch;
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(chatRequest({ message: "Hi", sessionId: "session-db" }) as any);
+
+    expect(response.status).toBe(503);
+    expect(await response.text()).toMatch(/database is unreachable/i);
+  });
+
+  it("falls back to local checks when the safety scanner replies in an unexpected shape", async () => {
+    const fetchMock = vi.fn().mockImplementation((url: string, init: RequestInit) => {
+      if (String(url).includes("/scan")) return Promise.resolve(new Response(JSON.stringify({ status: "ok" }), { status: 200 }));
+      const parsed = JSON.parse(init.body as string);
+      if (parsed.stream) return Promise.resolve(groqStreamResponse(["Hi"]));
+      return Promise.resolve(groqJsonResponse(JSON.stringify({ category: "profile_general" })));
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { POST } = await import("@/app/api/chat/route");
+    const response = await POST(chatRequest({ message: "Hello", sessionId: "session-scan" }) as any);
+
+    expect(response.status).toBe(200);
+    expect(await readStreamText(response)).toBe("Hi");
+  });
+
   it("rejects a request with a missing or malformed session key before calling Groq", async () => {
     const fetchMock = vi.fn();
     global.fetch = fetchMock as unknown as typeof fetch;

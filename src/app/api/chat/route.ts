@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { Prisma } from "@prisma/client";
 import crypto from "crypto";
 import { prisma } from "@/lib/db";
 import { encrypt, decrypt } from "@/lib/crypto";
@@ -7,7 +8,8 @@ import { checkAndRedactSensitiveInfo } from "@/lib/safety";
 // Groq retires models periodically, so keep the id in one configurable place.
 // Both `llama-3.1-8b-instant` and the rest of the Llama family were decommissioned;
 // override with GROQ_MODEL if this one is retired too.
-const GROQ_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-20b";
+// Read per request, so a changed GROQ_MODEL applies without a fresh module.
+const groqModel = () => process.env.GROQ_MODEL || "openai/gpt-oss-20b";
 
 // Hashing Helper for Client IP addresses to maintain GDPR compliance
 function getClientIpHash(req: NextRequest): string {
@@ -20,6 +22,7 @@ function getClientIpHash(req: NextRequest): string {
 
 export async function POST(req: NextRequest) {
   const startTime = Date.now();
+  const GROQ_MODEL = groqModel();
   
   try {
     // 1. IP and Device Fingerprint Extraction
@@ -162,8 +165,11 @@ export async function POST(req: NextRequest) {
         body: JSON.stringify({ text: message }),
         signal: AbortSignal.timeout(3000)
       });
-      if (pyScannerResponse.ok) {
-        const data = await pyScannerResponse.json();
+      const data = pyScannerResponse.ok ? await pyScannerResponse.json().catch(() => null) : null;
+      // Only trust a reply in the scanner's own shape. Anything else (a proxy
+      // page, another service on that URL) used to read as "unsafe" with no
+      // redacted text, and encrypting `undefined` crashed the whole request.
+      if (typeof data?.allowed === "boolean" && typeof data?.redactedText === "string") {
         safetyResult = {
           isSafe: data.allowed,
           redactedText: data.redactedText
@@ -611,6 +617,20 @@ From my credentials, I am a Computer Science MS/BS student at The University of 
 
   } catch (error) {
     console.error("Chat handler crash:", error);
+    // Every request reads Postgres before anything else (bans, rate limits), so
+    // an unreachable or paused database lands here. Say so instead of a
+    // generic error, so it can be told apart from a bug.
+    if (
+      error instanceof Prisma.PrismaClientInitializationError ||
+      error instanceof Prisma.PrismaClientKnownRequestError ||
+      error instanceof Prisma.PrismaClientUnknownRequestError ||
+      error instanceof Prisma.PrismaClientRustPanicError
+    ) {
+      return new Response(
+        "[SERVER ERROR] The chat database is unreachable right now. Please try again later.",
+        { status: 503 }
+      );
+    }
     return new Response(
       "[SERVER ERROR] An unexpected internal error occurred.",
       { status: 500 }
