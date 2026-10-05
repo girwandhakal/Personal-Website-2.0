@@ -33,7 +33,6 @@ export function Resume() {
   return <section className="experience-section section-inner section-space" id="experience" aria-labelledby="experience-title">
     <div className="section-label-row section-label-row--flush">
       <h2 id="experience-title" className="section-label">Experience</h2>
-      <span className="section-label-hint" aria-hidden="true">Hover a role</span>
     </div>
     <FocusText items={items} />
   </section>;
