@@ -192,7 +192,8 @@ body { overflow-x: clip; }
 
 /* ---------- About: Perspective Text Scroll ---------- */
 .about-section .section-label-row { margin-bottom: 0; }
-.about-perspective { font-size: clamp(18px, 2.5vw, 36px); line-height: 1.32; letter-spacing: -.025em; font-weight: 600; color: #dfe5ea; }
+/* Sized to both width and height so the whole paragraph fits on screen while it holds flat. */
+.about-perspective { font-size: clamp(18px, min(2.2vw, 3.3vh), 32px); line-height: 1.36; letter-spacing: -.02em; font-weight: 600; color: #e6ebef; }
 
 /* ---------- Experience: Liquid Index ---------- */
 .experience-section { border-top: 1px solid var(--line); }
@@ -271,6 +272,8 @@ body { overflow-x: clip; }
   .mobile-dock[data-hidden="true"] { opacity: 0; transform: translate(-50%, 24px); pointer-events: none; }
   .mobile-dock[data-hidden="true"]:focus-within { opacity: 1; transform: translateX(-50%); pointer-events: auto; }
   .chat-launcher { display: none; }
+  /* Keep the pinned About paragraph clear of the floating dock. */
+  .perspective-stage { padding-bottom: calc(84px + var(--safe-bottom)); }
   .site-footer { padding-bottom: 110px; }
 }
 @media (max-width: 767px) {
@@ -288,8 +291,7 @@ body { overflow-x: clip; }
   .section-label-hint { display: none; }
   .education-list { grid-template-columns: 1fr; }
   .skills-marquee { -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent); mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent); }
-  /* The tilt magnifies the paragraph; keep its widest (nearest) lines on screen. */
-  .about-perspective { padding-inline: 44px; font-size: 17px; }
+  .about-perspective { padding-inline: 24px; font-size: clamp(14px, 2.4vh, 17px); }
     .contact-grid { grid-template-columns: 1fr; }
   .site-footer { align-items: flex-start; gap: 15px; font-size: 11px; }
   .project-modal-layer { padding: 0; align-items: flex-end; }

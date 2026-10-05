@@ -7,10 +7,14 @@
  * reader, then tips away overhead as the page scrolls past it. Scroll progress
  * is eased toward with a lerp each frame so the motion trails the wheel softly.
  *
- * Changes from the original: content, height and colours come from props;
- * progress starts as the block enters the viewport rather than once pinned;
- * reduced motion shows the text flat and still; the frame loop only runs while
- * the block is near the viewport.
+ * Changes from the original, all for readability: the paragraph holds flat
+ * and at its natural size for the middle stretch of the scroll instead of
+ * facing the reader for a single instant (and magnified); the gradient that
+ * permanently faded out its bottom third is gone; the pinned stage sits below
+ * the nav bar rather than behind it. Also: content and height come from
+ * props, progress starts as the block enters the viewport, reduced motion
+ * shows the text flat and still, and the frame loop only runs while the block
+ * is near the viewport.
  */
 
 import { useReducedMotion } from "motion/react";
@@ -18,12 +22,15 @@ import { useEffect, useRef, type ReactNode } from "react";
 
 import { cn } from "@/lib/utils";
 
+// Tilts up out of the floor, holds flat and unscaled (transZ 0) from 0.34 to
+// 0.66 so the whole paragraph can be read, then tips away overhead.
 const KEYFRAMES = [
   { p: 0.0, rotX: 42, transY: 520, transZ: -30, opacity: 0.0 },
-  { p: 0.12, rotX: 38, transY: 220, transZ: -10, opacity: 1.0 },
-  { p: 0.5, rotX: 0, transY: 0, transZ: 25, opacity: 1.0 },
-  { p: 0.85, rotX: -24, transY: -180, transZ: 45, opacity: 1.0 },
-  { p: 1.0, rotX: -36, transY: -320, transZ: 60, opacity: 0.0 }
+  { p: 0.12, rotX: 30, transY: 200, transZ: -14, opacity: 1.0 },
+  { p: 0.34, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
+  { p: 0.66, rotX: 0, transY: 0, transZ: 0, opacity: 1.0 },
+  { p: 0.88, rotX: -24, transY: -180, transZ: 30, opacity: 1.0 },
+  { p: 1.0, rotX: -36, transY: -320, transZ: 50, opacity: 0.0 }
 ];
 
 const LERP = 0.06;
@@ -48,15 +55,12 @@ function interpolate(p: number) {
 export function PerspectiveText({
   children,
   height = "320vh",
-  fadeColor = "var(--surface)",
   className,
   textClassName
 }: {
   children: ReactNode;
   /** Total scroll distance the text is pinned for. */
   height?: string;
-  /** Matches the page behind it so the bottom fade disappears into it. */
-  fadeColor?: string;
   className?: string;
   textClassName?: string;
 }) {
@@ -126,7 +130,7 @@ export function PerspectiveText({
   return (
     <div ref={containerRef} className={cn("relative w-full", className)} style={{ height: reduce ? "auto" : height }}>
       <div
-        className={cn("flex w-full items-center justify-center overflow-hidden", reduce ? "py-24" : "sticky top-0 h-screen")}
+        className={cn("perspective-stage flex w-full items-center justify-center overflow-hidden", reduce ? "py-24" : "sticky top-[var(--nav-height)] h-[calc(100svh-var(--nav-height))]")}
         style={{ perspective: "200px", perspectiveOrigin: "50% 50%" }}
       >
         <div
@@ -141,11 +145,6 @@ export function PerspectiveText({
           }}
         >
           {children}
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 left-0 h-[34%] w-full select-none"
-            style={{ background: `linear-gradient(to bottom, transparent, ${fadeColor})` }}
-          />
         </div>
       </div>
     </div>
