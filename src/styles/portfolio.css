@@ -195,6 +195,11 @@ body { overflow-x: clip; }
 /* Sized to both width and height so the whole paragraph fits on screen while it holds flat. */
 .about-perspective { font-size: clamp(18px, min(2.2vw, 3.3vh), 32px); line-height: 1.36; letter-spacing: -.02em; font-weight: 600; color: #e6ebef; }
 
+/* ---------- Experience: pinned Focus Text ---------- */
+/* The label sits inside the pinned stage; the stage leaves its own room below it. */
+.experience-section .section-label-row--flush { margin-bottom: 0; }
+.focus-text-stage { padding-bottom: 40px; }
+
 /* ---------- Skills: drifting chip rows, borderless with faded edges ---------- */
 .skills-marquee { display: flex; flex-direction: column; align-items: center; gap: 16px; width: min(100%, 1240px); margin-inline: auto; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent); mask-image: linear-gradient(to right, transparent, #000 18%, #000 82%, transparent); }
 
@@ -261,6 +266,8 @@ body { overflow-x: clip; }
   /* The gooey row plus brand and résumé no longer fit side by side. */
   .site-nav-center { display: none; }
   .site-nav-shell { grid-template-columns: 1fr auto; }
+  /* Keep pinned text clear of the dock. */
+  .focus-text-stage { padding-bottom: calc(96px + var(--safe-bottom)); }
   .mobile-dock { display: block; position: fixed; left: 50%; bottom: calc(14px + var(--safe-bottom)); z-index: 70; transform: translateX(-50%); transition: opacity .35s var(--ease-out), transform .45s var(--ease-out); }
   .mobile-dock[data-hidden="true"] { opacity: 0; transform: translate(-50%, 24px); pointer-events: none; }
   .mobile-dock[data-hidden="true"]:focus-within { opacity: 1; transform: translateX(-50%); pointer-events: auto; }

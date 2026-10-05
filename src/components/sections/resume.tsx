@@ -30,10 +30,10 @@ const items: FocusTextItem[] = profile.experience.map((exp) => ({
 }));
 
 export function Resume() {
-  return <section className="experience-section section-inner section-space" id="experience" aria-labelledby="experience-title">
-    <div className="section-label-row section-label-row--flush">
-      <h2 id="experience-title" className="section-label">Experience</h2>
-    </div>
-    <FocusText items={items} />
+  return <section className="experience-section section-inner" id="experience" aria-labelledby="experience-title">
+    <FocusText
+      items={items}
+      header={<div className="section-label-row section-label-row--flush"><h2 id="experience-title" className="section-label">Experience</h2></div>}
+    />
   </section>;
 }

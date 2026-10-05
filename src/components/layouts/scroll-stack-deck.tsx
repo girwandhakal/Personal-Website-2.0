@@ -12,7 +12,8 @@
  * each card is a button that reports its box so a detail view can open from
  * it; the visual slot takes any node instead of an image URL; the pinned
  * stage clips, so cards waiting below never peek into tall viewports; phones
- * get a tighter stack step; reduced motion gets a plain column.
+ * get a tighter stack step; reduced motion gets a plain column; the last card
+ * holds for a full screen of scroll before the deck lets go.
  */
 
 import { motion, useReducedMotion, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
@@ -142,7 +143,10 @@ export function ScrollStackDeck({ items, onOpen, className }: { items: StackDeck
   const reduce = useReducedMotion();
   const phone = useIsPhone();
   const { scrollYProgress } = useScroll({ target: containerRef, offset: ["start start", "end end"] });
-  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 24, mass: 0.15, restDelta: 0.0001 });
+  // The cards finish arriving one screen before the pin releases, so the last
+  // one gets the same screen of scroll as the others.
+  const arrival = useTransform(scrollYProgress, [0, (items.length - 1) / items.length], [0, 1]);
+  const progress = useSpring(arrival, { stiffness: 120, damping: 24, mass: 0.15, restDelta: 0.0001 });
 
   if (reduce) {
     return (
@@ -153,7 +157,7 @@ export function ScrollStackDeck({ items, onOpen, className }: { items: StackDeck
   }
 
   return (
-    <div ref={containerRef} className={cn("relative isolate w-full", className)} style={{ height: `${items.length * 100}vh` }}>
+    <div ref={containerRef} className={cn("relative isolate w-full", className)} style={{ height: `${(items.length + 1) * 100}vh` }}>
       <div className="pointer-events-none sticky top-0 flex h-[100svh] w-full items-start justify-center overflow-clip pt-[calc(var(--nav-height)+80px)] md:items-center md:pt-0">
         <div className="pointer-events-auto relative h-[30rem] w-full md:h-[37rem]">
           {items.map((item, index) => (
