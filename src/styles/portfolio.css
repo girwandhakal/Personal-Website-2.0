@@ -281,7 +281,7 @@ body { overflow-x: clip; }
   /* The video reads as the top half of the screen, with the name/copy starting
      at that halfway line and below rather than centered over the whole section. */
   .hero-section { align-items: end; padding-top: 28px; padding-bottom: 116px; }
-  .intro-sound-wrap { right: 20px; top: calc(var(--nav-height) + 12px); bottom: auto; }
+  .intro-sound-wrap { right: 20px; top: auto; bottom: calc(20px + var(--safe-bottom)); }
     .hero-copy h1 { font-size: clamp(64px, 17vw, 112px); line-height: .98; }
   .hero-subtitle { margin-top: 18px; font-size: 17px; }
     .section-space { padding-block: 64px; }
