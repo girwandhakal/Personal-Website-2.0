@@ -1,17 +1,54 @@
 (() => {
   'use strict';
   const $=id=>document.getElementById(id), canvas=$('screen'), ctx=canvas.getContext('2d');
-  const game=new PacketEngine(); let mode='ready', best=0, last=0, frame=0, swipeX=null;
+  let game=new PacketEngine(); let mode='ready', best=0, last=0, frame=0, swipeX=null;
+  let ticket=null, ticks=0, moves=[], accumulator=0, generation=0;
+  const STEP=1/60;
   try { best=Number(localStorage.getItem('packet-run-best'))||0; } catch {}
   const pad=n=>String(n).padStart(4,'0');
   $('best').textContent=pad(best);
   function updateScore() { $('score').textContent=pad(game.score); $('lives').textContent=game.lives; }
   function saveBest() { if(game.score>best) { best=game.score; try {localStorage.setItem('packet-run-best',String(best));}catch{} $('best').textContent=pad(best); } }
   function overlay(title,copy,button) { $('overlay-title').textContent=title; $('overlay-copy').textContent=copy; $('start').textContent=button; $('overlay').hidden=false; }
-  function start() {
-    if(mode!=='paused') game.reset();
-    mode='playing'; $('overlay').hidden=true; $('pause').disabled=false; $('pause').textContent='Pause';
-    $('status').textContent='Run started. Collect + packets; avoid × bugs.'; updateScore(); canvas.focus({preventScroll:true});
+  async function api(data) {
+    const response=await fetch('/api/leaderboard',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:AbortSignal.timeout(12000)});
+    const body=await response.json();
+    if(!response.ok)throw new Error(body.error||'Leaderboard is temporarily unavailable.');
+    return body;
+  }
+  function displayScores(entries) {
+    $('leaderboard-rows').replaceChildren();
+    for(const entry of entries) {
+      const row=document.createElement('tr');
+      for(const value of [entry.rank,entry.nickname,entry.score]) {const cell=document.createElement('td');cell.textContent=value;row.append(cell);}
+      $('leaderboard-rows').append(row);
+    }
+    $('leaderboard-table').hidden=!entries.length;
+    $('leaderboard-status').textContent=entries.length?'Top 10 scores. Tied scores share a rank.':'No scores yet. Set the first record!';
+  }
+  async function loadScores() {
+    $('refresh-scores').disabled=true;
+    try {
+      const response=await fetch('/api/leaderboard',{signal:AbortSignal.timeout(12000)});
+      const body=await response.json();if(!response.ok)throw new Error(body.error);
+      displayScores(body.entries);
+    } catch { $('leaderboard-status').textContent='Scores are unavailable right now. Try refreshing in a moment.'; }
+    finally { $('refresh-scores').disabled=false; }
+  }
+  async function start() {
+    if(mode==='starting'||mode==='playing')return;
+    const resume=mode==='paused';
+    let practice=false;
+    if(!resume) {
+      generation++;mode='starting';$('start').disabled=true;$('start').textContent='Starting…';
+      $('run-result').hidden=true;$('score-form').hidden=true;$('submit-status').textContent='';
+      try {const run=await api({action:'start'});ticket=run.ticket;game=new PacketEngine(PacketEngine.random(run.seed));}
+      catch {ticket=null;practice=true;game=new PacketEngine();}
+      ticks=0;moves=[];accumulator=0;
+    }
+    mode='playing'; $('overlay').hidden=true; $('start').disabled=false; $('pause').disabled=false; $('pause').textContent='Pause';
+    $('status').textContent=practice?'Practice run: leaderboard unavailable.':'Run started. Collect + packets; avoid × bugs.';
+    updateScore(); canvas.focus({preventScroll:true});
     last=performance.now(); cancelAnimationFrame(frame); frame=requestAnimationFrame(loop);
   }
   function pause() {
@@ -20,16 +57,40 @@
     mode='paused'; cancelAnimationFrame(frame); saveBest(); $('pause').textContent='Resume';
     overlay('CONNECTION PAUSED','Your run is safe. Pick up where you left off.','Resume game'); $('status').textContent='Paused.';
   }
-  function finish() {
+  async function finish() {
     mode='over'; saveBest(); $('pause').disabled=true;
-    overlay('CONNECTION LOST', 'Score: '+game.score+' · Best: '+best+'. Ready for another run?', 'Play again');
-    $('status').textContent='Game over. Score '+game.score+'. Best '+best+'.'; $('start').focus({preventScroll:true});
+    overlay('CONNECTION LOST', 'Score: '+game.score+' · Best: '+best, 'Play again');
+    $('status').textContent='Game over. Score '+game.score+'.';
+    $('run-result').hidden=false;$('score-form').hidden=true;
+    const current=generation;
+    if(!ticket) {$('run-rank').textContent='Practice run. Play again to try the leaderboard.';return;}
+    $('run-rank').textContent='Checking your rank…';
+    try {
+      const result=await api({action:'finish',ticket,ticks,moves});
+      if(generation!==current||mode!=='over')return;
+      $('run-rank').textContent='Your score would place #'+result.rank+'.';
+      $('score-form').hidden=false;$('submit-score').disabled=false;
+      try {$('nickname').value=localStorage.getItem('packet-run-nickname')||'';}catch{}
+    } catch(error) {if(generation===current)$('run-rank').textContent=error.message||'Could not check this score. Try another run.';}
   }
-  function move(d) { if(mode==='playing') { game.move(d); draw(); } }
+  function move(d) { if(mode==='playing') {moves.push([ticks,d]);game.move(d);draw();} }
+  $('refresh-scores').addEventListener('click',loadScores);
+  $('score-form').addEventListener('submit',async event=> {
+    event.preventDefault();if(mode!=='over'||!ticket)return;
+    const current=generation;$('submit-score').disabled=true;$('submit-status').textContent='Saving…';
+    try {
+      const result=await api({action:'submit',ticket,nickname:$('nickname').value});
+      if(current!==generation)return;
+      $('run-rank').textContent='You’re #'+result.rank+' on the leaderboard!';
+      $('submit-status').textContent='Added as '+result.nickname+'.';$('score-form').hidden=true;
+      try{localStorage.setItem('packet-run-nickname',result.nickname);}catch{}
+      displayScores(result.entries);
+    } catch(error) {if(current===generation){$('submit-status').textContent=error.message||'Could not save. Try again.';$('submit-score').disabled=false;}}
+  });
   $('start').addEventListener('click',start); $('pause').addEventListener('click',pause);
   $('left').addEventListener('click',()=>move(-1)); $('right').addEventListener('click',()=>move(1));
   document.addEventListener('keydown',e=> {
-    if(e.altKey||e.ctrlKey||e.metaKey) return;
+    if(e.altKey||e.ctrlKey||e.metaKey||e.target.matches('input,textarea,select')) return;
     const key=e.key.toLowerCase();
     if(['arrowleft','arrowright','a','d'].includes(key) && mode==='playing') { e.preventDefault(); move(['arrowleft','a'].includes(key)?-1:1); }
     if(['p','escape'].includes(key)&&['playing','paused'].includes(mode)) { e.preventDefault(); if(!e.repeat) pause(); }
@@ -60,9 +121,11 @@
   }
   function loop(now) {
     if(mode!=='playing') return;
-    game.tick((now-last)/1000);last=now;updateScore();draw();
+    accumulator+=Math.min(.1,Math.max(0,(now-last)/1000));last=now;
+    while(accumulator>=STEP&&!game.over){game.tick(STEP);ticks++;accumulator-=STEP;}
+    updateScore();draw();
     if(game.lastEvent && $('status').textContent!==game.lastEvent) $('status').textContent=game.lastEvent;
     if(game.over) finish(); else frame=requestAnimationFrame(loop);
   }
-  draw();
+  draw();loadScores();
 })();

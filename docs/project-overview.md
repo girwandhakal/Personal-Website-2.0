@@ -158,3 +158,10 @@ The `retro-site` branch adds an independent static portfolio in `retro/`. Its fi
 `retro/arcade/index.html` hosts the optional Packet Run Easter egg, linked from the homepage footer. Only the arcade requires client JavaScript. Its simulation is separated into `engine.js`, with keyboard/touch input and canvas rendering in `arcade.js`. High scores remain in browser-local storage; no backend or database is required.
 
 Run `node scripts/serve-retro.cjs` to preview the static portfolio at `http://localhost:3000`. Run `node scripts/test-retro-arcade.cjs` for simulation checks. A future static host should publish `retro/`; existing Next.js and production deployment configuration remain separate.
+
+
+### Arcade leaderboard
+
+The retro arcade adds `retro/api/leaderboard.mjs`, a server-only Vercel Function with a pinned Postgres.js dependency. The existing project deploys from `retro/` using its own `vercel.json`. The HTML portfolio still needs no client framework or build. The function reuses `DATABASE_URL` and `IP_SALT`, storing isolated run and rate-limit records in the private `arcade` schema. RLS is enabled with no Data API grants; existing tables are unchanged.
+
+Runs use signed, expiring seeded tickets. The API replays tick-indexed lane changes with the shared game engine before calculating a rank or accepting a public nickname. Submissions are idempotent, names are validated, and writes are origin-checked and rate-limited. Scores are shared across browsers; practice runs and local best scores remain available when the backend is unavailable. See `retro/README.md` for setup and verification.
