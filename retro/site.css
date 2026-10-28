@@ -1,102 +1,654 @@
-:root { color-scheme: light; --ink: #2c241d; --accent: #682b38; --link: #74351f; --paper: #fff8e7; --silver: #d5c6a5; }
-* { box-sizing: border-box; }
-html { scroll-padding-top: 1rem; }
-body { margin: 24px 12px; color: var(--ink); background: #61483e; font: 18px/1.65 Georgia, "Times New Roman", serif; overflow-wrap: break-word; }
-.site-shell { max-width: 900px; margin: auto; background: var(--paper); border: 2px solid #95876b; box-shadow: 3px 4px 12px #0002; }
-a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
-a:visited { color: #654365; }
-a:hover { color: #58212d; background: #efdfa9; text-decoration-thickness: 2px; }
-a:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 3px solid #70401c; outline-offset: 4px; }
-.site-header { padding: 20px 32px; background: var(--accent); color: white; border-bottom: 2px solid #2c241d; font-family: Arial, Helvetica, sans-serif; }
-.site-header .site-name { margin: 0; color: #ffff9a; font-family: Georgia, serif; font-size: 1.8rem; font-weight: bold; line-height: 1.25; }
-.site-header p { margin: 8px 0 0; font-size: 1rem; }
-.site-nav { display: flex; flex-wrap: wrap; gap: 4px 8px; padding: 10px 24px; background: var(--silver); border-top: 1px solid white; border-bottom: 1px solid #95876b; font: bold 1rem/1.4 Arial, sans-serif; }
-.site-nav a, .site-nav a:visited { color: #542534; padding: 10px 8px; }
-.site-nav a[aria-current="page"] { color: white; background: var(--accent); text-decoration: none; }
-.site-nav a[aria-current="page"]:hover { color: white; background: #26269c; }
-main { padding: 32px 40px 40px; }
-h1,h2,h3,h4 { line-height: 1.3; }
-h1 { color: var(--accent); font-size: 2rem; margin: 0 0 20px; }
-h2 { font: bold 1.35rem/1.3 Arial, sans-serif; color: var(--accent); margin: 36px 0 16px; padding-bottom: 8px; border-bottom: 2px solid var(--accent); }
-h3 { font-size: 1.25rem; color: #58212d; margin: 28px 0 8px; }
-h4 { font-size: 1.1rem; margin: 24px 0 8px; }
-p { margin: 12px 0; }
-p,li { max-width: 72ch; }
-.lead { font-size: 1.2rem; }
-ul,ol { padding-left: 26px; }
-li { margin-bottom: 10px; }
-.details,.small,.project-meta,.breadcrumb { font: 1rem/1.55 Arial, sans-serif; color: #3e3e36; }
-.project-directory { margin: 24px 0; }
-.project-directory dt { padding-top: 24px; border-top: 1px solid #a0947b; font-size: 1.25rem; font-weight: bold; }
-.project-directory dt:first-child { padding-top: 0; border-top: 0; }
-.project-directory dt a, .project-directory dt a:visited { color: #682b38; }
-.project-directory dd { margin: 8px 0 24px; }
-.project-meta { display: block; margin-top: 4px; font-weight: normal; }
-dt { font-weight: bold; }
-dd { margin: 4px 0 20px; }
-#experience > article { border-bottom: 1px solid #a0947b; padding: 24px 0; }
-#experience > article:last-child { border-bottom: 0; }
-#experience > article > h3 { margin-top: 0; }
-summary { cursor: pointer; padding: 10px 0; color: var(--link); text-decoration: underline; text-underline-offset: 3px; }
-summary:hover { color: #58212d; }
-details[open] { padding-bottom: 12px; }
-.role-links { margin-top: 20px; }
-.retro-btn, .retro-btn:visited { display: inline-block; margin: 8px 8px 8px 0; padding: 9px 16px; background: var(--silver); border: 2px outset #f4e7cc; color: #542534; font: bold 1rem/1.5 Arial, sans-serif; }
-.retro-btn:hover { background: #eee4cb; color: #58212d; }
-.retro-btn:active { border-style: inset; }
-.case-study > section { padding: 8px 0 16px; }
-.case-study > h1 { margin-top: 20px; }
-.breadcrumb { margin-top: 0; }
-.takeaways { margin: 28px 0; }
-.takeaways h2 { margin-top: 0; }
-table { width: 100%; border-collapse: collapse; font-size: 1rem; }
-th,td { border: 1px solid #a0947b; padding: 12px; text-align: left; vertical-align: top; }
-thead th { background: var(--accent); color: white; }
-tbody th { background: #e9e4cc; color: var(--ink); width: 25%; }
-tbody th a, tbody th a:visited { color: #682b38; }
-thead a, thead a:visited { color: white; }
-hr { border: 0; border-top: 1px solid #a0947b; margin: 28px 0; }
-code { font-size: .9em; overflow-wrap: anywhere; }
-blockquote { margin: 20px 0; padding: 0 20px; border-left: 2px solid #95876b; }
-footer { border-top: 2px solid #95876b; padding: 16px 32px; background: #e9e4cc; font: 1rem/1.6 Arial, sans-serif; }
-footer p { margin: 4px 0; }
-.skip { position: absolute; top: -100px; left: 16px; padding: 10px; background: white; z-index: 2; }
-.skip:focus { top: 8px; }
-::selection { color: white; background: var(--accent); }
-@media (max-width: 600px) { body { margin: 8px; font-size: 17px; } main { padding: 24px 18px; } .site-header { padding: 18px; } .site-nav { padding: 6px 10px; gap: 2px; } .site-nav a { padding: 10px 8px; } h1 { font-size: 1.7rem; } footer { padding: 16px 18px; } th,td { padding: 8px; } }
-@media print { body { margin: 0; background: white; font-size: 12pt; } .site-shell { max-width: none; border: 0; box-shadow: none; } .site-header { background: white; color: black; padding: 0; } .site-header .site-name { color: black; } main { padding: 0; } nav,.skip,.retro-btn,.back,footer { display: none; } h2,h3 { break-after: avoid; } }
+/* ==========================================================================
+   Girwan Dhakal — Retro Portfolio Stylesheet
+   Authentic late-1990s / early-2000s personal homepage & academic webmaster.
+   Engineered for WCAG 2.2 Level AAA contrast, keyboard accessibility,
+   and tactile physical 3D retro controls.
+   ========================================================================== */
 
-/* Late-1990s personal homepage: tiled background, beveled navigation, classic document styling. */
-:root { --paper: #fff8e7; --silver: #d5c6a5; --link: #74351f; }
-body { background-color: #61483e; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath fill='%23533b32' d='M0 0h2v2H0zm4 4h2v2H4z'/%3E%3C/svg%3E"); font-family: "Times New Roman", Times, serif; }
-.site-shell { border: 3px outset #eee0c3; padding: 3px; background: #d5c6a5; box-shadow: 4px 6px 12px #2d1c1570; }
-.site-header { text-align: center; background: #fff8e7; color: #2c241d; border: 2px inset #f4e7cc; margin: 3px 0; padding: 24px 20px 20px; }
-.site-header .site-name { color: #682b38; font: bold 2.3rem/1.2 "Times New Roman", Times, serif; text-shadow: 1px 1px #d5c6a5; }
-.site-header p { font: 1rem/1.5 "Times New Roman", Times, serif; max-width: none; text-align: center; }
-.site-nav { justify-content: center; padding: 8px; gap: 6px; border: 0; background: #d5c6a5; }
-.site-nav a, .site-nav a:visited { min-height: 44px; padding: 9px 14px; border: 2px outset #fff4d8; color: #682b38; background: #d5c6a5; font: bold 15px/1.5 Arial, sans-serif; text-decoration: underline; }
-.site-nav a:hover { background: #e6d6b4; color: #58212d; }
-.site-nav a[aria-current="page"] { background: #eadfc6; color: #2c241d; border-style: inset; text-decoration: none; }
-.site-nav a[aria-current="page"]:hover { background: #eadfc6; color: #2c241d; }
-main { background: #fff8e7; border: 2px inset #f4e7cc; padding: 28px 36px 36px; }
-h1 { font-size: 2rem; color: #58212d; padding-bottom: 16px; border-bottom: 4px double #95876b; }
-.welcome-line { text-align: center; color: #682b38; font-style: italic; margin: 0 0 12px; }
-.welcome-line + h1 { text-align: center; }
-h2 { color: white; background: #682b38; padding: 6px 10px; border: 2px outset #b88a87; font: bold 1.15rem/1.4 Arial, sans-serif; }
-h3 { color: #454b27; }
-.project-directory dt { background: #e9e4cc; padding: 8px 12px; border: 1px solid #95876b; border-bottom: 3px double #95876b; font-size: 1.2rem; }
-.project-directory dt:first-child { padding: 8px 12px; border-top: 1px solid #95876b; }
-.project-directory dd { padding: 0 12px; }
-.project-directory dt a, .project-directory dt a:visited { color: #682b38; }
-.project-meta { display: inline-block; margin: 0 0 0 12px; font: normal .9rem/1.5 Arial, sans-serif; color: #494233; }
-.retro-btn, .retro-btn:visited { color: #2c241d; border-width: 3px; }
-table { border: 3px ridge #b0b0a0; background: #fffdf5; }
-caption { text-align: left; font-weight: bold; padding: 8px 0; }
-th,td { border: 1px solid #95876b; }
-thead th { background: #682b38; color: white; }
-tbody th { background: #e9e4cc; color: #2c241d; }
-footer { margin-top: 3px; border: 2px inset #f4e7cc; text-align: center; background: #d5c6a5; color: #2c241d; font: .9rem/1.6 "Times New Roman", Times, serif; padding: 16px; }
-footer p { max-width: none; }
-hr { height: 3px; border-top: 1px solid #95876b; border-bottom: 1px solid white; }
-@media(max-width: 600px) { body { margin: 8px; } .site-header { padding: 18px 12px; } .site-header .site-name { font-size: 1.9rem; } main { padding: 22px 16px; } .site-nav { gap: 4px; padding: 6px 0; } .site-nav a, .site-nav a:visited { font-size: 14px; padding: 10px; flex: 1 0 auto; text-align: center; } h1 { font-size: 1.7rem; } .project-meta { display: block; margin: 4px 0 0; } }
-@media print { body { background: white; } .site-shell { padding: 0; background: white; border: 0; box-shadow: none; } .site-header,main { background: white; border: 0; } h2 { color: black; background: white; border: 0; padding-left: 0; } }
+:root {
+  color-scheme: light;
+  /* Core Retro Palette */
+  --ink: #1c1511;           /* Deep vintage ink (17.7:1 contrast on parchment) */
+  --ink-secondary: #3a3127; /* Rich dark umber for metadata (12.5:1 contrast) */
+  --accent: #6f1424;        /* Deep Alabama Crimson / Wine (11.8:1 contrast) */
+  --accent-hover: #881b2e;  /* Warm bright crimson */
+  --accent-shadow: #3c060f; /* Deep shadow for 3D bevels */
+  --accent-highlight: #a83d4f; /* Light highlight for 3D bevels */
+  --paper: #fffdf6;         /* Warm ivory parchment well */
+  --chassis: #ded5c0;       /* Retro computer chassis / bevel background */
+  --chassis-dark: #c5b9a0;  /* Depressed / active tab chassis */
+  --chassis-light: #eee5d0; /* Raised button surface */
+  --bevel-light: #ffffff;   /* 3D top/left highlight */
+  --bevel-shadow: #6e614c;  /* 3D bottom/right shadow */
+  --bevel-deep: #473e30;    /* 3D deepest shadow edge */
+  --border-rule: #8a7c64;   /* Classic divider and border color */
+  --link: #0b4392;          /* Classic accessible retro cobalt blue (9.2:1 contrast) */
+  --link-visited: #5e227a;  /* Deep accessible royal amethyst (10.4:1 contrast) */
+  --link-hover: #761426;    /* Crimson highlight on hover */
+  --highlight-yellow: #fff3a8; /* Classic retro marker highlighter */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: 1.5rem;
+}
+
+/* Retro CRT / Workstation desktop with subtle micro-dithered tweed texture */
+body {
+  margin: 24px 12px;
+  color: var(--ink);
+  background-color: #261e18;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath fill='%231d1611' d='M0 0h2v2H0zm4 4h2v2H4z'/%3E%3C/svg%3E");
+  font: 18px/1.65 Georgia, "Times New Roman", Times, serif;
+  overflow-wrap: break-word;
+}
+
+/* Raised 3D computer chassis / card container */
+.site-shell {
+  max-width: 900px;
+  margin: 0 auto;
+  background: var(--chassis);
+  border-top: 3px solid var(--bevel-light);
+  border-left: 3px solid var(--bevel-light);
+  border-right: 3px solid var(--bevel-shadow);
+  border-bottom: 3px solid var(--bevel-shadow);
+  box-shadow: 4px 6px 0 rgba(0, 0, 0, 0.45);
+  padding: 4px;
+}
+
+/* ==========================================================================
+   Header & Masthead
+   ========================================================================== */
+.site-header {
+  text-align: center;
+  background: var(--paper);
+  color: var(--ink);
+  border-top: 2px solid var(--border-rule);
+  border-left: 2px solid var(--border-rule);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  margin-bottom: 4px;
+  padding: 24px 20px 20px;
+}
+
+.site-header .site-name {
+  margin: 0;
+  color: var(--accent);
+  font: bold 2.3rem/1.2 Georgia, "Times New Roman", Times, serif;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.9);
+  letter-spacing: -0.01em;
+}
+
+.site-header p {
+  margin: 10px 0 0;
+  font: 1.05rem/1.5 Arial, Helvetica, sans-serif;
+  color: var(--ink-secondary);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Navigation Bar & Beveled Buttons
+   ========================================================================== */
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 6px;
+  background: var(--chassis);
+  border-top: 1px solid var(--bevel-light);
+  border-bottom: 1px solid var(--border-rule);
+  margin-bottom: 4px;
+}
+
+.site-nav a,
+.site-nav a:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 16px;
+  background: var(--chassis-light);
+  color: var(--accent);
+  border-top: 2px solid var(--bevel-light);
+  border-left: 2px solid var(--bevel-light);
+  border-right: 2px solid var(--bevel-shadow);
+  border-bottom: 2px solid var(--bevel-shadow);
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.15);
+  font: bold 15px/1.4 Arial, Helvetica, sans-serif;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+.site-nav a:hover {
+  background: #fff8eb;
+  color: var(--accent-hover);
+  border-color: var(--bevel-light) var(--bevel-shadow) var(--bevel-shadow) var(--bevel-light);
+}
+
+.site-nav a:active {
+  background: var(--chassis-dark);
+  border-top: 2px solid var(--bevel-shadow);
+  border-left: 2px solid var(--bevel-shadow);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+/* Active / currently selected tab: physically depressed into chassis */
+.site-nav a[aria-current="page"] {
+  background: var(--chassis-dark);
+  color: var(--ink);
+  border-top: 2px solid var(--bevel-deep);
+  border-left: 2px solid var(--bevel-deep);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.site-nav a[aria-current="page"]:hover {
+  background: #cebf9f;
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   Main Sunken Parchment Well
+   ========================================================================== */
+main {
+  background: var(--paper);
+  border-top: 2px solid var(--border-rule);
+  border-left: 2px solid var(--border-rule);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  padding: 32px 40px 40px;
+}
+
+/* ==========================================================================
+   Typography & Classic Headings
+   ========================================================================== */
+h1, h2, h3, h4 {
+  line-height: 1.3;
+}
+
+h1 {
+  font-size: 2.1rem;
+  color: var(--accent);
+  margin: 0 0 24px;
+  padding-bottom: 12px;
+  border-bottom: 4px double var(--border-rule);
+}
+
+/* The iconic late-90s beveled section banner */
+h2 {
+  color: #ffffff;
+  background: var(--accent);
+  margin: 36px 0 16px;
+  padding: 8px 14px;
+  border-top: 2px solid var(--accent-highlight);
+  border-left: 2px solid var(--accent-highlight);
+  border-right: 2px solid var(--accent-shadow);
+  border-bottom: 2px solid var(--accent-shadow);
+  box-shadow: 1px 2px 0 rgba(0, 0, 0, 0.25);
+  font: bold 1.2rem/1.35 Arial, Helvetica, sans-serif;
+  letter-spacing: 0.02em;
+  text-shadow: 1px 1px 0 var(--accent-shadow);
+}
+
+/* Harmonious deep cordovan heading (no clashing olive) */
+h3 {
+  font-size: 1.3rem;
+  color: #541522;
+  margin: 28px 0 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+h4 {
+  font-size: 1.1rem;
+  color: var(--ink-secondary);
+  margin: 24px 0 8px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+}
+
+p {
+  margin: 14px 0;
+}
+
+p, li {
+  max-width: 72ch;
+}
+
+.lead {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.welcome-line {
+  text-align: center;
+  color: var(--accent);
+  font-style: italic;
+  font-size: 1.1rem;
+  margin: 0 0 12px;
+}
+
+.welcome-line + h1 {
+  text-align: center;
+}
+
+ul, ol {
+  padding-left: 26px;
+}
+
+li {
+  margin-bottom: 8px;
+}
+
+.details,
+.small,
+.project-meta,
+.breadcrumb {
+  font: 1rem/1.55 Arial, Helvetica, sans-serif;
+  color: var(--ink-secondary);
+}
+
+/* ==========================================================================
+   Hyperlinks & Focus Indicators (WCAG AAA)
+   ========================================================================== */
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+a:visited {
+  color: var(--link-visited);
+}
+
+a:hover {
+  color: var(--link-hover);
+  background-color: var(--highlight-yellow);
+  text-decoration-thickness: 2px;
+}
+
+/* Dual-layer high-contrast focus indicator */
+a:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+/* Skip link */
+.skip {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  padding: 10px 16px;
+  background: var(--accent);
+  color: #ffffff;
+  font: bold 14px Arial, sans-serif;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  text-decoration: none;
+}
+
+.skip:focus {
+  top: 12px;
+  outline: 3px solid var(--highlight-yellow);
+}
+
+/* ==========================================================================
+   Tactile 3D Retro Push-Buttons
+   ========================================================================== */
+.retro-btn,
+.retro-btn:visited {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 8px 8px 0;
+  padding: 9px 18px;
+  min-height: 44px;
+  background: var(--chassis-light);
+  border-top: 2px solid var(--bevel-light);
+  border-left: 2px solid var(--bevel-light);
+  border-right: 2px solid var(--bevel-shadow);
+  border-bottom: 2px solid var(--bevel-shadow);
+  color: var(--ink);
+  font: bold 1rem/1.4 Arial, Helvetica, sans-serif;
+  text-decoration: none;
+  box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.retro-btn:hover {
+  background: #fff8eb;
+  color: var(--accent);
+  border-color: var(--bevel-light) var(--bevel-shadow) var(--bevel-shadow) var(--bevel-light);
+}
+
+.retro-btn:active {
+  background: var(--chassis-dark);
+  border-top: 2px solid var(--bevel-deep);
+  border-left: 2px solid var(--bevel-deep);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  transform: translate(1px, 1px);
+  box-shadow: none;
+}
+
+/* ==========================================================================
+   Projects & Directory Lists
+   ========================================================================== */
+.project-directory {
+  margin: 24px 0;
+}
+
+.project-directory dt {
+  background: var(--chassis-light);
+  padding: 10px 14px;
+  border: 1px solid var(--border-rule);
+  border-bottom: 3px double var(--border-rule);
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+.project-directory dt:first-child {
+  border-top: 1px solid var(--border-rule);
+}
+
+.project-directory dt a,
+.project-directory dt a:visited {
+  color: var(--accent);
+}
+
+.project-directory dt a:hover {
+  color: var(--link-hover);
+  background-color: var(--highlight-yellow);
+}
+
+.project-directory dd {
+  padding: 4px 14px 20px;
+  margin: 0;
+}
+
+.project-meta {
+  display: inline-block;
+  margin: 0 0 0 12px;
+  font: normal 0.95rem/1.5 Arial, Helvetica, sans-serif;
+  color: var(--ink-secondary);
+}
+
+/* ==========================================================================
+   Experience Articles & Disclosures
+   ========================================================================== */
+#experience > article {
+  border-bottom: 1px solid var(--border-rule);
+  padding: 24px 0;
+}
+
+#experience > article:last-child {
+  border-bottom: 0;
+}
+
+#experience > article > h3 {
+  margin-top: 0;
+}
+
+summary {
+  cursor: pointer;
+  padding: 10px 0;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  color: var(--link);
+  font-weight: bold;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.95rem;
+}
+
+summary:hover {
+  color: var(--accent);
+  background: var(--highlight-yellow);
+}
+
+details[open] {
+  padding-bottom: 12px;
+}
+
+.role-links {
+  margin-top: 20px;
+}
+
+/* ==========================================================================
+   Case Studies & Content
+   ========================================================================== */
+.case-study > section {
+  padding: 8px 0 16px;
+}
+
+.case-study > h1 {
+  margin-top: 16px;
+}
+
+.breadcrumb {
+  margin-top: 0;
+}
+
+.takeaways {
+  margin: 28px 0;
+}
+
+.takeaways h2 {
+  margin-top: 0;
+}
+
+/* ==========================================================================
+   Tables (High-Contrast Retro Layout)
+   ========================================================================== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+  border: 2px solid var(--border-rule);
+  background: #fffdf9;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  margin: 16px 0;
+}
+
+caption {
+  text-align: left;
+  font-weight: bold;
+  padding: 8px 0;
+  color: var(--ink);
+}
+
+th, td {
+  border: 1px solid var(--border-rule);
+  padding: 12px 14px;
+  text-align: left;
+  vertical-align: top;
+}
+
+thead th {
+  background: var(--accent);
+  color: #ffffff;
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  border-color: var(--accent-shadow);
+}
+
+thead a,
+thead a:visited {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+tbody th {
+  background: #eee5d0;
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  width: 25%;
+}
+
+tbody th a,
+tbody th a:visited {
+  color: var(--accent);
+}
+
+tbody tr:nth-child(even) td {
+  background: #f7f1e1;
+}
+
+/* ==========================================================================
+   Dividers, Code & Blockquotes
+   ========================================================================== */
+hr {
+  height: 2px;
+  border: 0;
+  border-top: 1px solid var(--border-rule);
+  border-bottom: 1px solid #ffffff;
+  margin: 28px 0;
+}
+
+code {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.95em;
+  background: #eee5d0;
+  color: var(--ink);
+  padding: 2px 5px;
+  border: 1px solid var(--border-rule);
+  overflow-wrap: anywhere;
+}
+
+blockquote {
+  margin: 20px 0;
+  padding: 12px 20px;
+  background: #f7f1e1;
+  border-left: 4px solid var(--accent);
+  font-style: italic;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+footer {
+  margin-top: 4px;
+  text-align: center;
+  background: var(--chassis);
+  color: var(--ink);
+  border-top: 2px solid var(--border-rule);
+  border-left: 2px solid var(--border-rule);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  padding: 18px 24px;
+  font: 0.95rem/1.6 Arial, Helvetica, sans-serif;
+}
+
+footer p {
+  margin: 6px 0;
+  max-width: none;
+}
+
+::selection {
+  color: #ffffff;
+  background: var(--accent);
+}
+
+/* ==========================================================================
+   Responsive Viewports
+   ========================================================================== */
+@media (max-width: 600px) {
+  body {
+    margin: 8px 6px;
+    font-size: 17px;
+  }
+  .site-header {
+    padding: 18px 12px;
+  }
+  .site-header .site-name {
+    font-size: 1.85rem;
+  }
+  main {
+    padding: 22px 16px;
+  }
+  .site-nav {
+    gap: 4px;
+    padding: 6px 4px;
+  }
+  .site-nav a,
+  .site-nav a:visited {
+    font-size: 14px;
+    padding: 9px 10px;
+    flex: 1 0 auto;
+    text-align: center;
+  }
+  h1 {
+    font-size: 1.7rem;
+  }
+  .project-meta {
+    display: block;
+    margin: 4px 0 0;
+  }
+  th, td {
+    padding: 8px 10px;
+  }
+}
+
+/* ==========================================================================
+   Print View
+   ========================================================================== */
+@media print {
+  body {
+    margin: 0;
+    background: #ffffff;
+    color: #000000;
+    font-size: 12pt;
+  }
+  .site-shell {
+    max-width: none;
+    padding: 0;
+    background: #ffffff;
+    border: 0;
+    box-shadow: none;
+  }
+  .site-header,
+  main {
+    background: #ffffff;
+    border: 0;
+    padding: 0;
+  }
+  .site-header .site-name {
+    color: #000000;
+  }
+  h2 {
+    color: #000000;
+    background: #ffffff;
+    border: 0;
+    border-bottom: 1px solid #000000;
+    padding-left: 0;
+  }
+  nav,
+  .skip,
+  .retro-btn,
+  .back,
+  footer {
+    display: none;
+  }
+  h2, h3 {
+    break-after: avoid;
+  }
+}
