@@ -483,9 +483,9 @@ table {
   width: 100%;
   border-collapse: collapse;
   font-size: 1rem;
-  border: 2px solid var(--border-rule);
+  border: 2px solid #5a6b7d;
   background: #fffdf9;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
   margin: 16px 0;
 }
 
@@ -497,18 +497,20 @@ caption {
 }
 
 th, td {
-  border: 1px solid var(--border-rule);
+  border: 1px solid #7c8d9e;
   padding: 12px 14px;
   text-align: left;
   vertical-align: top;
 }
 
+/* Table header row: distinct retro Navy / Oxford Blue, differentiating from crimson section headers */
 thead th {
-  background: var(--accent);
+  background: #1b385a;
   color: #ffffff;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
-  border-color: var(--accent-shadow);
+  border-color: #0d2038;
+  letter-spacing: 0.02em;
 }
 
 thead a,
@@ -518,20 +520,21 @@ thead a:visited {
 }
 
 tbody th {
-  background: #eee5d0;
-  color: var(--ink);
+  background: #e6edf5;
+  color: #101c2a;
   font-family: Arial, Helvetica, sans-serif;
   font-weight: bold;
   width: 25%;
+  border-color: #7c8d9e;
 }
 
 tbody th a,
 tbody th a:visited {
-  color: var(--accent);
+  color: #0b4392;
 }
 
 tbody tr:nth-child(even) td {
-  background: #f7f1e1;
+  background: #f1f5fa;
 }
 
 /* ==========================================================================
