@@ -42,6 +42,10 @@ button:disabled { opacity: .6; cursor: default; }
 .leaderboard th:last-child { width: 24%; }
 .leaderboard td:last-child { font-variant-numeric: tabular-nums; }
 #run-result { width: 100%; }
+#run-leaderboard { margin-top: 14px; text-align: left; }
+#run-leaderboard h3 { margin: 0 0 6px; font-size: 1rem; }
+#run-leaderboard table { margin-top: 6px; font-size: .86rem; }
+#run-leaderboard th, #run-leaderboard td { padding: 4px 6px; }
 #run-result[hidden], #score-form[hidden], #leaderboard-table[hidden] { display: none; }
 #run-rank { margin: 8px 0; font-weight: bold; color: #ffff9a; }
 #score-form label { display: block; text-align: left; font: bold .9rem/1.4 Arial, sans-serif; }

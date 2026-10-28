@@ -2,7 +2,7 @@
   'use strict';
   const $=id=>document.getElementById(id), canvas=$('screen'), ctx=canvas.getContext('2d');
   let game=new PacketEngine(); let mode='ready', best=0, last=0, frame=0, swipeX=null;
-  let ticket=null, ticks=0, moves=[], accumulator=0, generation=0;
+  let ticket=null, ticks=0, moves=[], accumulator=0, generation=0, leaderboardEntries=[];
   const STEP=1/60;
   try { best=Number(localStorage.getItem('packet-run-best'))||0; } catch {}
   const pad=n=>String(n).padStart(4,'0');
@@ -17,6 +17,7 @@
     return body;
   }
   function displayScores(entries) {
+    leaderboardEntries=entries;
     $('leaderboard-rows').replaceChildren();
     for(const entry of entries) {
       const row=document.createElement('tr');
@@ -25,6 +26,20 @@
     }
     $('leaderboard-table').hidden=!entries.length;
     $('leaderboard-status').textContent=entries.length?'Top 10 scores. Tied scores share a rank.':'No scores yet. Set the first record!';
+    const runRows=$('run-leaderboard-rows');
+    if(runRows) {
+      runRows.replaceChildren();
+      for(const entry of entries) { const row=document.createElement('tr'); for(const value of [entry.rank,entry.nickname,entry.score]) { const cell=document.createElement('td'); cell.textContent=value; row.append(cell); } runRows.append(row); }
+      $('run-leaderboard-table').hidden=!entries.length;
+      $('run-leaderboard-status').textContent=entries.length?'Top 10 scores.':'No scores yet.';
+    }
+  }
+  function showRunLeaderboard() {
+    if($('run-leaderboard')) return;
+    const box=document.createElement('div'); box.id='run-leaderboard'; box.className='run-leaderboard';
+    box.innerHTML='<h3>Current leaderboard</h3><p id="run-leaderboard-status">Loading scores…</p><table id="run-leaderboard-table" hidden><thead><tr><th>Rank</th><th>Nickname</th><th>Score</th></tr></thead><tbody id="run-leaderboard-rows"></tbody></table>';
+    $('run-result').append(box);
+    displayScores(leaderboardEntries);
   }
   async function loadScores() {
     $('refresh-scores').disabled=true;
@@ -62,6 +77,7 @@
     overlay('CONNECTION LOST', 'Score: '+game.score+' · Best: '+best, 'Play again');
     $('status').textContent='Game over. Score '+game.score+'.';
     $('run-result').hidden=false;$('score-form').hidden=true;
+    showRunLeaderboard();
     const current=generation;
     if(!ticket) {$('run-rank').textContent='Practice run. Play again to try the leaderboard.';return;}
     $('run-rank').textContent='Checking your rank…';
