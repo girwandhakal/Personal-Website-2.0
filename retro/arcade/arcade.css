@@ -8,6 +8,8 @@ body.arcade-page { margin: 0; }
 .game-layout { display: grid; grid-template-columns: 96px var(--board-width) 96px; align-items: center; gap: 12px; }
 .side-actions { display: contents; }
 .side-actions .retro-btn { margin: 0; min-width: 0; padding: 8px 6px; }
+.side-actions .retro-btn, .game-actions .retro-btn { background: #fff8e7; color: #2c241d; border: 2px solid #2c241d; }
+.side-actions .retro-btn:hover, .game-actions .retro-btn:hover { background: #ffff9a; color: #2c241d; }
 .side-actions .retro-btn:last-child { grid-column: 3; grid-row: 1; }
 .game-layout .cabinet { grid-column: 2; grid-row: 1; }
 .game-stage > h1 { border: 0; padding: 0; margin: 0; text-align: center; font-size: 1.5rem; line-height: 1.2; }
