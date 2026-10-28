@@ -85,7 +85,9 @@ body {
 }
 
 .site-header p {
-  margin: 10px 0 0;
+  margin: 10px auto 0;
+  max-width: none;
+  text-align: center;
   font: 1.05rem/1.5 Arial, Helvetica, sans-serif;
   color: var(--ink-secondary);
   font-weight: 500;
