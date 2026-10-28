@@ -12,7 +12,6 @@
     if(mode!=='paused') game.reset();
     mode='playing'; $('overlay').hidden=true; $('pause').disabled=false; $('pause').textContent='Pause';
     $('status').textContent='Run started. Collect + packets; avoid × bugs.'; updateScore(); canvas.focus({preventScroll:true});
-    canvas.scrollIntoView({block:'start',behavior:'instant'});
     last=performance.now(); cancelAnimationFrame(frame); frame=requestAnimationFrame(loop);
   }
   function pause() {
