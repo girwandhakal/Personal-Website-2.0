@@ -63,7 +63,7 @@ async function limit(ip,action) {
 }
 async function topScores(sql) {
   return sql`select nickname,score,(rank() over(order by score desc))::int as rank
-    from arcade.runs where nickname is not null order by score desc,submitted_at asc,id asc limit 10`;
+    from arcade.runs where nickname is not null order by score desc,submitted_at asc,id asc limit 5`;
 }
 async function position(sql,score) {
   const [row]=await sql`select (count(*)+1)::int as rank from arcade.runs where nickname is not null and score>${score}`;

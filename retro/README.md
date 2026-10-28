@@ -19,8 +19,7 @@ Run simulation checks: `node scripts/test-retro-arcade.cjs`.
 
 ## Shared leaderboard
 
-No sign-in is required. After game over, the server verifies the run and returns its potential rank. Players can optionally submit a public nickname. The top 10 contains only named scores; ties share a rank, ordered by submission time. Repeating a submission is idempotent per signed run.
-
+No sign-in is required. After game over, the server verifies the run and returns its potential rank. Players can optionally submit a public nickname. Ties share a rank, ordered by submission time. Repeating a submission is idempotent per signed run.
 The browser uses a signed server-issued seed and a fixed 60 Hz simulation, recording lane changes by tick. The server replays the same engine and computes the score itself. It checks the signature, source identity, ticket age, elapsed time, and input limits. This blocks simple score edits and replay spam, but cannot prove a human played; automated play remains possible. The backend limits requests and rejects runs longer than one hour of simulated play or tickets older than two hours.
 
 The backend reuses `DATABASE_URL` and `IP_SALT`. These remain server-only. Records live in the isolated `arcade.runs` and `arcade.rate_limits` tables, with RLS enabled and no grants for public, anonymous, or authenticated Data API roles. Only the server's database owner connection accesses them; existing tables are unchanged. Raw IP addresses are not stored. Unclaimed scores and expired rate counters are removed after one day when a run finishes; named entries persist.

@@ -25,13 +25,13 @@
       $('leaderboard-rows').append(row);
     }
     $('leaderboard-table').hidden=!entries.length;
-    $('leaderboard-status').textContent=entries.length?'Top 10 scores. Tied scores share a rank.':'No scores yet. Set the first record!';
+    $('leaderboard-status').textContent=entries.length?'Tied scores share a rank.':'No scores yet. Set the first record!';
     const runRows=$('run-leaderboard-rows');
     if(runRows) {
       runRows.replaceChildren();
       for(const entry of entries) { const row=document.createElement('tr'); for(const value of [entry.rank,entry.nickname,entry.score]) { const cell=document.createElement('td'); cell.textContent=value; row.append(cell); } runRows.append(row); }
       $('run-leaderboard-table').hidden=!entries.length;
-      $('run-leaderboard-status').textContent=entries.length?'Top 10 scores.':'No scores yet.';
+      $('run-leaderboard-status').textContent=entries.length?'Tied scores share a rank.':'No scores yet.';
     }
   }
   function showRunLeaderboard() {
