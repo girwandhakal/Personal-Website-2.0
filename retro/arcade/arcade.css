@@ -36,18 +36,18 @@ body.arcade-page {
   gap: 8px;
 }
 
-/* 3D Beveled Back Button */
+/* 3D Beveled Back Button (styled like Info button for high visibility on dark arcade background) */
 .back-link {
   position: absolute;
   top: 14px;
   left: 20px;
   z-index: 10;
-  color: #ffffff;
-  background: var(--accent);
-  border-top: 2px solid var(--accent-highlight);
-  border-left: 2px solid var(--accent-highlight);
-  border-right: 2px solid var(--accent-shadow);
-  border-bottom: 2px solid var(--accent-shadow);
+  color: var(--ink);
+  background: var(--chassis-light);
+  border-top: 2px solid var(--bevel-light);
+  border-left: 2px solid var(--bevel-light);
+  border-right: 2px solid var(--bevel-shadow);
+  border-bottom: 2px solid var(--bevel-shadow);
   padding: 8px 14px;
   min-height: 44px;
   display: inline-flex;
@@ -58,14 +58,24 @@ body.arcade-page {
 }
 
 .back-link:hover {
-  color: #ffffff;
-  background: var(--accent-hover);
-  border-color: var(--accent-highlight) var(--accent-shadow) var(--accent-shadow) var(--accent-highlight);
+  color: var(--accent);
+  background: #fff8eb;
+  border-color: var(--bevel-light) var(--bevel-shadow) var(--bevel-shadow) var(--bevel-light);
 }
 
 .back-link:active {
-  background: var(--accent-shadow);
+  color: var(--ink);
+  background: var(--chassis-dark);
+  border-top: 2px solid var(--bevel-deep);
+  border-left: 2px solid var(--bevel-deep);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
   transform: translate(1px, 1px);
+}
+
+.back-link:focus-visible {
+  outline: 3px solid #ffe853;
+  outline-offset: 2px;
 }
 
 .game-layout {
