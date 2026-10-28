@@ -72,7 +72,7 @@ body { background-color: #61483e; background-image: url("data:image/svg+xml,%3Cs
 .site-shell { border: 3px outset #eee0c3; padding: 3px; background: #d5c6a5; box-shadow: 4px 6px 12px #2d1c1570; }
 .site-header { text-align: center; background: #fff8e7; color: #2c241d; border: 2px inset #f4e7cc; margin: 3px 0; padding: 24px 20px 20px; }
 .site-header .site-name { color: #682b38; font: bold 2.3rem/1.2 "Times New Roman", Times, serif; text-shadow: 1px 1px #d5c6a5; }
-.site-header p { font: 1rem/1.5 "Times New Roman", Times, serif; }
+.site-header p { font: 1rem/1.5 "Times New Roman", Times, serif; max-width: none; text-align: center; }
 .site-nav { justify-content: center; padding: 8px; gap: 6px; border: 0; background: #d5c6a5; }
 .site-nav a, .site-nav a:visited { min-height: 44px; padding: 9px 14px; border: 2px outset #fff4d8; color: #682b38; background: #d5c6a5; font: bold 15px/1.5 Arial, sans-serif; text-decoration: underline; }
 .site-nav a:hover { background: #e6d6b4; color: #58212d; }
