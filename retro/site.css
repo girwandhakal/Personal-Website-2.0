@@ -409,6 +409,23 @@ input:focus-visible {
   margin-top: 0;
 }
 
+.role-highlight {
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.role-more {
+  font-size: 1rem;
+}
+
+.role-more ul,
+.role-more ol,
+.role-more li {
+  font-size: 1rem;
+  line-height: 1.65;
+  font-family: Georgia, "Times New Roman", Times, serif;
+}
+
 summary {
   cursor: pointer;
   padding: 10px 0;
@@ -420,7 +437,7 @@ summary {
   text-decoration: underline;
   text-underline-offset: 3px;
   font-family: Arial, Helvetica, sans-serif;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 summary:hover {
