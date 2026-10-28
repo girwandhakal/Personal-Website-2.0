@@ -91,7 +91,6 @@
   }
   function move(d) { if(mode==='playing') {moves.push([ticks,d]);game.move(d);draw();} }
   $('refresh-scores').addEventListener('click',loadScores);
-  $('open-leaderboard').addEventListener('click',()=>{ $('leaderboard-dialog').showModal(); loadScores(); });
   $('open-info').addEventListener('click',()=>$('info-dialog').showModal());
   document.querySelectorAll('[data-close-dialog]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
   $('score-form').addEventListener('submit',async event=> {
