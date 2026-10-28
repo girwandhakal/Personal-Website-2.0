@@ -352,6 +352,81 @@ input:focus-visible {
 }
 
 /* ==========================================================================
+   Retro Form Controls (Contact Form)
+   ========================================================================== */
+.retro-form {
+  margin: 20px 0 28px;
+  max-width: 620px;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font: bold 0.95rem/1.4 Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.form-group .required {
+  color: var(--accent);
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  background: #fffdf9;
+  color: var(--ink);
+  border-top: 2px solid var(--bevel-shadow);
+  border-left: 2px solid var(--bevel-shadow);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  padding: 10px 12px;
+  font: 1rem/1.5 Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.form-group input:focus-visible,
+.form-group textarea:focus-visible {
+  outline: 3px solid var(--link);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px #ffffff;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.form-status {
+  font: bold 0.95rem/1.4 Arial, Helvetica, sans-serif;
+  min-height: 1.5em;
+}
+
+.form-status.success {
+  color: #0b6623;
+}
+
+.form-status.error {
+  color: var(--accent);
+}
+
+.form-status.sending {
+  color: var(--ink-secondary);
+}
+
+/* ==========================================================================
    Projects & Directory Lists
    ========================================================================== */
 .project-directory {

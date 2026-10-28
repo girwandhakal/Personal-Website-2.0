@@ -5,6 +5,7 @@
   "buildCommand": "",
   "outputDirectory": ".",
   "functions": {
-    "api/leaderboard.mjs": { "maxDuration": 20 }
+    "api/leaderboard.mjs": { "maxDuration": 20 },
+    "api/contact.mjs": { "maxDuration": 15 }
   }
 }
