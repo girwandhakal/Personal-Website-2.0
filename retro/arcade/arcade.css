@@ -1,0 +1,24 @@
+.scoreboard { display: flex; justify-content: space-between; gap: 12px; font: 1rem/1.4 "Courier New", monospace; padding: 12px 0; max-width: 480px; }
+.scoreboard strong { display: block; font-size: 1.4rem; color: #682b38; }
+.cabinet { position: relative; width: 100%; max-width: 480px; border: 4px ridge #94948c; background: #292219; }
+canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; touch-action: pan-y; }
+canvas:focus-visible { outline-offset: 4px; }
+.game-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; background: #292219f2; color: #fffef7; text-align: center; }
+.game-overlay[hidden] { display: none; }
+.game-overlay h2 { color: #ffff9a; border: 0; margin: 0 0 12px; font: bold 1.5rem/1.4 "Courier New", monospace; }
+.game-overlay p { font-size: 1rem; }
+.game-overlay .retro-btn { margin: 12px 0 0; }
+.game-actions { display: flex; justify-content: space-between; gap: 8px; max-width: 480px; }
+.game-actions button { flex: 1; min-height: 48px; margin-right: 0; touch-action: manipulation; }
+button:disabled { opacity: .6; cursor: default; }
+#status { min-height: 3.2em; max-width: 480px; font-size: 1rem; }
+@media(max-width: 400px) { .game-actions button { padding: 8px; } }
+/* Keep the board and controls within reach on short screens. */
+.cabinet { max-width: min(480px, calc((100svh - 180px) * .75)); min-width: 180px; }
+/* Match the arcade to a late-90s desktop game window. */
+.scoreboard { padding: 10px; margin: 16px 0 8px; background: #d5c6a5; border: 3px inset #eee; }
+.scoreboard strong { background: #111; color: #9dffce; padding: 3px 6px; font-family: "Courier New", monospace; }
+.cabinet { border: 5px inset #d5c6a5; }
+.game-overlay h2 { background: transparent; padding: 0; text-shadow: none; }
+.game-actions { background: #d5c6a5; border: 2px outset #eee; padding: 4px; }
+.game-actions .retro-btn { margin: 0; }

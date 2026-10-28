@@ -149,3 +149,12 @@ Run the Next.js frontend and API:
 ```bash
 npm run dev
 ```
+
+
+## Alternative retro portfolio
+
+The `retro-site` branch adds an independent static portfolio in `retro/`. Its five main pages and seven project case studies share `retro/site.css`; the portfolio uses plain HTML and CSS with no build step. This variant uses a burgundy and parchment palette, native disclosure controls, and responsive navigation.
+
+`retro/arcade/index.html` hosts the optional Packet Run Easter egg, linked from the homepage footer. Only the arcade requires client JavaScript. Its simulation is separated into `engine.js`, with keyboard/touch input and canvas rendering in `arcade.js`. High scores remain in browser-local storage; no backend or database is required.
+
+Run `node scripts/serve-retro.cjs` to preview the static portfolio at `http://localhost:3000`. Run `node scripts/test-retro-arcade.cjs` for simulation checks. A future static host should publish `retro/`; existing Next.js and production deployment configuration remain separate.

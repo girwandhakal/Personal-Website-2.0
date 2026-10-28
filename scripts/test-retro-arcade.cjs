@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict');
+const Engine=require('../retro/arcade/engine.js');
+const g=new Engine(()=>0);
+g.move(-1);g.move(-1);assert.equal(g.lane,0);g.move(1);g.move(1);g.move(1);assert.equal(g.lane,2);
+g.reset();g.spawnIn=100;g.objects=[{lane:1,y:413,type:'gold'}];g.tick(.02);assert.equal(g.score,10);assert.equal(g.streak,1);
+g.objects=[{lane:1,y:413,type:'bug'}];g.tick(.02);assert.equal(g.lives,2);assert.equal(g.streak,0);
+g.objects=[{lane:1,y:413,type:'bug'}];g.tick(.02);assert.equal(g.lives,2,'shield blocks repeated hits');
+g.shield=0;g.lives=1;g.objects=[{lane:1,y:413,type:'bug'}];g.tick(.02);assert.equal(g.over,true);let t=g.time;g.tick(.02);assert.equal(g.time,t);
+g.reset();g.spawnIn=100;g.streak=19;g.objects=[{lane:1,y:413,type:'gold'}];g.tick(.02);assert.equal(g.score,50);
+g.objects=[{lane:0,y:413,type:'gold'}];g.tick(.02);assert.equal(g.streak,0);
+g.reset();for(let i=0;i<180;i++)g.tick(1/60);assert.ok(g.objects.length>=2);assert.notEqual(g.objects[0].lane,g.objects[1].lane,'gold never shares a bug lane');
+console.log('PASS: lane bounds, collection, multiplier, missed packet, damage, shield, game over, fair spawns.');
