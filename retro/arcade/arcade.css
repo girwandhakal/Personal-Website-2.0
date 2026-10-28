@@ -19,6 +19,10 @@ canvas:focus-visible { outline-offset: 4px; }
 button:disabled { opacity: .6; cursor: default; }
 #status { order: 2; width: var(--board-width); min-height: 2.8em; margin: 0; text-align: center; font-size: .85rem; line-height: 1.4; }
 .arcade-help { padding: 20px 24px 28px; border-top: 3px double #95876b; }
+.arcade-help dialog { width: min(92vw, 560px); border: 3px double #95876b; padding: 0; background: #fff8e7; color: #2c241d; }
+.arcade-help dialog::backdrop { background: #16110dcc; }
+.arcade-help dialog section { padding: 18px 20px; }
+.arcade-help dialog h2 { margin-top: 0; }
 .game-info { max-width: 480px; margin: auto; }
 .game-info > summary { list-style: none; min-height: 44px; }
 .game-info > summary::-webkit-details-marker { display: none; }
