@@ -45,6 +45,7 @@ button:disabled { opacity: .6; cursor: default; }
 .leaderboard tbody tr:nth-child(even) { background: #eee4cb; }
 #run-result { width: 100%; }
 #run-leaderboard { width: min(100%, 420px); margin-top: 14px; padding: 10px; text-align: left; background: #fff8e7; color: #2c241d; border: 2px solid #95876b; box-shadow: 3px 3px 0 #1118; }
+#run-leaderboard h3, #run-leaderboard p, #run-leaderboard td { color: #2c241d; }
 #run-leaderboard h3 { margin: 0 0 6px; font-size: 1rem; }
 #run-leaderboard table { margin-top: 6px; font-size: .86rem; }
 #run-leaderboard th, #run-leaderboard td { padding: 4px 6px; }
