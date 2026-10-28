@@ -378,12 +378,10 @@ input:focus-visible {
 .form-group input,
 .form-group textarea {
   width: 100%;
-  background: #fffdf9;
+  background: #ffffff;
   color: var(--ink);
-  border-top: 2px solid var(--bevel-shadow);
-  border-left: 2px solid var(--bevel-shadow);
-  border-right: 2px solid var(--bevel-light);
-  border-bottom: 2px solid var(--bevel-light);
+  border: 2px solid #4a3e2f;
+  box-shadow: inset 1px 1px 3px rgba(0, 0, 0, 0.15);
   padding: 10px 12px;
   font: 1rem/1.5 Arial, Helvetica, sans-serif;
   box-sizing: border-box;
@@ -398,6 +396,7 @@ input:focus-visible {
 .form-group textarea:focus-visible {
   outline: 3px solid var(--link);
   outline-offset: 2px;
+  border-color: var(--link);
   box-shadow: 0 0 0 4px #ffffff;
 }
 
