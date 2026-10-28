@@ -7,9 +7,8 @@ assert.equal(run.seed,issued.seed);
 assert.throws(()=>verifyTicket(issued.ticket+'x','test-ip',now));
 assert.throws(()=>verifyTicket(issued.ticket,'other-ip',now));
 assert.throws(()=>verifyTicket(issued.ticket,'test-ip',now+7200001));
-assert.equal(nickname('  Pixel  Runner '),'Pixel Runner');
-assert.equal(nickname('Zoë_7'),'Zoë_7');
-for(const bad of ['x','x'.repeat(19),'<script>','😀','a\u200db'])assert.throws(()=>nickname(bad));
+assert.equal(nickname('  pixel7 '),'PIXEL7');
+for(const bad of ['x','x'.repeat(19),'<script>','😀','a_b','pixel 7'])assert.throws(()=>nickname(bad));
 const game=new Engine(Engine.random(run.seed));let ticks=0;
 while(!game.over&&ticks<216000){game.tick(1/60);ticks++;}
 assert.ok(game.over);

@@ -31,8 +31,8 @@ export function verifyTicket(ticket,ip,now=Date.now()) {
 }
 export function nickname(value) {
   if(typeof value!=='string')throw fail('Enter a nickname.');
-  const name=value.normalize('NFKC').trim().replace(/\s+/g,' ');
-  if([...name].length<2||[...name].length>18||!(/^[\p{L}\p{N} _.-]+$/u).test(name))throw fail('Use 2–18 letters, numbers, spaces, dots, hyphens, or underscores.');
+  const name=value.normalize('NFKC').trim().toUpperCase();
+  if(!/^[A-Z0-9]+$/.test(name)||name.length<2||name.length>18)throw fail('Use 2–18 letters or numbers only.');
   return name;
 }
 export function replay(run,ticks,moves,now=Date.now()) {
@@ -94,7 +94,11 @@ async function handle(request) {
     return {score:stored.score,rank:await position(sql,stored.score)};
   }
   const name=nickname(data.nickname);
-  const [saved]=await sql`update arcade.runs set nickname=${name},submitted_at=now() where id=${run.id} and ip_hash=${ip} and nickname is null returning score,nickname`;
+  const [saved]=await sql`update arcade.runs set nickname=${name},submitted_at=now() where id=${run.id} and ip_hash=${ip} and nickname is null and not exists (select 1 from arcade.runs other where lower(other.nickname)=lower(${name})) returning score,nickname`;
+  if(!saved) {
+    const [duplicate]=await sql`select 1 from arcade.runs where lower(nickname)=lower(${name}) limit 1`;
+    if(duplicate)throw fail('That nickname is already taken. Choose another.');
+  }
   const existing=saved||(await sql`select score,nickname from arcade.runs where id=${run.id} and ip_hash=${ip} and nickname is not null`)[0];
   if(!existing)throw fail('Finish a run before adding it to the leaderboard.');
   return {...existing,rank:await position(sql,existing.score),entries:await topScores(sql)};

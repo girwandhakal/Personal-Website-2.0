@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS arcade.runs (
 );
 CREATE INDEX IF NOT EXISTS arcade_scores_idx ON arcade.runs (score DESC, submitted_at, id) WHERE nickname IS NOT NULL;
 CREATE INDEX IF NOT EXISTS arcade_pending_idx ON arcade.runs (created_at) WHERE nickname IS NULL;
+
 CREATE TABLE IF NOT EXISTS arcade.rate_limits (
  key text PRIMARY KEY,
  window_start timestamptz NOT NULL DEFAULT now(),
