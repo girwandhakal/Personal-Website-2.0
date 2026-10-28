@@ -22,3 +22,9 @@ button:disabled { opacity: .6; cursor: default; }
 .game-overlay h2 { background: transparent; padding: 0; text-shadow: none; }
 .game-actions { background: #d5c6a5; border: 2px outset #eee; padding: 4px; }
 .game-actions .retro-btn { margin: 0; }
+
+.game-info { margin-top: 12px; max-width: 480px; }
+.game-info > summary { list-style: none; min-height: 44px; }
+.game-info > summary::-webkit-details-marker { display: none; }
+.game-info[open] > summary { border-style: inset; }
+.game-info #instructions { margin-top: 8px; }
