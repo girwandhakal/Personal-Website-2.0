@@ -1,46 +1,75 @@
 /* ==========================================================================
    Girwan Dhakal — Retro Arcade Stylesheet (Packet Run)
    Authentic retro cabinet styling, CRT screen framing, tactile controls,
-   and WCAG 2.2 Level AAA high-contrast game elements.
+   and a strict single-page, zero-scroll layout across all viewports.
    ========================================================================== */
 
+html,
 body.arcade-page {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  max-height: 100svh;
+  overflow: hidden;
   background-color: #1a140f;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath fill='%23120d09' d='M0 0h2v2H0zm4 4h2v2H4z'/%3E%3C/svg%3E");
+  touch-action: none;
 }
 
 .arcade-page .site-shell {
   max-width: 900px;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  max-height: 100svh;
   border: 0;
   padding: 0;
+  margin: 0 auto;
   background: transparent;
   box-shadow: none;
+  overflow: hidden;
 }
 
 .arcade-page main {
   position: relative;
+  width: 100%;
+  height: 100%;
+  height: 100svh;
+  max-height: 100svh;
   border: 0;
   padding: 0;
   background: transparent;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
+/* ==========================================================================
+   Zero-Scroll Game Stage Layout
+   ========================================================================== */
 .game-stage {
-  --board-width: min(440px, calc(100vw - 32px), calc((100svh - 210px) * .75));
-  min-height: 100svh;
-  padding: 48px 16px 16px;
+  --board-width: min(380px, calc(100vw - 28px), calc((100svh - 165px) * .75));
+  width: 100%;
+  height: 100%;
+  max-height: 100svh;
+  box-sizing: border-box;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 4px;
 }
 
-/* 3D Beveled Back Button (styled like Info button for high visibility on dark arcade background) */
+/* Top Bar: 3D Beveled Back Button (Top-Left) */
 .back-link {
   position: absolute;
-  top: 14px;
-  left: 20px;
+  top: 10px;
+  left: 14px;
   z-index: 10;
   color: var(--ink);
   background: var(--chassis-light);
@@ -48,13 +77,14 @@ body.arcade-page {
   border-left: 2px solid var(--bevel-light);
   border-right: 2px solid var(--bevel-shadow);
   border-bottom: 2px solid var(--bevel-shadow);
-  padding: 8px 14px;
+  padding: 6px 12px;
   min-height: 44px;
   display: inline-flex;
   align-items: center;
   font: bold 0.95rem/1.2 Arial, Helvetica, sans-serif;
   text-decoration: none;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  touch-action: manipulation;
 }
 
 .back-link:hover {
@@ -78,41 +108,62 @@ body.arcade-page {
   outline-offset: 2px;
 }
 
+/* Top Bar: Info Button (Top-Right) */
+#open-info {
+  position: absolute;
+  top: 10px;
+  right: 14px;
+  z-index: 10;
+  margin: 0;
+  padding: 6px 14px;
+  min-height: 44px;
+  color: var(--ink);
+  background: var(--chassis-light);
+  border-top: 2px solid var(--bevel-light);
+  border-left: 2px solid var(--bevel-light);
+  border-right: 2px solid var(--bevel-shadow);
+  border-bottom: 2px solid var(--bevel-shadow);
+  font: bold 0.95rem/1.4 Arial, Helvetica, sans-serif;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  touch-action: manipulation;
+}
+
+#open-info:hover {
+  background: #fff8eb;
+  color: var(--accent);
+}
+
+#open-info:active {
+  background: var(--chassis-dark);
+  border-top: 2px solid var(--bevel-deep);
+  border-left: 2px solid var(--bevel-deep);
+  border-right: 2px solid var(--bevel-light);
+  border-bottom: 2px solid var(--bevel-light);
+  transform: translate(1px, 1px);
+}
+
+#open-info:focus-visible {
+  outline: 3px solid #ffe853;
+  outline-offset: 2px;
+}
+
 .game-layout {
-  display: grid;
-  grid-template-columns: 96px var(--board-width) 96px;
-  align-items: center;
-  gap: 12px;
+  display: block;
+  width: var(--board-width);
+  margin: 0;
 }
 
 .side-actions {
   display: contents;
 }
 
-.side-actions .retro-btn {
-  margin: 0;
-  min-width: 0;
-  padding: 8px 6px;
-  font-size: 0.95rem;
-}
-
-.side-actions .retro-btn:last-child {
-  grid-column: 3;
-  grid-row: 1;
-}
-
-.game-layout .cabinet {
-  grid-column: 2;
-  grid-row: 1;
-}
-
 .game-stage > h1 {
   border: 0;
   padding: 0;
-  margin: 0;
+  margin: 0 0 2px;
   text-align: center;
-  font-size: 1.6rem;
-  line-height: 1.2;
+  font-size: 1.35rem;
+  line-height: 1.1;
   color: #ffe853;
   font-family: Arial, Helvetica, sans-serif;
   letter-spacing: 0.05em;
@@ -123,9 +174,9 @@ body.arcade-page {
 .scoreboard {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   width: var(--board-width);
-  padding: 8px 12px;
+  padding: 4px 10px;
   margin: 0;
   background: var(--chassis);
   border-top: 2px solid var(--bevel-light);
@@ -133,7 +184,7 @@ body.arcade-page {
   border-right: 2px solid var(--bevel-shadow);
   border-bottom: 2px solid var(--bevel-shadow);
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
-  font: 0.85rem/1.2 "Courier New", Courier, monospace;
+  font: 0.8rem/1.2 "Courier New", Courier, monospace;
   color: var(--ink);
   font-weight: bold;
 }
@@ -149,8 +200,8 @@ body.arcade-page {
   display: block;
   background: #0d0f0e;
   color: #00ff88;
-  padding: 4px 8px;
-  font: bold 1.25rem/1.1 "Courier New", Courier, monospace;
+  padding: 2px 6px;
+  font: bold 1.15rem/1.1 "Courier New", Courier, monospace;
   border: 2px inset #444;
   letter-spacing: 0.08em;
   text-shadow: 0 0 6px rgba(0, 255, 136, 0.5);
@@ -160,12 +211,12 @@ body.arcade-page {
 .cabinet {
   position: relative;
   width: var(--board-width);
-  border-top: 4px solid var(--bevel-shadow);
-  border-left: 4px solid var(--bevel-shadow);
-  border-right: 4px solid var(--bevel-light);
-  border-bottom: 4px solid var(--bevel-light);
+  border-top: 3px solid var(--bevel-shadow);
+  border-left: 3px solid var(--bevel-shadow);
+  border-right: 3px solid var(--bevel-light);
+  border-bottom: 3px solid var(--bevel-light);
   background: #1c1511;
-  box-shadow: 0 0 0 3px #0d0a08, 4px 6px 12px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 0 2px #0d0a08, 2px 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 canvas {
@@ -191,7 +242,7 @@ canvas:focus-visible {
   align-items: center;
   justify-content: safe center;
   overflow-y: auto;
-  padding: 18px;
+  padding: 14px;
   background: rgba(18, 14, 11, 0.95);
   color: #ffffff;
   text-align: center;
@@ -207,22 +258,22 @@ canvas:focus-visible {
   border: 0;
   box-shadow: none;
   padding: 0;
-  margin: 0 0 12px;
-  font: bold clamp(1.1rem, 4.5vw, 1.55rem)/1.3 "Courier New", Courier, monospace;
+  margin: 0 0 8px;
+  font: bold clamp(1rem, 4vw, 1.4rem)/1.2 "Courier New", Courier, monospace;
   letter-spacing: 0.06em;
   text-shadow: 0 0 8px rgba(255, 232, 83, 0.4);
 }
 
 .game-overlay p {
-  font-size: 1rem;
-  line-height: 1.45;
-  margin: 8px 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  margin: 6px 0;
   color: #fffef7;
   flex-shrink: 0;
 }
 
 .game-overlay .retro-btn {
-  margin: 12px 0 0;
+  margin: 8px 0 0;
   min-height: 44px;
 }
 
@@ -235,51 +286,45 @@ canvas:focus-visible {
   order: 1;
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   width: var(--board-width);
   background: var(--chassis);
   border-top: 2px solid var(--bevel-light);
   border-left: 2px solid var(--bevel-light);
   border-right: 2px solid var(--bevel-shadow);
   border-bottom: 2px solid var(--bevel-shadow);
-  padding: 6px;
+  padding: 4px;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3);
 }
 
-.game-actions .retro-btn,
-.side-actions .retro-btn {
+.game-actions .retro-btn {
   background: var(--chassis-light);
   color: var(--ink);
   border-top: 2px solid var(--bevel-light);
   border-left: 2px solid var(--bevel-light);
   border-right: 2px solid var(--bevel-shadow);
   border-bottom: 2px solid var(--bevel-shadow);
-  font: bold 0.95rem/1.4 Arial, Helvetica, sans-serif;
+  font: bold 0.95rem/1.3 Arial, Helvetica, sans-serif;
   box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  flex: 1;
+  min-height: 42px;
+  margin: 0;
+  padding: 6px;
+  touch-action: manipulation;
 }
 
-.game-actions .retro-btn:hover,
-.side-actions .retro-btn:hover {
+.game-actions .retro-btn:hover {
   background: #fff8eb;
   color: var(--accent);
 }
 
-.game-actions .retro-btn:active,
-.side-actions .retro-btn:active {
+.game-actions .retro-btn:active {
   background: var(--chassis-dark);
   border-top: 2px solid var(--bevel-deep);
   border-left: 2px solid var(--bevel-deep);
   border-right: 2px solid var(--bevel-light);
   border-bottom: 2px solid var(--bevel-light);
   transform: translate(1px, 1px);
-}
-
-.game-actions .retro-btn {
-  flex: 1;
-  min-height: 48px;
-  margin: 0;
-  padding: 8px;
-  touch-action: manipulation;
 }
 
 button:disabled {
@@ -291,20 +336,20 @@ button:disabled {
 #status {
   order: 2;
   width: var(--board-width);
-  min-height: 2.8em;
-  margin: 4px 0 0;
+  min-height: 1.4em;
+  margin: 2px 0 0;
   text-align: center;
-  font-size: 0.9rem;
-  line-height: 1.4;
+  font-size: 0.82rem;
+  line-height: 1.3;
   color: #ded5c0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 /* ==========================================================================
-   Help & Leaderboard Modal Dialogs
+   Help & Leaderboard Modal Dialogs (Zero Layout Height)
    ========================================================================== */
 .arcade-help {
-  padding: 16px 24px;
+  display: contents;
 }
 
 .arcade-help dialog {
@@ -370,9 +415,9 @@ button:disabled {
 }
 
 #run-leaderboard {
-  width: min(100%, 420px);
-  margin: 14px auto 0;
-  padding: 12px;
+  width: min(100%, 360px);
+  margin: 10px auto 0;
+  padding: 10px;
   text-align: left;
   background: var(--paper);
   color: var(--ink);
@@ -381,24 +426,24 @@ button:disabled {
 }
 
 #run-leaderboard h3 {
-  margin: 0 0 6px;
-  font-size: 1.05rem;
+  margin: 0 0 4px;
+  font-size: 1rem;
   color: var(--accent);
 }
 
 #run-leaderboard p {
   color: var(--ink-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 #run-leaderboard table {
-  margin-top: 8px;
-  font-size: 0.88rem;
+  margin-top: 6px;
+  font-size: 0.82rem;
 }
 
 #run-leaderboard th,
 #run-leaderboard td {
-  padding: 5px 8px;
+  padding: 4px 6px;
   color: var(--ink);
 }
 
@@ -417,24 +462,24 @@ button:disabled {
 }
 
 #run-rank {
-  margin: 8px 0;
+  margin: 6px 0;
   font-weight: bold;
   color: #ffe853;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   text-shadow: 0 0 6px rgba(255, 232, 83, 0.4);
 }
 
 #score-form label {
   display: block;
   text-align: left;
-  font: bold 0.9rem/1.4 Arial, Helvetica, sans-serif;
+  font: bold 0.85rem/1.3 Arial, Helvetica, sans-serif;
   color: #fffef7;
   margin-bottom: 4px;
 }
 
 .nickname-row {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   align-items: stretch;
 }
 
@@ -446,8 +491,8 @@ button:disabled {
   border-right: 2px solid var(--bevel-light);
   border-bottom: 2px solid var(--bevel-light);
   border-radius: 0;
-  padding: 8px 10px;
-  font: 16px/1.3 Arial, Helvetica, sans-serif;
+  padding: 6px 8px;
+  font: 15px/1.3 Arial, Helvetica, sans-serif;
   background: #fffdf9;
   color: var(--ink);
   text-transform: uppercase;
@@ -455,47 +500,30 @@ button:disabled {
 
 #submit-score.retro-btn {
   margin: 0;
-  padding: 8px 12px;
+  padding: 6px 10px;
   flex-shrink: 0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 #submit-status {
-  font-size: 0.9rem;
-  margin: 6px 0;
+  font-size: 0.85rem;
+  margin: 4px 0;
   color: #ffe853;
 }
 
 /* ==========================================================================
-   Responsive Adaptations
-   ========================================================================= */
-@media (max-width: 520px) {
-  .game-layout {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-  .side-actions {
-    display: flex;
-    flex-direction: row;
-    order: 2;
-  }
-  .side-actions .retro-btn:first-child,
-  .side-actions .retro-btn:last-child {
-    grid-column: auto;
-    grid-row: auto;
-  }
-}
-
+   Compact Landscape Mode (Height <= 500px)
+   ========================================================================== */
 @media (max-height: 500px) and (min-width: 500px) {
   .game-stage {
-    --board-width: min(300px, calc((100svh - 40px) * .75));
+    --board-width: min(260px, calc((100svh - 20px) * .75));
     display: grid;
     grid-template-columns: var(--board-width) minmax(200px, 300px);
     grid-template-rows: auto auto auto auto;
     align-content: center;
     justify-content: center;
-    column-gap: 24px;
+    column-gap: 18px;
+    padding: 6px 10px;
   }
   .cabinet {
     grid-column: 1;
@@ -508,19 +536,19 @@ button:disabled {
     grid-column: 2;
     width: 100%;
   }
-  .game-stage > h1 { grid-row: 1; }
+  .game-stage > h1 { grid-row: 1; font-size: 1.15rem; }
   .scoreboard { grid-row: 2; }
   .game-actions { grid-row: 3; }
   #status { grid-row: 4; }
-  .game-overlay p { font-size: 0.85rem; }
+  .game-overlay p { font-size: 0.82rem; }
 }
 
 @media (max-height: 500px) {
   .game-overlay {
-    padding: 10px;
+    padding: 8px;
   }
   .game-overlay h2 {
-    font-size: 1rem;
-    margin-bottom: 4px;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
   }
 }
