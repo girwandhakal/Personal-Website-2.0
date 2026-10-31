@@ -591,12 +591,32 @@ html, body.arcade-page {
 .game-overlay { background: rgba(15, 29, 50, .96); }
 .game-overlay h2 { color: #fff; font-family: inherit; letter-spacing: -.02em; text-shadow: none; }
 .game-overlay p { color: #fff; }
+.game-overlay .retro-btn {
+  border: 2px solid #fff;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--accent);
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .25);
+  font-family: inherit;
+}
+.game-overlay .retro-btn:hover {
+  background: #e8eef7;
+  border-color: #e8eef7;
+  color: var(--accent-hover);
+}
+.game-overlay .retro-btn:active {
+  background: var(--chassis-dark);
+  border-color: var(--chassis-dark);
+  transform: none;
+}
 .game-actions { border: 0; background: #fff; box-shadow: none; gap: 8px; padding: 8px 0 0; }
 .game-actions .retro-btn {
   border: 1px solid var(--border-rule);
   border-radius: 8px;
   background: var(--chassis-light);
   color: var(--ink);
+  min-height: 44px;
   box-shadow: none;
   font-family: inherit;
 }
@@ -610,4 +630,4 @@ html, body.arcade-page {
 #run-leaderboard { border: 1px solid var(--border-rule); border-radius: 8px; box-shadow: none; }
 #run-rank, #submit-status { color: #fff; text-shadow: none; }
 #score-form label { color: #fff; }
-#nickname { border: 1px solid var(--border-rule); border-radius: 8px; text-transform: none; }
+#nickname { border: 1px solid var(--border-rule); border-radius: 8px; font-size: 16px; text-transform: none; }
