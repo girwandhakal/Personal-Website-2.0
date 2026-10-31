@@ -552,3 +552,62 @@ button:disabled {
     margin-bottom: 2px;
   }
 }
+
+/* Keep the game artwork while matching the site's lighter interface. */
+html, body.arcade-page {
+  background: #fff;
+  background-image: none;
+}
+.back-link, #open-info {
+  border: 1px solid var(--border-rule);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--ink);
+  box-shadow: none;
+  font-family: inherit;
+}
+.back-link:hover, #open-info:hover { background: var(--chassis-light); color: var(--accent); }
+.back-link:active, #open-info:active { border: 1px solid var(--border-rule); background: var(--chassis-dark); transform: none; }
+.back-link:focus-visible, #open-info:focus-visible, canvas:focus-visible { outline: 3px solid var(--accent); }
+.game-stage > h1 { color: var(--ink); text-shadow: none; letter-spacing: -.025em; }
+.scoreboard {
+  background: #fff;
+  border: 0;
+  box-shadow: none;
+  color: var(--ink-secondary);
+  font-family: inherit;
+  font-weight: 600;
+}
+.scoreboard strong {
+  background: none;
+  border: 0;
+  color: var(--ink);
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  text-shadow: none;
+}
+.cabinet { border: 1px solid var(--border-rule); border-radius: 10px; overflow: hidden; box-shadow: 0 12px 30px rgba(23, 34, 52, .12); }
+.game-overlay { background: rgba(15, 29, 50, .96); }
+.game-overlay h2 { color: #fff; font-family: inherit; letter-spacing: -.02em; text-shadow: none; }
+.game-overlay p { color: #fff; }
+.game-actions { border: 0; background: #fff; box-shadow: none; gap: 8px; padding: 8px 0 0; }
+.game-actions .retro-btn {
+  border: 1px solid var(--border-rule);
+  border-radius: 8px;
+  background: var(--chassis-light);
+  color: var(--ink);
+  box-shadow: none;
+  font-family: inherit;
+}
+.game-actions .retro-btn:hover { background: var(--chassis-dark); color: var(--accent); }
+.game-actions .retro-btn:active { border: 1px solid var(--border-rule); background: var(--chassis-dark); transform: none; }
+#status { color: var(--ink-secondary); font-family: inherit; }
+.arcade-help dialog { border: 1px solid var(--border-rule); border-radius: 12px; box-shadow: 0 20px 60px rgba(23, 34, 52, .2); }
+.arcade-help dialog::backdrop { background: rgba(15, 29, 50, .65); }
+.leaderboard tbody, #run-leaderboard tbody { background: #fff; }
+.leaderboard tbody tr:nth-child(even), #run-leaderboard tbody tr:nth-child(even) { background: var(--chassis-light); }
+#run-leaderboard { border: 1px solid var(--border-rule); border-radius: 8px; box-shadow: none; }
+#run-rank, #submit-status { color: #fff; text-shadow: none; }
+#score-form label { color: #fff; }
+#nickname { border: 1px solid var(--border-rule); border-radius: 8px; text-transform: none; }
