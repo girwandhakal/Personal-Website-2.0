@@ -36,6 +36,7 @@ body {
 }
 .site-header h1.site-name { font-size: clamp(2.5rem, 5.5vw, 4.5rem); letter-spacing: -.035em; }
 .site-header p:not(.site-name) { margin: 9px 0 0; color: var(--ink-secondary); font-size: .95rem; }
+body:not(:has(.site-header h1)) .site-header { display: none; }
 .site-nav {
   display: flex;
   flex-wrap: wrap;
