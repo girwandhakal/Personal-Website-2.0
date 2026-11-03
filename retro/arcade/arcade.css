@@ -65,46 +65,41 @@ body.arcade-page {
   gap: 4px;
 }
 
-/* Top Bar: 3D Beveled Back Button (Top-Left) */
+/* Top Bar: Clean Minimal Back Button (Top-Left) */
 .back-link {
   position: absolute;
   top: 10px;
   left: 14px;
   z-index: 10;
-  color: var(--ink);
-  background: var(--chassis-light);
-  border-top: 2px solid var(--bevel-light);
-  border-left: 2px solid var(--bevel-light);
-  border-right: 2px solid var(--bevel-shadow);
-  border-bottom: 2px solid var(--bevel-shadow);
-  padding: 6px 12px;
-  min-height: 44px;
+  color: #111111;
+  background: #ffffff;
+  border: 1px solid #d4d4d4;
+  border-radius: 6px;
+  padding: 6px 14px;
+  min-height: 40px;
   display: inline-flex;
   align-items: center;
-  font: bold 0.95rem/1.2 Arial, Helvetica, sans-serif;
+  font: 600 0.9rem/1.2 -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   text-decoration: none;
-  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.4);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   touch-action: manipulation;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
 
 .back-link:hover {
-  color: var(--accent);
-  background: #fff8eb;
-  border-color: var(--bevel-light) var(--bevel-shadow) var(--bevel-shadow) var(--bevel-light);
+  color: #ffffff;
+  background: #111111;
+  border-color: #111111;
 }
 
 .back-link:active {
-  color: var(--ink);
-  background: var(--chassis-dark);
-  border-top: 2px solid var(--bevel-deep);
-  border-left: 2px solid var(--bevel-deep);
-  border-right: 2px solid var(--bevel-light);
-  border-bottom: 2px solid var(--bevel-light);
+  color: #ffffff;
+  background: #222222;
   transform: translate(1px, 1px);
 }
 
 .back-link:focus-visible {
-  outline: 3px solid #ffe853;
+  outline: 2px solid #ffffff;
   outline-offset: 2px;
 }
 
