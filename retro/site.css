@@ -102,6 +102,8 @@ body {
   min-height: 38px;
   padding: 6px 8px;
   border: 1px solid transparent;
+  background-color: transparent;
+  -webkit-tap-highlight-color: transparent;
   color: var(--ink-secondary);
   font-size: 0.92rem;
   font-weight: 500;
@@ -120,6 +122,10 @@ body {
 .site-nav a:focus {
   color: var(--ink);
   border-color: var(--ink);
+}
+
+.site-nav a:focus:not(:focus-visible) {
+  outline: none;
 }
 
 .site-nav a:last-child {

@@ -65,4 +65,20 @@ link.removeAttribute('target');
 link.setAttribute('download', '');
 assert.equal(click('/'), false, 'downloads must work');
 dom.window.close();
+
+const mobile = new JSDOM(fs.readFileSync(path.join(root, 'contact.html'), 'utf8'), {
+  url: 'https://girwan.com/contact.html', runScripts: 'outside-only'
+});
+const mobileNavigation = mobile.window.document.querySelector('.site-nav');
+Object.defineProperties(mobileNavigation, {
+  scrollWidth: { value: 520 }, clientWidth: { value: 375 }
+});
+const contact = mobileNavigation.querySelector('[aria-current="page"]');
+let scrollOptions;
+contact.scrollIntoView = options => { scrollOptions = options; };
+mobile.window.eval(script);
+assert.equal(contact.textContent, 'Contact');
+assert.deepEqual({ ...scrollOptions }, { block: 'nearest', inline: 'center', behavior: 'instant' },
+  'overflowing navigation must reveal the active tab without scrolling to another page section');
+mobile.window.close();
 console.log(`PASS: ${pages.length} pages preload the font and load navigation; current-page clicks, home aliases, case studies, modifiers, targets, fragments, queries, and downloads behave correctly.`);
