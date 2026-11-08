@@ -684,14 +684,14 @@ main > dl:not(.project-directory) dd {
 .form-group textarea {
   width: 100%;
   padding: 10px 13px;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
+  border: 2px solid var(--border-strong);
+  border-radius: 0;
   background: #ffffff;
   color: var(--ink);
   font: inherit;
   font-size: 0.95rem;
   letter-spacing: normal;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .form-group input::placeholder,
@@ -704,12 +704,17 @@ main > dl:not(.project-directory) dd {
 .form-group textarea:focus {
   border-color: var(--ink);
   outline: none;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08);
 }
 
 .form-group textarea {
   min-height: 130px;
   resize: vertical;
+}
+
+.retro-form .retro-btn {
+  border-width: 2px;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .form-actions {
@@ -729,8 +734,8 @@ main > dl:not(.project-directory) dd {
 .form-status.success {
   display: inline-block;
   padding: 6px 12px;
-  border: 1px solid var(--ink);
-  border-radius: 4px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   background: #f7f7f7;
   color: var(--ink);
 }
