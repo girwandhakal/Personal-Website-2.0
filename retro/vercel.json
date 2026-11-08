@@ -1,11 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "installCommand": "npm ci --omit=dev --ignore-scripts",
+  "installCommand": "",
   "buildCommand": "",
   "outputDirectory": ".",
   "functions": {
-    "api/leaderboard.mjs": { "maxDuration": 20 },
     "api/contact.mjs": { "maxDuration": 15 }
   }
 }

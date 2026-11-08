@@ -153,15 +153,10 @@ npm run dev
 
 ## Alternative retro portfolio
 
-The `retro-site` branch adds an independent static portfolio in `retro/`. Its five main pages and seven project case studies share `retro/site.css`; the portfolio uses plain HTML and CSS with no build step. This variant uses a burgundy and parchment palette, native disclosure controls, and responsive navigation.
+The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.com`. Its five main pages and seven project case studies share `retro/site.css`, a monochrome palette, self-hosted Geist typography, native disclosure controls, and responsive navigation with a compact GD home link. The homepage contains a personal greeting and introduction.
 
-`retro/arcade/index.html` hosts the optional Packet Run Easter egg, linked from the homepage footer. Only the arcade requires client JavaScript. Its simulation is separated into `engine.js`, with keyboard/touch input and canvas rendering in `arcade.js`. High scores remain in browser-local storage; no backend or database is required.
+The portfolio uses plain HTML and CSS with no build step or package dependencies. The contact page uses a small client script and `retro/api/contact.mjs`, a Vercel Function that sends messages through EmailJS with validation, origin checks, a honeypot, and rate limiting. `retro/vercel.json` configures this deployment independently of the Next.js application.
 
-Run `node scripts/serve-retro.cjs` to preview the static portfolio at `http://localhost:3000`. Run `node scripts/test-retro-arcade.cjs` for simulation checks. A future static host should publish `retro/`; existing Next.js and production deployment configuration remain separate.
+Run `node scripts/serve-retro.cjs` to preview the portfolio at `http://localhost:3000`. Run `node scripts/test-retro-contact.mjs` for contact checks.
 
-
-### Arcade leaderboard
-
-The retro arcade adds `retro/api/leaderboard.mjs`, a server-only Vercel Function with a pinned Postgres.js dependency. The existing project deploys from `retro/` using its own `vercel.json`. The HTML portfolio still needs no client framework or build. The function reuses `DATABASE_URL` and `IP_SALT`, storing isolated run and rate-limit records in the private `arcade` schema. RLS is enabled with no Data API grants; existing tables are unchanged.
-
-Runs use signed, expiring seeded tickets. The API replays tick-indexed lane changes with the shared game engine before calculating a rank or accepting a public nickname. Submissions are idempotent, names are validated, and writes are origin-checked and rate-limited. Scores are shared across browsers; practice runs and local best scores remain available when the backend is unavailable. See `retro/README.md` for setup and verification.
+The arcade and leaderboard code, deployment endpoint, setup scripts, and tests have been removed. Existing leaderboard database records are preserved but no longer accessed by the site.
