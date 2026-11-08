@@ -92,7 +92,6 @@ body {
   align-items: center;
   gap: 6px 24px;
   padding: 14px 0;
-  border-bottom: 1px solid var(--border-rule);
 }
 
 .site-nav a,
@@ -385,7 +384,6 @@ a.retro-btn + a.retro-btn:hover {
 
 .project-directory dt {
   padding: 24px 0 6px;
-  border-top: 1px solid var(--border-rule);
   font-size: 1.18rem;
   font-weight: 650;
   letter-spacing: normal;
@@ -443,14 +441,12 @@ a.retro-btn + a.retro-btn:hover {
    ========================================================================== */
 #experience > article {
   padding: 32px 0 38px;
-  border-top: 1px solid var(--border-rule);
 }
 
 #experience > article > h2 {
   margin: 0 0 6px;
   font-size: 1.35rem;
   font-weight: 650;
-  border-bottom: none;
   padding-bottom: 0;
   letter-spacing: -0.01em;
 }
@@ -512,10 +508,6 @@ details[open] {
   padding: 6px 0 20px;
 }
 
-.case-study > section + section {
-  border-top: 1px solid var(--border-rule);
-}
-
 .takeaways {
   margin: 32px 0;
 }
@@ -523,7 +515,6 @@ details[open] {
 .takeaways h2 {
   margin-top: 0;
   font-size: 1.25rem;
-  border-bottom: none;
   padding-bottom: 0;
   letter-spacing: -0.01em;
 }
@@ -559,9 +550,6 @@ table {
   margin: 20px 0 28px;
   border-collapse: collapse;
   font-size: 0.94rem;
-  border: 1px solid var(--border-rule);
-  border-radius: 6px;
-  overflow: hidden;
 }
 
 caption {
@@ -575,7 +563,6 @@ caption {
 
 th, td {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--border-rule);
   text-align: left;
   vertical-align: top;
   line-height: 1.5;
@@ -586,7 +573,6 @@ thead th {
   background: var(--surface);
   color: var(--ink);
   font-weight: 650;
-  border-bottom: 1px solid var(--border-strong);
 }
 
 tbody th {
@@ -596,19 +582,8 @@ tbody th {
   background: #fafafa;
 }
 
-tbody tr:last-child th,
-tbody tr:last-child td {
-  border-bottom: none;
-}
-
 .overview-table {
   margin: 16px 0;
-}
-
-hr {
-  margin: 40px 0;
-  border: 0;
-  border-top: 1px solid var(--border-rule);
 }
 
 code {
@@ -782,12 +757,9 @@ main > dl:not(.project-directory) dd {
     align-items: center;
     gap: 0 4px;
     padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border-rule);
-    border-bottom: 0;
     background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
