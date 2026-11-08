@@ -938,9 +938,9 @@ footer a:hover {
     navigation: auto;
   }
 
+  ::view-transition-group(root),
   ::view-transition-old(root),
   ::view-transition-new(root) {
-    animation-duration: 120ms;
-    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+    animation: none;
   }
 }
