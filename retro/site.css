@@ -666,7 +666,6 @@ main > dl:not(.project-directory) dd {
   font: inherit;
   font-size: 0.95rem;
   letter-spacing: normal;
-  transition: border-color 0.15s ease;
 }
 
 .form-group input::placeholder,
