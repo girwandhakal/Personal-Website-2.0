@@ -1,3 +1,11 @@
+@font-face {
+  font-family: "Geist";
+  src: url("assets/fonts/Geist.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   color-scheme: light;
   
@@ -28,7 +36,7 @@
   
   --focus-outline: #111111;
   
-  /* Grayscale fallbacks for retro components & arcade */
+  /* Grayscale fallbacks for retro components */
   --accent: #111111;
   --accent-hover: #000000;
   --chassis: #ffffff;
@@ -58,7 +66,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: "Geist", sans-serif;
   font-size: 16.5px;
   line-height: 1.7;
   letter-spacing: normal;
@@ -72,43 +80,6 @@ body {
   max-width: 780px;
   margin: 0 auto;
   padding: 0 28px;
-}
-
-/* ==========================================================================
-   Site Header (Uniform across all pages)
-   ========================================================================== */
-.site-header {
-  padding: 38px 0 18px;
-  border-bottom: 1px solid var(--border-rule);
-}
-
-.site-header .site-name,
-.site-header h1.site-name {
-  margin: 0;
-  color: var(--ink);
-  font-size: 1.35rem;
-  font-weight: 700;
-  line-height: 1.25;
-  letter-spacing: -0.015em;
-}
-
-.site-header .site-name a {
-  color: inherit;
-  text-decoration: none;
-}
-
-.site-header .site-name a:hover {
-  color: #000000;
-}
-
-.site-header p:not(.site-name),
-.site-header .site-tagline {
-  margin: 6px 0 0;
-  color: var(--ink-secondary);
-  font-size: 0.92rem;
-  font-weight: 400;
-  line-height: 1.45;
-  letter-spacing: normal;
 }
 
 /* ==========================================================================
@@ -128,6 +99,8 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 38px;
+  padding: 6px 8px;
+  border: 1px solid transparent;
   color: var(--ink-secondary);
   font-size: 0.92rem;
   font-weight: 500;
@@ -142,10 +115,11 @@ body {
   color: var(--ink);
 }
 
-.site-nav a[aria-current="page"] {
+.site-nav a[aria-current="page"],
+.site-nav a:focus {
   color: var(--ink);
   font-weight: 650;
-  box-shadow: inset 0 -2px 0 var(--ink);
+  border-color: var(--ink);
 }
 
 .site-nav a:last-child {
@@ -160,6 +134,20 @@ body {
 main {
   padding: 44px 0 76px;
   min-height: 52vh;
+}
+
+.site-nav .home-link {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.home-page main {
+  min-height: 0;
+  padding-bottom: 32px;
+}
+
+.home-page footer {
+  padding: 24px 0;
 }
 
 main > p:first-child {
@@ -283,6 +271,9 @@ a:hover {
   text-decoration-thickness: 1.5px;
 }
 
+a:focus,
+button:focus,
+summary:focus,
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -335,7 +326,7 @@ a.retro-btn:visited {
   border-radius: 6px;
   background: var(--btn-bg);
   color: #ffffff;
-  font: 600 0.92rem/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  font: 600 0.92rem/1.35 "Geist", sans-serif;
   text-decoration: none;
   letter-spacing: normal;
   cursor: pointer;
@@ -743,7 +734,7 @@ main > dl:not(.project-directory) dd {
 }
 
 /* ==========================================================================
-   Footer & Secret Arcade Link
+   Footer
    ========================================================================== */
 footer {
   display: flex;
@@ -772,30 +763,6 @@ footer a:hover {
   color: var(--ink);
 }
 
-/* Splash of brightness in footer arcade badge */
-footer a[href*="arcade"],
-footer a[href*="arcade"]:visited {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 8px;
-  background: var(--bright-badge-bg);
-  border: 1px solid var(--bright-badge-border);
-  border-radius: 4px;
-  color: var(--ink);
-  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-decoration: none;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-}
-
-footer a[href*="arcade"]:hover {
-  background: #111111;
-  color: #ffffff !important;
-  border-color: #111111;
-}
-
 /* ==========================================================================
    Selection
    ========================================================================== */
@@ -808,16 +775,26 @@ footer a[href*="arcade"]:hover {
    Responsive Adaptations
    ========================================================================== */
 @media (max-width: 760px) {
+  .home-page,
+  .home-page .lead {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .home-page main {
+    padding: 24px 0 16px;
+  }
+
+  .home-page footer {
+    padding: 16px 0;
+  }
+
   html {
     scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
 
   .site-shell {
     padding: 0 20px;
-  }
-
-  .site-header {
-    padding: 24px 0 16px;
   }
 
   .site-nav {
@@ -856,8 +833,7 @@ footer a[href*="arcade"]:hover {
     flex: 0 0 auto;
     min-height: 42px;
     padding: 6px 10px;
-    border-top: 0;
-    border-bottom: 2px solid transparent;
+    border: 1px solid transparent;
     font-size: 0.82rem;
     line-height: 1.2;
     text-align: center;
@@ -866,7 +842,7 @@ footer a[href*="arcade"]:hover {
   }
 
   .site-nav a[aria-current="page"] {
-    border-bottom-color: var(--ink);
+    border-color: var(--ink);
     color: var(--ink);
     font-weight: 600;
     box-shadow: none;
@@ -876,7 +852,7 @@ footer a[href*="arcade"]:hover {
     margin-left: 0;
   }
 
-  body:not(.arcade-page) {
+  body {
     padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
 
@@ -939,10 +915,6 @@ footer a[href*="arcade"]:hover {
   .site-shell {
     max-width: none;
     padding: 0;
-  }
-
-  .site-header {
-    padding: 0 0 12px;
   }
 
   main {
