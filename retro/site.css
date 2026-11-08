@@ -152,10 +152,6 @@ main {
   padding-bottom: 32px;
 }
 
-.home-page footer {
-  padding: 24px 0;
-}
-
 main > p:first-child {
   margin-top: 0;
 }
@@ -740,36 +736,6 @@ main > dl:not(.project-directory) dd {
 }
 
 /* ==========================================================================
-   Footer
-   ========================================================================== */
-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px 20px;
-  padding: 32px 0 44px;
-  border-top: 1px solid var(--border-rule);
-  color: var(--ink-secondary);
-  font-size: 0.88rem;
-  letter-spacing: normal;
-}
-
-footer p {
-  margin: 0;
-  color: var(--ink-secondary);
-  letter-spacing: normal;
-}
-
-footer a {
-  color: var(--ink-secondary);
-}
-
-footer a:hover {
-  color: var(--ink);
-}
-
-/* ==========================================================================
    Selection
    ========================================================================== */
 ::selection {
@@ -789,10 +755,6 @@ footer a:hover {
 
   .home-page main {
     padding: 24px 0 16px;
-  }
-
-  .home-page footer {
-    padding: 16px 0;
   }
 
   html {
@@ -928,7 +890,6 @@ footer a:hover {
 
   .site-nav,
   .skip,
-  footer,
   .retro-btn,
   .back {
     display: none;
