@@ -4,7 +4,7 @@ The portfolio is plain HTML and CSS in `retro/`, independent of the Next.js appl
 
 Run from the project root: `node scripts/serve-retro.cjs`, then visit http://localhost:3000.
 
-Pages: Home, Experience, Projects, Education & skills, Contact, plus seven project case studies. All share `retro/site.css` and a compact GD home link in the navigation. The homepage contains a personal greeting and introduction. The portfolio requires no client framework, build step, external font services, or package dependencies.
+Pages: Home, Experience, Projects, Education & skills, Contact, plus seven project case studies. All share `retro/site.css` and a Home link in the navigation. The homepage contains a personal greeting and introduction. The portfolio requires no client framework, build step, external font services, or package dependencies.
 
 Manrope is self-hosted in `assets/fonts/` with its OFL license and preloaded on every page. Optional font loading prevents a late font swap. The shared stylesheet reserves scrollbar space and keeps navigation font weights stable. Supported browsers use an atomic native page swap without fading old and new text over one another, respecting reduced motion. The mobile navbar stays fixed at the bottom, reveals the active tab when its links overflow horizontally, and uses border-only tap feedback while retaining keyboard focus outlines. `navigation.js` prevents ordinary clicks on the current URL from reloading the page, while preserving modified clicks and navigation from case studies to the project directory.
 

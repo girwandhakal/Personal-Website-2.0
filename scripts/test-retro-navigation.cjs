@@ -37,7 +37,7 @@ for (const page of pages) {
   dom.window.close();
 }
 
-const dom = new JSDOM('<nav class="site-nav"><a href="/index.html"><span>GD</span></a></nav>', {
+const dom = new JSDOM('<nav class="site-nav"><a href="/index.html"><span>Home</span></a></nav>', {
   url: 'https://girwan.com/', runScripts: 'outside-only'
 });
 dom.window.eval(script);

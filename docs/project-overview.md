@@ -153,7 +153,7 @@ npm run dev
 
 ## Alternative retro portfolio
 
-The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.com`. Its five main pages and seven project case studies share `retro/site.css`, a monochrome palette, self-hosted Manrope typography, native disclosure controls, and responsive navigation with a compact GD home link. The homepage contains a personal greeting and introduction. A small shared navigation script prevents redundant current-URL reloads; font preloading, stable scrollbar space, and constant navigation weights prevent text and layout jumps. Native page transitions are enabled where supported, respecting reduced motion.
+The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.com`. Its five main pages and seven project case studies share `retro/site.css`, a monochrome palette, self-hosted Manrope typography, native disclosure controls, and responsive navigation with a Home link. The homepage contains a personal greeting and introduction. A small shared navigation script prevents redundant current-URL reloads; font preloading, stable scrollbar space, and constant navigation weights prevent text and layout jumps. Native page transitions are enabled where supported, respecting reduced motion.
 
 The portfolio uses plain HTML and CSS with no build step or package dependencies. The contact page uses a small client script and `retro/api/contact.mjs`, a Vercel Function that sends messages through EmailJS with validation, origin checks, a honeypot, and rate limiting. `retro/vercel.json` configures this deployment independently of the Next.js application.
 
