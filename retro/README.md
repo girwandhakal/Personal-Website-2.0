@@ -6,9 +6,9 @@ Run from the project root: `node scripts/serve-retro.cjs`, then visit http://loc
 
 Pages: Home, Experience, Projects, Education & skills, Contact, plus seven project case studies. All share `retro/site.css` and a compact GD home link in the navigation. The homepage contains a personal greeting and introduction. The portfolio requires no client framework, build step, external font services, or package dependencies.
 
-Geist is self-hosted in `assets/fonts/` with its OFL license.
+Manrope is self-hosted in `assets/fonts/` with its OFL license and preloaded on every page. Optional font loading prevents a late font swap. The shared stylesheet reserves scrollbar space and keeps navigation font weights stable. Supported browsers use a brief native page transition, respecting reduced motion. `navigation.js` prevents ordinary clicks on the current URL from reloading the page, while preserving modified clicks and navigation from case studies to the project directory.
 
-The existing Vercel project publishes `retro/` from `retro-site` to `girwan.com`. `retro/vercel.json` deploys the contact API, which uses the platform fetch API to send messages through EmailJS. Run `node scripts/test-retro-contact.mjs` to check contact validation and handling.
+The existing Vercel project publishes `retro/` from `retro-site` to `girwan.com`. `retro/vercel.json` deploys the contact API, which uses the platform fetch API to send messages through EmailJS. Run `node scripts/test-retro-contact.mjs` to check contact validation and handling, and `node scripts/test-retro-navigation.cjs` to check navigation behavior and font loading markup.
 
 Content was reconciled against the recent root HTML and project case studies on October 27, 2026. These contain updates missing from the older TypeScript profile, including the resumed credit-union role and research evaluation caveats. No new employment or performance claims were invented.
 

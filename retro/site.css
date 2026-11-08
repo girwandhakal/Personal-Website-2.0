@@ -1,9 +1,9 @@
 @font-face {
-  font-family: "Geist";
-  src: url("assets/fonts/Geist.woff2") format("woff2");
+  font-family: "Manrope";
+  src: url("assets/fonts/Manrope.woff2") format("woff2");
   font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
+  font-weight: 200 800;
+  font-display: optional;
 }
 
 :root {
@@ -57,6 +57,7 @@
 }
 
 html {
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
   scroll-padding-top: 2rem;
   -webkit-text-size-adjust: 100%;
@@ -66,7 +67,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: "Geist", sans-serif;
+  font-family: "Manrope", sans-serif;
   font-size: 16.5px;
   line-height: 1.7;
   letter-spacing: normal;
@@ -118,7 +119,6 @@ body {
 .site-nav a[aria-current="page"],
 .site-nav a:focus {
   color: var(--ink);
-  font-weight: 650;
   border-color: var(--ink);
 }
 
@@ -326,7 +326,7 @@ a.retro-btn:visited {
   border-radius: 6px;
   background: var(--btn-bg);
   color: #ffffff;
-  font: 600 0.92rem/1.35 "Geist", sans-serif;
+  font: 600 0.92rem/1.35 "Manrope", sans-serif;
   text-decoration: none;
   letter-spacing: normal;
   cursor: pointer;
@@ -844,7 +844,6 @@ footer a:hover {
   .site-nav a[aria-current="page"] {
     border-color: var(--ink);
     color: var(--ink);
-    font-weight: 600;
     box-shadow: none;
   }
 
@@ -931,5 +930,17 @@ footer a:hover {
 
   h2, h3 {
     break-after: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 120ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
   }
 }
