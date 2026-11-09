@@ -100,7 +100,7 @@ body {
   align-items: center;
   min-height: 38px;
   padding: 6px 8px;
-  border: 1px solid transparent;
+  border: 2px solid transparent;
   background-color: transparent;
   -webkit-tap-highlight-color: transparent;
   color: var(--ink-secondary);
@@ -777,7 +777,7 @@ main > dl:not(.project-directory) dd {
     flex: 0 0 auto;
     min-height: 42px;
     padding: 6px 10px;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     font-size: 0.82rem;
     line-height: 1.2;
     text-align: center;
