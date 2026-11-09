@@ -4,6 +4,14 @@
   "installCommand": "",
   "buildCommand": "",
   "outputDirectory": ".",
+  "headers": [
+    {
+      "source": "/((?!api(?:/|$)).*)",
+      "headers": [
+        { "key": "Cache-Control", "value": "public, max-age=300, must-revalidate" }
+      ]
+    }
+  ],
   "functions": {
     "api/contact.mjs": { "maxDuration": 15 }
   }

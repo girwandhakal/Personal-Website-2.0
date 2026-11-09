@@ -81,4 +81,16 @@ assert.equal(contact.textContent, 'Contact');
 assert.deepEqual({ ...scrollOptions }, { block: 'nearest', inline: 'center', behavior: 'instant' },
   'overflowing navigation must reveal the active tab without scrolling to another page section');
 mobile.window.close();
+
+const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
+const cacheRules = config.headers.filter(rule => rule.headers.some(header =>
+  header.key.toLowerCase() === 'cache-control' && /max-age=[1-9]\d*/.test(header.value)));
+const isBrowserCached = pathname => cacheRules.some(rule => new RegExp(`^${rule.source}$`).test(pathname));
+for (const pathname of ['/', ...pages.map(page => `/${page}`), '/site.css', '/navigation.js', '/assets/fonts/Manrope.woff2']) {
+  assert(isBrowserCached(pathname), `${pathname}: static files need a fresh browser cache for prefetch reuse`);
+}
+for (const pathname of ['/api', '/api/', '/api/contact', '/api/contact.html']) {
+  assert(!isBrowserCached(pathname), `${pathname}: API responses must not inherit static browser caching`);
+}
+console.log('PASS: static pages and shared assets have browser caching; API paths are excluded.');
 console.log(`PASS: ${pages.length} pages preload the font and load navigation; current-page clicks, home aliases, case studies, modifiers, targets, fragments, queries, and downloads behave correctly.`);

@@ -157,6 +157,8 @@ The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.c
 
 The portfolio uses plain HTML and CSS with no build step or package dependencies. The contact page uses a small client script and `retro/api/contact.mjs`, a Vercel Function that sends messages through EmailJS with validation, origin checks, a honeypot, and rate limiting. `retro/vercel.json` configures this deployment independently of the Next.js application.
 
+Static files use a five-minute browser cache so prefetched pages and shared CSS, navigation JavaScript, and fonts can be reused without a network validation on each click. API paths are excluded; contact responses retain `Cache-Control: no-store`. Returning visitors may see a previous static file for up to five minutes after deployment; filenames are not versioned, so these responses do not use long-lived immutable caching.
+
 Run `node scripts/serve-retro.cjs` to preview the portfolio at `http://localhost:3000`. Run `node scripts/test-retro-contact.mjs` for contact checks.
 
 The arcade and leaderboard code, deployment endpoint, setup scripts, and tests have been removed. Existing leaderboard database records are preserved but no longer accessed by the site.
