@@ -156,13 +156,18 @@ main > p:first-child {
 }
 
 /* Uniform, readable heading scale */
-main h1 {
+main h1,
+#skills-title {
   margin: 0 0 18px;
   color: var(--ink);
   font-size: clamp(1.45rem, 2.4vw, 1.8rem);
   font-weight: 700;
   line-height: 1.25;
   letter-spacing: -0.015em;
+}
+
+#skills-title {
+  margin-top: 44px;
 }
 
 .case-study > h1 {
@@ -823,6 +828,7 @@ main > dl:not(.project-directory) dd {
   }
 
   main h1,
+  #skills-title,
   .case-study > h1 {
     margin-bottom: 20px;
   }
