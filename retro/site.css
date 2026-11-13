@@ -582,6 +582,11 @@ tbody th {
   background: #fafafa;
 }
 
+#skills th {
+  background: transparent;
+  border-bottom: 1px solid var(--border-rule);
+}
+
 .overview-table {
   margin: 16px 0;
 }
