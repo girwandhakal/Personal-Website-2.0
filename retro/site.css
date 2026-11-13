@@ -584,6 +584,9 @@ tbody th {
 
 #skills th {
   background: transparent;
+}
+
+#skills thead th {
   border-bottom: 1px solid var(--border-rule);
 }
 
