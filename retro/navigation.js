@@ -1,7 +1,19 @@
 const navigation = document.querySelector('.site-nav');
-if (navigation.scrollWidth > navigation.clientWidth) {
-  navigation.querySelector('[aria-current="page"]')?.scrollIntoView({
-    block: 'nearest', inline: 'center', behavior: 'instant'
+const menu = document.querySelector('.menu-toggle');
+if (menu) {
+  function closeMenu(restoreFocus = false) {
+    menu.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) menu.focus();
+  }
+  menu.hidden = false;
+  menu.addEventListener('click', () => {
+    menu.setAttribute('aria-expanded', String(menu.getAttribute('aria-expanded') === 'false'));
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') closeMenu(true);
+  });
+  document.addEventListener('click', event => {
+    if (!event.target.closest('.site-header')) closeMenu();
   });
 }
 

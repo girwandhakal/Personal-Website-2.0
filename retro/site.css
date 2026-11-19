@@ -133,6 +133,30 @@ body {
   font-weight: 600;
 }
 
+.menu-toggle {
+  display: none;
+}
+
+.page-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 16px;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--border-rule);
+  font-size: 0.9rem;
+}
+
+.page-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.page-links a[rel="next"] {
+  margin-left: auto;
+}
+
 /* ==========================================================================
    Main Content & Typography
    ========================================================================== */
@@ -782,67 +806,56 @@ main > dl:not(.project-directory) dd {
     padding: 24px 0 16px;
   }
 
-  html {
-    scroll-padding-bottom: calc(76px + env(safe-area-inset-bottom));
-  }
-
   .site-shell {
     padding: 0 20px;
   }
 
-  .site-nav {
-    position: fixed;
-    z-index: 50;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0 4px;
-    padding: 6px 10px calc(6px + env(safe-area-inset-bottom));
-    background: rgba(255, 255, 255, 0.97);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    scroll-padding: 0 10px;
-    scroll-snap-type: x proximity;
+  .site-header {
+    position: relative;
+    display: flow-root;
+    padding-top: 6px;
   }
 
-  .site-nav::-webkit-scrollbar {
+  .menu-toggle:not([hidden]) {
+    display: block;
+    margin-left: auto;
+    min-height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--border-strong);
+    background: var(--paper);
+    color: var(--ink);
+    font: inherit;
+    cursor: pointer;
+  }
+
+  .menu-toggle[aria-expanded="false"]:not([hidden]) + .site-nav {
     display: none;
+  }
+
+  .menu-toggle:not([hidden]) + .site-nav {
+    position: absolute;
+    z-index: 50;
+    top: 100%;
+    right: 0;
+    width: max-content;
+    max-width: 100%;
+    max-height: calc(var(--chat-viewport-height, 100dvh) - 56px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    display: grid;
+    gap: 0;
+    padding: 4px;
+    border: 1px solid var(--border-strong);
+    background: var(--paper);
   }
 
   .site-nav a,
   .site-nav a:visited {
-    justify-content: center;
-    flex: 0 0 auto;
-    min-height: 42px;
-    padding: 6px 10px;
-    border: 2px solid transparent;
-    font-size: 0.82rem;
-    line-height: 1.2;
-    text-align: center;
-    white-space: nowrap;
-    scroll-snap-align: start;
-  }
-
-  .site-nav a[aria-current="page"] {
-    border-color: var(--ink);
-    color: var(--ink);
-    box-shadow: none;
+    min-height: 44px;
   }
 
   .site-nav a:last-child {
     margin-left: 0;
-  }
-
-  body {
-    padding-bottom: calc(76px + env(safe-area-inset-bottom));
   }
 
   main {
@@ -854,10 +867,6 @@ main > dl:not(.project-directory) dd {
     margin: 4px 0 0;
   }
 
-  .chat-page {
-    padding-bottom: 0;
-  }
-
   .chat-page .site-shell {
     display: flex;
     flex-direction: column;
@@ -866,10 +875,8 @@ main > dl:not(.project-directory) dd {
     overflow: hidden;
   }
 
-  .chat-page .site-nav {
-    position: static;
+  .chat-page .site-header {
     flex: none;
-    padding: 6px 0;
   }
 
   .chat-page main {
@@ -893,6 +900,11 @@ main > dl:not(.project-directory) dd {
     min-height: 0;
     overflow-y: auto;
     overscroll-behavior-y: contain;
+  }
+
+  .chat-page .page-links {
+    flex: none;
+    padding-top: 0;
   }
 
   .chat-page .retro-form:not([hidden]) {

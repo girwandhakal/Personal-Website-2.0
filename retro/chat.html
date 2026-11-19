@@ -14,19 +14,23 @@
 <body class="chat-page">
   <a class="skip" href="#main">Skip to content</a>
   <div class="site-shell">
-    <nav class="site-nav" aria-label="Main navigation">
-      <a class="home-link" href="index.html" aria-label="Home">Home</a>
-      <a href="experience.html">Experience</a>
-      <a href="projects.html">Projects</a>
-      <a href="education.html">Education &amp; skills</a>
-      <a href="contact.html">Contact</a>
-      <a href="chat.html" aria-current="page">Chat</a>
-      <a href="https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing">Résumé</a>
-    </nav>
+    <header class="site-header">
+      <button class="menu-toggle" type="button" aria-controls="site-navigation" aria-expanded="false" hidden>Menu</button>
+      <nav id="site-navigation" class="site-nav" aria-label="Main navigation">
+        <a class="home-link" href="index.html" aria-label="Home">Home</a>
+        <a href="experience.html">Experience</a>
+        <a href="projects.html">Projects</a>
+        <a href="education.html">Education &amp; skills</a>
+        <a href="contact.html">Contact</a>
+        <a href="chat.html" aria-current="page">Chat</a>
+        <a href="https://drive.google.com/file/d/19ZlE3TBH60342uetNyYsDHVeINJYsBdf/view?usp=sharing">Résumé</a>
+      </nav>
+    </header>
     <main id="main" tabindex="-1">
       <h1>Chat</h1>
       <p>Ask my AI assistant about my projects, work, or research.</p>
       <div id="conversation" class="conversation" role="log" aria-label="Conversation" tabindex="0"></div>
+      <nav class="page-links" aria-label="Adjacent pages"><a href="contact.html" rel="prev">← Contact</a></nav>
       <form id="chat-form" class="retro-form" hidden>
         <div class="form-group">
           <label for="question">Your question</label>

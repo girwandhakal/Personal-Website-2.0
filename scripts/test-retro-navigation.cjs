@@ -7,6 +7,7 @@ const root = path.resolve(__dirname, '../retro');
 const script = fs.readFileSync(path.join(root, 'navigation.js'), 'utf8');
 const pages = fs.readdirSync(root).filter(file => file.endsWith('.html'))
   .concat(fs.readdirSync(path.join(root, 'projects')).map(file => `projects/${file}`));
+const adjacent = new Map();
 
 for (const page of pages) {
   const file = path.join(root, page);
@@ -22,6 +23,10 @@ for (const page of pages) {
   assert(navigation && navigation.defer, `${page}: missing deferred navigation script`);
   const chat = [...document.querySelectorAll('.site-nav a')].find(link => link.textContent === 'Chat');
   assert.equal(chat?.href, 'https://girwan.com/chat.html', `${page}: missing Chat link`);
+  const pager = document.querySelector('.page-links');
+  assert(pager?.querySelector('a'), `${page}: missing adjacent page links`);
+  adjacent.set(page, Object.fromEntries([...pager.querySelectorAll('a')].map(link =>
+    [link.rel, new URL(link.href).pathname.slice(1)])));
   dom.window.eval(script);
 
   const link = document.querySelector('.site-nav [aria-current="page"]');
@@ -38,6 +43,16 @@ for (const page of pages) {
   assert.equal(probe(), shouldStay, `${page}: current link behavior`);
   dom.window.close();
 }
+
+const seen = new Set();
+let previous;
+for (let page = 'index.html'; page; page = adjacent.get(page).next) {
+  assert(adjacent.has(page) && !seen.has(page), `Invalid page sequence at ${page}`);
+  assert.equal(adjacent.get(page).prev, previous, `${page}: previous link must match the sequence`);
+  seen.add(page);
+  previous = page;
+}
+assert.equal(seen.size, pages.length, 'Adjacent links must reach every page');
 
 const dom = new JSDOM('<nav class="site-nav"><a href="/index.html"><span>Home</span></a></nav>', {
   url: 'https://girwan.com/', runScripts: 'outside-only'
@@ -71,17 +86,19 @@ dom.window.close();
 const mobile = new JSDOM(fs.readFileSync(path.join(root, 'contact.html'), 'utf8'), {
   url: 'https://girwan.com/contact.html', runScripts: 'outside-only'
 });
-const mobileNavigation = mobile.window.document.querySelector('.site-nav');
-Object.defineProperties(mobileNavigation, {
-  scrollWidth: { value: 520 }, clientWidth: { value: 375 }
-});
-const contact = mobileNavigation.querySelector('[aria-current="page"]');
-let scrollOptions;
-contact.scrollIntoView = options => { scrollOptions = options; };
 mobile.window.eval(script);
-assert.equal(contact.textContent, 'Contact');
-assert.deepEqual({ ...scrollOptions }, { block: 'nearest', inline: 'center', behavior: 'instant' },
-  'overflowing navigation must reveal the active tab without scrolling to another page section');
+const menu = mobile.window.document.querySelector('.menu-toggle');
+assert.equal(menu.hidden, false);
+assert.equal(menu.getAttribute('aria-expanded'), 'false');
+menu.click();
+assert.equal(menu.getAttribute('aria-expanded'), 'true');
+mobile.window.document.querySelector('.site-nav a').focus();
+mobile.window.document.dispatchEvent(new mobile.window.KeyboardEvent('keydown', { key: 'Escape' }));
+assert.equal(menu.getAttribute('aria-expanded'), 'false');
+assert.equal(mobile.window.document.activeElement, menu);
+menu.click();
+mobile.window.document.querySelector('main').click();
+assert.equal(menu.getAttribute('aria-expanded'), 'false');
 mobile.window.close();
 
 const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
@@ -95,4 +112,5 @@ for (const pathname of ['/api', '/api/', '/api/contact', '/api/contact.html']) {
   assert(!isBrowserCached(pathname), `${pathname}: API responses must not inherit static browser caching`);
 }
 console.log('PASS: static pages and shared assets have browser caching; API paths are excluded.');
+console.log('PASS: the menu opens and closes, and adjacent links connect every page.');
 console.log(`PASS: ${pages.length} pages preload the font and load navigation; current-page clicks, home aliases, case studies, modifiers, targets, fragments, queries, and downloads behave correctly.`);
