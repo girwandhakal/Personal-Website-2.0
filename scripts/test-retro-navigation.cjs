@@ -35,6 +35,10 @@ for (const page of pages) {
   // Suppress jsdom's unimplemented native navigation after the handler has run.
   document.addEventListener('click', event => event.preventDefault());
   const shouldStay = !page.startsWith('projects/');
+  if (!shouldStay) {
+    assert.deepEqual([...pager.querySelectorAll('a')].map(link => link.href),
+      ['https://girwan.com/projects.html'], `${page}: footer must return to the Projects page`);
+  }
   const probe = () => {
     const event = new dom.window.MouseEvent('click', { bubbles: true, cancelable: true });
     let prevented;
@@ -54,7 +58,8 @@ for (let page = 'index.html'; page; page = adjacent.get(page).next) {
   seen.add(page);
   previous = page;
 }
-assert.equal(seen.size, pages.length, 'Adjacent links must reach every page');
+assert.deepEqual([...seen], ['index.html', 'experience.html', 'projects.html', 'education.html', 'contact.html', 'chat.html'],
+  'Adjacent links must follow the main menu without stepping through case studies');
 
 const dom = new JSDOM('<nav class="site-nav"><a href="/index.html"><span>Home</span></a></nav>', {
   url: 'https://girwan.com/', runScripts: 'outside-only'
@@ -114,5 +119,5 @@ for (const pathname of ['/api', '/api/', '/api/contact', '/api/contact.html']) {
   assert(!isBrowserCached(pathname), `${pathname}: API responses must not inherit static browser caching`);
 }
 console.log('PASS: static pages and shared assets have browser caching; API paths are excluded.');
-console.log('PASS: the menu opens and closes, and adjacent links connect every page.');
+console.log('PASS: the menu opens and closes, main pages link in menu order, and case studies link back to Projects.');
 console.log(`PASS: ${pages.length} pages preload the font and load navigation; current-page clicks, home aliases, case studies, modifiers, targets, fragments, queries, and downloads behave correctly.`);
