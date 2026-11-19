@@ -736,6 +736,7 @@ main > dl:not(.project-directory) dd {
 #chat-form:not([hidden]) {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
   gap: 4px 8px;
 }
 
@@ -753,7 +754,6 @@ main > dl:not(.project-directory) dd {
   margin: 0;
 }
 
-#chat-form textarea,
 #chat-form button {
   height: 44px;
 }
@@ -761,6 +761,7 @@ main > dl:not(.project-directory) dd {
 #chat-form textarea {
   display: block;
   min-height: 44px;
+  max-height: min(144px, max(44px, calc(var(--chat-viewport-height, 100vh) / 3)));
   padding-block: 8px;
   font-size: 16px;
   line-height: 24px;

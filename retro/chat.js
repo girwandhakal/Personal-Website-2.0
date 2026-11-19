@@ -21,6 +21,20 @@ function showLatestMessage() {
   conversation.scrollTop = conversation.scrollHeight;
 }
 
+function resizeField() {
+  field.style.height = 'auto';
+  const borders = field.offsetHeight - field.clientHeight;
+  field.style.height = `${field.scrollHeight + borders}px`;
+}
+
+field.addEventListener('input', resizeField);
+window.addEventListener('resize', resizeField);
+field.addEventListener('keydown', event => {
+  if (event.key !== 'Enter' || event.shiftKey || event.isComposing || event.keyCode === 229) return;
+  event.preventDefault();
+  if (!event.repeat && !button.disabled && field.value.trim()) form.requestSubmit();
+});
+
 function addMessage(label, text = '') {
   const message = document.createElement('div');
   const name = document.createElement('strong');
@@ -81,6 +95,7 @@ form.addEventListener('submit', async event => {
 
   button.disabled = true;
   field.value = '';
+  resizeField();
   status.textContent = 'Waiting for a reply…';
   const user = { role: 'user', content: question };
   const sent = addMessage('You', question);
@@ -134,6 +149,7 @@ form.addEventListener('submit', async event => {
     status.textContent = 'The reply could not be completed. Please try again.';
     if (!field.value) field.value = question;
   } finally {
+    resizeField();
     conversation.setAttribute('aria-live', 'polite');
     button.disabled = false;
   }

@@ -50,8 +50,12 @@ async function main() {
   const form = document.querySelector('form');
   assert.equal(form.hidden, false);
   assert.equal(document.querySelector('#conversation p').textContent, 'hey, ask me about anything');
-  document.querySelector('textarea').value = question.content;
-  form.dispatchEvent(new dom.window.Event('submit', { cancelable: true }));
+  const field = document.querySelector('textarea');
+  field.value = question.content;
+  const shiftEnter = new dom.window.KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, cancelable: true });
+  assert.equal(field.dispatchEvent(shiftEnter), true, 'Shift+Enter must keep native line breaks');
+  const enter = new dom.window.KeyboardEvent('keydown', { key: 'Enter', cancelable: true });
+  assert.equal(field.dispatchEvent(enter), false, 'Enter must send instead of inserting a line break');
   assert.equal(document.querySelector('#conversation div:last-child p').textContent, question.content);
   assert.match(document.querySelector('#chat-status').textContent, /Waiting/);
   const button = form.querySelector('button');
