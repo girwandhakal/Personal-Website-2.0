@@ -45,9 +45,10 @@ async function main() {
   dom.window.eval(readFileSync('retro/chat.js', 'utf8'));
   const form = document.querySelector('form');
   assert.equal(form.hidden, false);
+  assert.equal(document.querySelector('#conversation p').textContent, 'hey, ask me about anything');
   document.querySelector('textarea').value = question.content;
   form.dispatchEvent(new dom.window.Event('submit', { cancelable: true }));
-  assert.equal(document.querySelector('#conversation p').textContent, question.content);
+  assert.equal(document.querySelector('#conversation div:last-child p').textContent, question.content);
   assert.match(document.querySelector('#chat-status').textContent, /Waiting/);
   const button = form.querySelector('button');
   await new Promise((resolve, reject) => {

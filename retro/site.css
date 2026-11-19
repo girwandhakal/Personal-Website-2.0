@@ -666,12 +666,17 @@ main > dl:not(.project-directory) dd {
   letter-spacing: normal;
 }
 
-.chat-page .conversation,
-.chat-page .retro-form {
+.chat-panel {
   max-width: 65ch;
+  background: var(--surface);
 }
 
-.conversation > div {
+.conversation {
+  min-height: 7rem;
+  padding: 12px;
+}
+
+.conversation > div + div {
   border-top: 1px solid var(--border-strong);
   padding-top: 12px;
   margin-top: 16px;
@@ -687,6 +692,13 @@ main > dl:not(.project-directory) dd {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 4px 8px;
+}
+
+#chat-form {
+  max-width: none;
+  margin: 0;
+  padding: 8px 12px;
+  border-top: 1px solid var(--border-rule);
 }
 
 #chat-form .form-group,
@@ -929,11 +941,14 @@ main > dl:not(.project-directory) dd {
   }
 
   .chat-page main h1 {
-    margin: 0 0 4px;
+    margin: 0 0 8px;
   }
 
-  .chat-page main > p {
-    margin: 0 0 8px;
+  .chat-panel {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
   }
 
   .chat-page .conversation {
@@ -944,9 +959,7 @@ main > dl:not(.project-directory) dd {
   }
 
   #chat-form {
-    margin: 0;
-    padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--border-rule);
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
   }
 
 }
