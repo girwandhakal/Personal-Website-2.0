@@ -53,7 +53,8 @@ async function main() {
   assert.equal(form.hidden, false);
   assert.equal(document.querySelector('#conversation p').textContent, 'hey, ask me about anything');
   const field = document.querySelector('textarea');
-  const greetings = ['Hey, how are you?', 'How’s it going?'];
+  const greetings = ['Hey, how are you?', 'How’s it going?', 'how r u', 'hey how r u doin?',
+    'How are you doing today?', 'How are things with you?'];
   const greetingReply = 'I’m doing well, thanks for asking! What’s on your mind?';
   for (const greeting of greetings) {
     field.value = greeting;
@@ -61,6 +62,7 @@ async function main() {
     assert.equal(document.querySelector('#conversation div:last-child p').textContent, greetingReply);
   }
   assert.equal(chatRequests, 0);
+  assert.equal(dom.window.greetingReply('how r u doing at Shipt'), undefined);
   field.value = question.content;
   const shiftEnter = new dom.window.KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, cancelable: true });
   assert.equal(field.dispatchEvent(shiftEnter), true, 'Shift+Enter must keep native line breaks');

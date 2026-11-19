@@ -46,15 +46,58 @@ function addMessage(label, text = '') {
   return body;
 }
 
+function bigrams(phrase) {
+  const padded = `^${phrase}$`;
+  return new Set([...padded].slice(0, -1).map((_, index) => padded.slice(index, index + 2)));
+}
+
+const greetingClasses = [
+  {
+    reply: 'Hey! What would you like to know?',
+    examples: ['hi', 'hey', 'hello', 'hi there', 'hey there', 'hello there', 'hiya',
+      'good morning', 'good afternoon', 'good evening']
+  },
+  {
+    reply: 'I’m doing well, thanks for asking! What’s on your mind?',
+    examples: ['how are you', 'how are you doing', 'how are you today', 'how have you been',
+      'how you doing', 'how is it going', 'how is everything going', 'how is your day going',
+      'how is your day', 'how is life', 'how are things', 'how are things going',
+      'how are you doing tonight', 'how have things been with you', 'how are things with you',
+      'what is up', 'what is good', 'you doing okay']
+  }
+].map(({ reply, examples }) => ({
+  reply,
+  vocabulary: new Set(examples.flatMap(phrase => phrase.split(' '))),
+  samples: examples.map(phrase => ({ words: phrase.split(' ').length, features: bigrams(phrase) }))
+}));
+
 function greetingReply(question) {
-  const phrase = question.toLowerCase().replace(/[‘’]/g, "'")
+  let phrase = question.toLowerCase().replace(/[‘’]/g, "'")
+    .replace(/\b(how|what)'?s\b/g, '$1 is')
+    .replace(/\br\b/g, 'are').replace(/\bu\b/g, 'you')
+    .replace(/\bya\b/g, 'you').replace(/\bdoin\b/g, 'doing')
     .replace(/\s+/g, ' ').replace(/[.!?]+$/, '').trim();
-  if (/^(?:hi|hey|hello|hey there|hi there|hello there)$/.test(phrase)) {
-    return 'Hey! What would you like to know?';
+  phrase = phrase.replace(/^(?:hi|hey|hello)(?:[,!.]\s*|\s+)(?=how |what |you )/, '');
+  const words = phrase.split(' ');
+  const features = bigrams(phrase);
+  let bestScore = 0.79;
+  let reply;
+  for (const category of greetingClasses) {
+    if (!words.every(word => category.vocabulary.has(word))) continue;
+    for (const sample of category.samples) {
+      if (words.length !== sample.words) continue;
+      let overlap = 0;
+      for (const feature of features) {
+        if (sample.features.has(feature)) overlap++;
+      }
+      const score = 2 * overlap / (features.size + sample.features.size);
+      if (score > bestScore) {
+        bestScore = score;
+        reply = category.reply;
+      }
+    }
   }
-  if (/^(?:(?:hi|hey|hello)(?:[,!.]\s*|\s+))?(?:how are you(?: doing)?|how(?:'s| is) it going|how(?:'s| is) your day going|what(?:'s| is) up)$/.test(phrase)) {
-    return 'I’m doing well, thanks for asking! What’s on your mind?';
-  }
+  return reply;
 }
 
 function rememberTurn(user, text, local = false) {
