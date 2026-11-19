@@ -7,7 +7,7 @@
   <title>Chat | Girwan Dhakal</title>
   <link rel="icon" href="assets/animal-domestic-lion-svgrepo-com.svg" type="image/svg+xml">
   <link rel="preload" href="assets/fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="site.css?v=native-menu">
+  <link rel="stylesheet" href="site.css?v=compact-chat">
   <script src="navigation.js?v=native-menu" defer></script>
   <script src="chat.js" defer></script>
 </head>
@@ -40,8 +40,7 @@
       <div id="conversation" class="conversation" role="log" aria-label="Conversation" tabindex="0"></div>
       <form id="chat-form" class="retro-form" hidden>
         <div class="form-group">
-          <label for="question">Your question</label>
-          <textarea id="question" rows="2" maxlength="400" required></textarea>
+          <textarea id="question" rows="1" maxlength="400" placeholder="Ask a question…" aria-label="Your question" required></textarea>
         </div>
         <button type="submit" class="retro-btn">Send</button>
         <p id="chat-status" class="form-status" role="status"></p>

@@ -683,8 +683,42 @@ main > dl:not(.project-directory) dd {
   overflow-wrap: anywhere;
 }
 
-.chat-page .form-group textarea {
-  min-height: 4.5rem;
+#chat-form:not([hidden]) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 8px;
+}
+
+#chat-form .form-group,
+#chat-form button,
+#chat-status {
+  margin: 0;
+}
+
+#chat-form textarea,
+#chat-form button {
+  height: 44px;
+}
+
+#chat-form textarea {
+  display: block;
+  min-height: 44px;
+  padding-block: 8px;
+  font-size: 16px;
+  line-height: 24px;
+  resize: none;
+}
+
+#chat-form textarea::placeholder {
+  color: var(--ink-muted);
+}
+
+#chat-status {
+  grid-column: 1 / -1;
+}
+
+#chat-status:empty {
+  display: none;
 }
 
 .chat-announcement {
@@ -909,35 +943,12 @@ main > dl:not(.project-directory) dd {
     overscroll-behavior-y: contain;
   }
 
-  .chat-page .retro-form:not([hidden]) {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: end;
-    gap: 4px 8px;
+  #chat-form {
     margin: 0;
     padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
     border-top: 1px solid var(--border-rule);
   }
 
-  .chat-page .form-group,
-  .chat-page #chat-status {
-    margin: 0;
-  }
-
-  .chat-page .form-group textarea {
-    display: block;
-    min-height: 44px;
-    font-size: 16px;
-    resize: none;
-  }
-
-  .chat-page #chat-status {
-    grid-column: 1 / -1;
-  }
-
-  .chat-page #chat-status:empty {
-    display: none;
-  }
 }
 
 @media (max-width: 480px) {
