@@ -46,6 +46,27 @@ function addMessage(label, text = '') {
   return body;
 }
 
+function greetingReply(question) {
+  const phrase = question.toLowerCase().replace(/[‘’]/g, "'")
+    .replace(/\s+/g, ' ').replace(/[.!?]+$/, '').trim();
+  if (/^(?:hi|hey|hello|hey there|hi there|hello there)$/.test(phrase)) {
+    return 'Hey! What would you like to know?';
+  }
+  if (/^(?:(?:hi|hey|hello)(?:[,!.]\s*|\s+))?(?:how are you(?: doing)?|how(?:'s| is) it going|how(?:'s| is) your day going|what(?:'s| is) up)$/.test(phrase)) {
+    return 'I’m doing well, thanks for asking! What’s on your mind?';
+  }
+}
+
+function rememberTurn(user, text, local = false) {
+  const assistant = { role: 'assistant', content: text.trim() };
+  turns.push({ ...user, local }, { ...assistant, local });
+  try {
+    sessionStorage.setItem(historyKey, JSON.stringify(turns));
+  } catch {
+    // Keep the current conversation visible if storage is unavailable.
+  }
+}
+
 function restoreHistory(reloaded = false) {
   try {
     if (reloaded) {
@@ -93,20 +114,30 @@ form.addEventListener('submit', async event => {
   const question = field.value.trim();
   if (!question || button.disabled) return;
 
-  button.disabled = true;
   field.value = '';
   resizeField();
-  status.textContent = 'Waiting for a reply…';
   const user = { role: 'user', content: question };
   const sent = addMessage('You', question);
   showLatestMessage();
+  const greeting = greetingReply(question);
+  if (greeting) {
+    addMessage('Assistant', greeting);
+    rememberTurn(user, greeting, true);
+    status.textContent = '';
+    showLatestMessage();
+    return;
+  }
+
+  button.disabled = true;
+  status.textContent = 'Waiting for a reply…';
   let reply;
   try {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ messages: [
-        ...turns.slice(-4).map(message => ({ ...message, content: message.content.slice(0, 1200) })),
+        ...turns.filter(message => !message.local).slice(-4)
+          .map(({ role, content }) => ({ role, content: content.slice(0, 1200) })),
         user
       ] }),
       signal: AbortSignal.timeout(30000)
@@ -131,12 +162,7 @@ form.addEventListener('submit', async event => {
       if (atBottom) showLatestMessage();
     });
     if (!text.trim()) throw new Error('Empty reply');
-    turns.push(user, { role: 'assistant', content: text.trim() });
-    try {
-      sessionStorage.setItem(historyKey, JSON.stringify(turns));
-    } catch {
-      // Keep the current conversation visible if storage is unavailable.
-    }
+    rememberTurn(user, text);
     conversation.setAttribute('aria-live', 'polite');
     status.textContent = '';
     const announcement = document.createElement('span');

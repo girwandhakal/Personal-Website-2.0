@@ -6,7 +6,7 @@ async function main() {
   const { handleChat } = await import('../retro/api/chat.mjs');
   process.env.GROQ_API_KEY = 'test-key';
   process.env.SAFETY_SERVICE_URL = 'https://scanner.example/scan';
-  const question = { role: 'user', content: 'What is Cueframe?' };
+  const question = { role: 'user', content: 'Hey, how are you? What is Cueframe?' };
   const request = (messages, origin = 'https://girwan.com') => new Request('https://girwan.com/api/chat', {
     method: 'POST',
     headers: { origin, 'content-type': 'application/json' },
@@ -42,7 +42,9 @@ async function main() {
   const dom = new JSDOM(html, options);
   const { document } = dom.window;
   dom.window.TextDecoderStream = TextDecoderStream;
+  let chatRequests = 0;
   dom.window.fetch = async (_url, init) => {
+    chatRequests++;
     assert.deepEqual(JSON.parse(init.body), { messages: [question] });
     return response;
   };
@@ -51,6 +53,14 @@ async function main() {
   assert.equal(form.hidden, false);
   assert.equal(document.querySelector('#conversation p').textContent, 'hey, ask me about anything');
   const field = document.querySelector('textarea');
+  const greetings = ['Hey, how are you?', 'How’s it going?'];
+  const greetingReply = 'I’m doing well, thanks for asking! What’s on your mind?';
+  for (const greeting of greetings) {
+    field.value = greeting;
+    form.requestSubmit();
+    assert.equal(document.querySelector('#conversation div:last-child p').textContent, greetingReply);
+  }
+  assert.equal(chatRequests, 0);
   field.value = question.content;
   const shiftEnter = new dom.window.KeyboardEvent('keydown', { key: 'Enter', shiftKey: true, cancelable: true });
   assert.equal(field.dispatchEvent(shiftEnter), true, 'Shift+Enter must keep native line breaks');
@@ -71,6 +81,7 @@ async function main() {
     observer.observe(button, { attributes: true });
   });
   assert.equal(document.querySelector('#conversation div:last-child p').textContent, 'A teleprompter.');
+  assert.equal(chatRequests, 1);
   const key = 'portfolio-chat-history';
   const saved = dom.window.sessionStorage.getItem(key);
   assert(saved);
@@ -78,7 +89,8 @@ async function main() {
   returned.window.sessionStorage.setItem(key, saved);
   returned.window.eval(script);
   assert.deepEqual([...returned.window.document.querySelectorAll('#conversation p')].map(p => p.textContent),
-    ['hey, ask me about anything', question.content, 'A teleprompter.']);
+    ['hey, ask me about anything', ...greetings.flatMap(greeting => [greeting, greetingReply]),
+      question.content, 'A teleprompter.']);
   returned.window.close();
   const reloaded = new JSDOM(html, options);
   reloaded.window.sessionStorage.setItem(key, saved);
