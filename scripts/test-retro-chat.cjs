@@ -47,6 +47,8 @@ async function main() {
   assert.equal(form.hidden, false);
   document.querySelector('textarea').value = question.content;
   form.dispatchEvent(new dom.window.Event('submit', { cancelable: true }));
+  assert.equal(document.querySelector('#conversation p').textContent, question.content);
+  assert.match(document.querySelector('#chat-status').textContent, /Waiting/);
   const button = form.querySelector('button');
   await new Promise((resolve, reject) => {
     const timeout = setTimeout(() => { observer.disconnect(); reject(new Error('Chat did not finish')); }, 1000);
