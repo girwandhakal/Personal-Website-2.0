@@ -30,6 +30,7 @@ async function main() {
     if (url === process.env.SAFETY_SERVICE_URL) return Response.json({ allowed: true });
     const payload = JSON.parse(init.body);
     assert.equal(payload.stream, true);
+    assert.match(payload.messages[0].content, /use “I,” “me,” and “my” for Girwan/);
     assert.match(payload.messages[0].content, /teleprompter for slide decks/);
     assert.deepEqual(payload.messages[1], question);
     return new Response(mockProvider, { headers: { 'content-type': 'text/event-stream' } });
