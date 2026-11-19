@@ -642,6 +642,39 @@ main > dl:not(.project-directory) dd {
   letter-spacing: normal;
 }
 
+.chat-page .conversation,
+.chat-page .retro-form {
+  max-width: 65ch;
+}
+
+.conversation > div {
+  border-top: 1px solid var(--border-strong);
+  padding-top: 12px;
+  margin-top: 16px;
+}
+
+.conversation p {
+  margin-top: 4px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.chat-page .form-group textarea {
+  min-height: 4.5rem;
+}
+
+.chat-page #chat-privacy {
+  margin-top: 8px;
+}
+
+.chat-announcement {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
 /* ==========================================================================
    Contact Form (Monochrome Minimalist)
    ========================================================================== */

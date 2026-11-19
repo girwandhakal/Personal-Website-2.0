@@ -13,6 +13,10 @@
     }
   ],
   "functions": {
-    "api/contact.mjs": { "maxDuration": 15 }
+    "api/contact.mjs": { "maxDuration": 15 },
+    "api/chat.mjs": {
+      "maxDuration": 30,
+      "includeFiles": "{index.html,education.html,experience.html,projects.html,projects/*.html}"
+    }
   }
 }

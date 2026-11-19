@@ -20,6 +20,8 @@ for (const page of pages) {
   assert(fs.existsSync(path.resolve(path.dirname(file), font.getAttribute('href'))));
   const navigation = document.querySelector('script[src$="navigation.js"]');
   assert(navigation && navigation.defer, `${page}: missing deferred navigation script`);
+  const chat = [...document.querySelectorAll('.site-nav a')].find(link => link.textContent === 'Chat');
+  assert.equal(chat?.href, 'https://girwan.com/chat.html', `${page}: missing Chat link`);
   dom.window.eval(script);
 
   const link = document.querySelector('.site-nav [aria-current="page"]');
