@@ -10,7 +10,7 @@ Manrope is self-hosted in `assets/fonts/` with its OFL license and preloaded on 
 
 The existing Vercel project publishes `retro/` from `retro-site` to `girwan.com`. `retro/vercel.json` deploys the contact API, which uses the platform fetch API to send messages through EmailJS. Run `node scripts/test-retro-contact.mjs` to check contact validation and handling, and `node scripts/test-retro-navigation.cjs` to check navigation behavior and font loading markup.
 
-The Chat page sends questions and up to two previous turns to `/api/chat`. The function scans input with `SAFETY_SERVICE_URL`, uses the current public HTML pages as context, and streams replies from Groq using `GROQ_API_KEY` and optional `GROQ_MODEL`. The site does not store chat history. Rate limits apply per running function instance. Run `node scripts/test-retro-chat.cjs` to check the form, streaming, and API.
+The Chat page sends questions and up to two previous turns to `/api/chat`. The function checks input with local patterns and the optional `SAFETY_SERVICE_URL` scanner, uses public HTML pages as context, and streams replies from Groq using `GROQ_API_KEY` and optional `GROQ_MODEL`. The site does not store chat history. Rate limits apply per running function instance. Run `node scripts/test-retro-chat.cjs` to check the form, streaming, and API.
 
 Content was reconciled against the recent root HTML and project case studies on October 27, 2026. These contain updates missing from the older TypeScript profile, including the resumed credit-union role and research evaluation caveats. No new employment or performance claims were invented.
 

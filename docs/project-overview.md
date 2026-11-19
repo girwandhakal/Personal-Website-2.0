@@ -153,7 +153,7 @@ npm run dev
 
 ## Alternative retro portfolio
 
-The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.com`. Its six main pages and seven project case studies share `retro/site.css`, self-hosted Manrope typography, and responsive navigation. The Chat page uses a plain JavaScript form and a separate Vercel Function that scans input, loads public HTML as context, and streams Groq responses. Recent chat turns live in the browser tab. The chat function requires the production model key and safety scanner, with per-instance request limits.
+The `retro-site` branch serves an independent portfolio in `retro/` at `girwan.com`. Its six main pages and seven project case studies share `retro/site.css`, self-hosted Manrope typography, and responsive navigation. The Chat page uses a plain JavaScript form and a separate Vercel Function that checks input, loads public HTML as context, and streams Groq responses. Recent chat turns live in the browser tab. The chat function requires the production model key and applies per-instance request limits. Local input checks run even when the external scanner is unavailable.
 
 The portfolio uses plain HTML and CSS with no build step or package dependencies. The contact page uses a small client script and `retro/api/contact.mjs`, a Vercel Function that sends messages through EmailJS with validation, origin checks, a honeypot, and rate limiting. `retro/vercel.json` configures this deployment independently of the Next.js application.
 

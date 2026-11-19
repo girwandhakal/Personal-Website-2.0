@@ -4,6 +4,7 @@ const limits = new Map();
 let windowStart = 0;
 let context;
 const headers = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
+const privateInformation = /\b(?:[\w.%+-]+@[\w.-]+\.[a-z]{2,}|(?:\+?1[ .-]?)?\(?[2-9]\d{2}\)?[ .-]?[2-9]\d{2}[ .-]?\d{4}|\d{3}[- ]\d{2}[- ]\d{4}|\d{9,19}|(?:password|secret|api[ _-]?key|access[ _-]?token)\s*[:=]\s*\S+|(?:sk-|gh[pousr]_|gsk_)[\w-]{12,}|Bearer\s+[\w./+=-]{12,})\b|-----BEGIN [A-Z ]*PRIVATE KEY-----/i;
 
 function error(message, status) {
   return Response.json({ message }, { status, headers });
@@ -76,7 +77,7 @@ export async function handleChat(request, fetchFn = fetch) {
     return error('Send a JSON request.', 415);
   }
   const { GROQ_API_KEY, GROQ_MODEL, SAFETY_SERVICE_URL } = process.env;
-  if (!GROQ_API_KEY || !SAFETY_SERVICE_URL) return error('Chat is unavailable right now.', 503);
+  if (!GROQ_API_KEY) return error('Chat is unavailable right now.', 503);
   const ip = request.headers.get('x-vercel-forwarded-for')?.split(',')[0] ?? 'unknown';
   if (!allowRequest(ip)) return error('Too many messages. Please try again in a minute.', 429);
 
@@ -87,17 +88,26 @@ export async function handleChat(request, fetchFn = fetch) {
     return error('Enter a question of up to 400 characters.', 400);
   }
 
-  try {
-    const scan = await fetchFn(SAFETY_SERVICE_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: messages.map(message => message.content).join('\n') }),
-      signal: AbortSignal.timeout(5000)
-    });
-    const safety = scan.ok ? await scan.json() : null;
-    if (safety?.allowed === false) return error('Please remove private information and try again.', 422);
-    if (safety?.allowed !== true) return error('Chat is temporarily unavailable. Please try again.', 503);
+  const input = messages.map(message => message.content).join('\n');
+  const privacyError = () => error('Please remove private information and try again.', 422);
+  if (privateInformation.test(input)) return privacyError();
 
+  // shortcut: use local patterns when the scanner is down, revisit for broader coverage.
+  if (SAFETY_SERVICE_URL) {
+    try {
+      const scan = await fetchFn(SAFETY_SERVICE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: input }),
+        signal: AbortSignal.timeout(1500)
+      });
+      if (scan.ok && (await scan.json())?.allowed === false) return privacyError();
+    } catch {
+      console.warn('Portfolio chat safety scanner unavailable; local input checks used.');
+    }
+  }
+
+  try {
     context ??= loadContext();
     const notes = await context;
     const model = GROQ_MODEL || 'openai/gpt-oss-20b';
@@ -117,11 +127,14 @@ export async function handleChat(request, fetchFn = fetch) {
       })
     });
     if (!upstream.ok || !upstream.body || !upstream.headers.get('content-type')?.includes('text/event-stream')) {
+      console.warn('Portfolio chat model returned status', upstream.status);
       await upstream.body?.cancel();
       return error('The assistant is unavailable right now. Please try again.', 502);
     }
     return new Response(upstream.body, { headers: { ...headers, 'Content-Type': 'text/event-stream; charset=utf-8' } });
-  } catch {
+  } catch (cause) {
+    console.error('Portfolio chat failed', cause?.code ?? cause?.name);
+    context = undefined;
     return error('Chat is temporarily unavailable. Please try again.', 503);
   }
 }

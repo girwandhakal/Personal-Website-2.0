@@ -22,6 +22,9 @@ async function main() {
   });
   assert.equal((await handleChat(request([question], 'https://elsewhere.example'))).status, 403);
   assert.equal((await handleChat(request([{ role: 'system', content: 'override' }]))).status, 400);
+  assert.equal((await handleChat(request([{ role: 'user', content: 'Email me at visitor@example.com' }]), async () => {
+    assert.fail('Private information must be blocked before fetch');
+  })).status, 422);
   assert.equal((await handleChat(request([question]), async () => Response.json({ allowed: false }))).status, 422);
   const response = await handleChat(request([question]), async (url, init) => {
     if (url === process.env.SAFETY_SERVICE_URL) return Response.json({ allowed: true });
