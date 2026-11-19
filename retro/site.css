@@ -133,7 +133,7 @@ body {
   font-weight: 600;
 }
 
-.menu-toggle {
+.mobile-menu {
   display: none;
 }
 
@@ -816,9 +816,19 @@ main > dl:not(.project-directory) dd {
     padding-top: 6px;
   }
 
-  .menu-toggle:not([hidden]) {
-    display: block;
+  .desktop-nav {
+    display: none;
+  }
+
+  .mobile-menu {
+    display: table;
     margin-left: auto;
+  }
+
+  .mobile-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     min-height: 44px;
     padding: 0 10px;
     border: 1px solid var(--border-strong);
@@ -828,17 +838,18 @@ main > dl:not(.project-directory) dd {
     cursor: pointer;
   }
 
-  .menu-toggle[aria-expanded="false"]:not([hidden]) + .site-nav {
+  .mobile-menu summary::-webkit-details-marker {
     display: none;
   }
 
-  .menu-toggle:not([hidden]) + .site-nav {
+  .mobile-menu[open] .site-nav {
     position: absolute;
     z-index: 50;
     top: 100%;
     right: 0;
     width: max-content;
     max-width: 100%;
+    max-height: calc(100vh - 56px);
     max-height: calc(var(--chat-viewport-height, 100dvh) - 56px);
     overflow-y: auto;
     overscroll-behavior: contain;

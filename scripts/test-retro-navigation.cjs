@@ -19,10 +19,12 @@ for (const page of pages) {
   assert(font, `${page}: missing font preload`);
   assert(font.hasAttribute('crossorigin'), `${page}: font preload requires CORS`);
   assert(fs.existsSync(path.resolve(path.dirname(file), font.getAttribute('href'))));
-  const navigation = document.querySelector('script[src$="navigation.js"]');
+  const navigation = document.querySelector('script[src*="navigation.js"]');
   assert(navigation && navigation.defer, `${page}: missing deferred navigation script`);
   const chat = [...document.querySelectorAll('.site-nav a')].find(link => link.textContent === 'Chat');
   assert.equal(chat?.href, 'https://girwan.com/chat.html', `${page}: missing Chat link`);
+  const mobileLinks = [...document.querySelectorAll('.mobile-menu .site-nav a')].map(link => link.href);
+  assert.deepEqual(mobileLinks, [...document.querySelectorAll('.desktop-nav a')].map(link => link.href));
   const pager = document.querySelector('.page-links');
   assert(pager?.querySelector('a'), `${page}: missing adjacent page links`);
   adjacent.set(page, Object.fromEntries([...pager.querySelectorAll('a')].map(link =>
@@ -86,19 +88,19 @@ dom.window.close();
 const mobile = new JSDOM(fs.readFileSync(path.join(root, 'contact.html'), 'utf8'), {
   url: 'https://girwan.com/contact.html', runScripts: 'outside-only'
 });
+const menu = mobile.window.document.querySelector('.mobile-menu');
+const summary = menu.querySelector('summary');
+assert.equal(menu.open, false);
+summary.click();
+assert.equal(menu.open, true, 'Tapping Menu must work before navigation.js runs');
 mobile.window.eval(script);
-const menu = mobile.window.document.querySelector('.menu-toggle');
-assert.equal(menu.hidden, false);
-assert.equal(menu.getAttribute('aria-expanded'), 'false');
-menu.click();
-assert.equal(menu.getAttribute('aria-expanded'), 'true');
-mobile.window.document.querySelector('.site-nav a').focus();
+menu.querySelector('a').focus();
 mobile.window.document.dispatchEvent(new mobile.window.KeyboardEvent('keydown', { key: 'Escape' }));
-assert.equal(menu.getAttribute('aria-expanded'), 'false');
-assert.equal(mobile.window.document.activeElement, menu);
-menu.click();
+assert.equal(menu.open, false);
+assert.equal(mobile.window.document.activeElement, summary);
+summary.click();
 mobile.window.document.querySelector('main').click();
-assert.equal(menu.getAttribute('aria-expanded'), 'false');
+assert.equal(menu.open, false);
 mobile.window.close();
 
 const config = JSON.parse(fs.readFileSync(path.join(root, 'vercel.json'), 'utf8'));
