@@ -26,8 +26,9 @@ for (const page of pages) {
   const mobileLinks = [...document.querySelectorAll('.mobile-menu .site-nav a')].map(link => link.href);
   assert.deepEqual(mobileLinks, [...document.querySelectorAll('.desktop-nav a')].map(link => link.href));
   const pager = document.querySelector('.page-links');
-  assert(pager?.querySelector('a'), `${page}: missing adjacent page links`);
-  adjacent.set(page, Object.fromEntries([...pager.querySelectorAll('a')].map(link =>
+  if (page === 'chat.html') assert.equal(pager, null, 'Chat has no footer navigation');
+  else assert(pager?.querySelector('a'), `${page}: missing adjacent page links`);
+  adjacent.set(page, Object.fromEntries([...(pager?.querySelectorAll('a') ?? [])].map(link =>
     [link.rel, new URL(link.href).pathname.slice(1)])));
   dom.window.eval(script);
 
@@ -54,7 +55,8 @@ const seen = new Set();
 let previous;
 for (let page = 'index.html'; page; page = adjacent.get(page).next) {
   assert(adjacent.has(page) && !seen.has(page), `Invalid page sequence at ${page}`);
-  assert.equal(adjacent.get(page).prev, previous, `${page}: previous link must match the sequence`);
+  assert.equal(adjacent.get(page).prev, page === 'chat.html' ? undefined : previous,
+    `${page}: previous link must match the sequence`);
   seen.add(page);
   previous = page;
 }

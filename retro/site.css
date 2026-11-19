@@ -687,10 +687,6 @@ main > dl:not(.project-directory) dd {
   min-height: 4.5rem;
 }
 
-.chat-page #chat-privacy {
-  margin-top: 8px;
-}
-
 .chat-announcement {
   position: absolute;
   width: 1px;
@@ -913,11 +909,6 @@ main > dl:not(.project-directory) dd {
     overscroll-behavior-y: contain;
   }
 
-  .chat-page .page-links {
-    flex: none;
-    padding-top: 0;
-  }
-
   .chat-page .retro-form:not([hidden]) {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
@@ -929,7 +920,6 @@ main > dl:not(.project-directory) dd {
   }
 
   .chat-page .form-group,
-  .chat-page #chat-privacy,
   .chat-page #chat-status {
     margin: 0;
   }
@@ -941,7 +931,6 @@ main > dl:not(.project-directory) dd {
     resize: none;
   }
 
-  .chat-page #chat-privacy,
   .chat-page #chat-status {
     grid-column: 1 / -1;
   }
