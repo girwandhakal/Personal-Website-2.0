@@ -4,6 +4,7 @@ const button = form.querySelector('button');
 const conversation = document.querySelector('#conversation');
 const status = document.querySelector('#chat-status');
 const turns = [];
+const historyKey = 'portfolio-chat-history';
 const viewport = window.visualViewport;
 
 function keepComposerAboveKeyboard() {
@@ -29,6 +30,26 @@ function addMessage(label, text = '') {
   message.append(name, body);
   conversation.append(message);
   return body;
+}
+
+function restoreHistory(reloaded = false) {
+  try {
+    if (reloaded) {
+      sessionStorage.removeItem(historyKey);
+      return;
+    }
+    const saved = JSON.parse(sessionStorage.getItem(historyKey) ?? '[]');
+    if (JSON.stringify(saved) === JSON.stringify(turns)) return;
+    while (conversation.children.length > 1) conversation.lastElementChild.remove();
+    turns.length = 0;
+    for (const message of saved) {
+      addMessage(message.role === 'user' ? 'You' : 'Assistant', message.content);
+      turns.push(message);
+    }
+    showLatestMessage();
+  } catch {
+    // Chat still works when the browser blocks storage.
+  }
 }
 
 async function readReply(stream, onText) {
@@ -69,7 +90,10 @@ form.addEventListener('submit', async event => {
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [...turns, user] }),
+      body: JSON.stringify({ messages: [
+        ...turns.slice(-4).map(message => ({ ...message, content: message.content.slice(0, 1200) })),
+        user
+      ] }),
       signal: AbortSignal.timeout(30000)
     });
     if (!response.ok) {
@@ -92,8 +116,12 @@ form.addEventListener('submit', async event => {
       if (atBottom) showLatestMessage();
     });
     if (!text.trim()) throw new Error('Empty reply');
-    turns.push(user, { role: 'assistant', content: text.trim().slice(0, 1200) });
-    if (turns.length > 4) turns.splice(0, 2);
+    turns.push(user, { role: 'assistant', content: text.trim() });
+    try {
+      sessionStorage.setItem(historyKey, JSON.stringify(turns));
+    } catch {
+      // Keep the current conversation visible if storage is unavailable.
+    }
     conversation.setAttribute('aria-live', 'polite');
     status.textContent = '';
     const announcement = document.createElement('span');
@@ -112,3 +140,7 @@ form.addEventListener('submit', async event => {
 });
 
 form.hidden = false;
+restoreHistory(performance.getEntriesByType?.('navigation')[0]?.type === 'reload');
+window.addEventListener('pageshow', event => {
+  if (event.persisted) restoreHistory();
+});

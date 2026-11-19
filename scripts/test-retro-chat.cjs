@@ -36,14 +36,17 @@ async function main() {
     return new Response(mockProvider, { headers: { 'content-type': 'text/event-stream' } });
   });
   assert.equal(response.status, 200);
-  const dom = new JSDOM(readFileSync('retro/chat.html', 'utf8'), { runScripts: 'outside-only' });
+  const html = readFileSync('retro/chat.html', 'utf8');
+  const script = readFileSync('retro/chat.js', 'utf8');
+  const options = { runScripts: 'outside-only', url: 'https://girwan.com/chat.html' };
+  const dom = new JSDOM(html, options);
   const { document } = dom.window;
   dom.window.TextDecoderStream = TextDecoderStream;
   dom.window.fetch = async (_url, init) => {
     assert.deepEqual(JSON.parse(init.body), { messages: [question] });
     return response;
   };
-  dom.window.eval(readFileSync('retro/chat.js', 'utf8'));
+  dom.window.eval(script);
   const form = document.querySelector('form');
   assert.equal(form.hidden, false);
   assert.equal(document.querySelector('#conversation p').textContent, 'hey, ask me about anything');
@@ -64,6 +67,22 @@ async function main() {
     observer.observe(button, { attributes: true });
   });
   assert.equal(document.querySelector('#conversation div:last-child p').textContent, 'A teleprompter.');
+  const key = 'portfolio-chat-history';
+  const saved = dom.window.sessionStorage.getItem(key);
+  assert(saved);
+  const returned = new JSDOM(html, options);
+  returned.window.sessionStorage.setItem(key, saved);
+  returned.window.eval(script);
+  assert.deepEqual([...returned.window.document.querySelectorAll('#conversation p')].map(p => p.textContent),
+    ['hey, ask me about anything', question.content, 'A teleprompter.']);
+  returned.window.close();
+  const reloaded = new JSDOM(html, options);
+  reloaded.window.sessionStorage.setItem(key, saved);
+  reloaded.window.performance.getEntriesByType = () => [{ type: 'reload' }];
+  reloaded.window.eval(script);
+  assert.equal(reloaded.window.sessionStorage.getItem(key), null);
+  assert.equal(reloaded.window.document.querySelectorAll('#conversation p').length, 1);
+  reloaded.window.close();
   dom.window.close();
   console.log('PASS: chat grounding, input checks, and browser rendering of split stream chunks.');
 }

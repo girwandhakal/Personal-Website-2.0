@@ -172,7 +172,17 @@ main {
 
 .home-page main {
   min-height: 0;
-  padding-bottom: 32px;
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+
+.home-page .page-links {
+  position: fixed;
+  inset: auto 0 0;
+  z-index: 1;
+  max-width: 780px;
+  margin-inline: auto;
+  padding: 4px 28px calc(4px + env(safe-area-inset-bottom));
+  background: var(--paper);
 }
 
 main > p:first-child {
@@ -666,7 +676,42 @@ main > dl:not(.project-directory) dd {
   letter-spacing: normal;
 }
 
+.chat-page .site-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: var(--chat-viewport-height, 100dvh);
+  overflow: hidden;
+}
+
+.chat-page .site-header {
+  flex: none;
+}
+
+.chat-page main {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  padding: 8px 0 0;
+}
+
+.chat-page main h1 {
+  margin: 0 0 8px;
+}
+
+.chat-page .conversation {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
 .chat-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
   max-width: 65ch;
   background: var(--surface);
 }
@@ -695,9 +740,10 @@ main > dl:not(.project-directory) dd {
 }
 
 #chat-form {
+  flex: none;
   max-width: none;
   margin: 0;
-  padding: 8px 12px;
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--border-rule);
 }
 
@@ -719,6 +765,7 @@ main > dl:not(.project-directory) dd {
   font-size: 16px;
   line-height: 24px;
   resize: none;
+  overflow-y: auto;
 }
 
 #chat-form textarea::placeholder {
@@ -849,11 +896,7 @@ main > dl:not(.project-directory) dd {
   }
 
   .home-page .page-links {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 1;
-    padding: 4px 20px calc(4px + env(safe-area-inset-bottom));
-    background: var(--paper);
+    padding-inline: 20px;
   }
 
   .site-shell {
@@ -928,47 +971,6 @@ main > dl:not(.project-directory) dd {
     margin: 4px 0 0;
   }
 
-  .chat-page .site-shell {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    height: var(--chat-viewport-height, 100dvh);
-    overflow: hidden;
-  }
-
-  .chat-page .site-header {
-    flex: none;
-  }
-
-  .chat-page main {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-height: 0;
-    padding: 8px 0 0;
-  }
-
-  .chat-page main h1 {
-    margin: 0 0 8px;
-  }
-
-  .chat-panel {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-height: 0;
-  }
-
-  .chat-page .conversation {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-  }
-
-  #chat-form {
-    padding-bottom: calc(8px + env(safe-area-inset-bottom));
-  }
 
 }
 
