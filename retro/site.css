@@ -291,9 +291,13 @@ ul, ol {
 /* ==========================================================================
    Links & Focus States
    ========================================================================== */
+a,
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+
 a {
   color: var(--link);
-  -webkit-tap-highlight-color: transparent;
   text-decoration: underline;
   text-decoration-color: var(--link-underline);
   text-decoration-thickness: 1px;
@@ -928,7 +932,6 @@ main > dl:not(.project-directory) dd {
     background: var(--paper);
     color: var(--ink);
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-menu summary::-webkit-details-marker {
