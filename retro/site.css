@@ -151,6 +151,7 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .page-links a[rel="next"] {
@@ -920,16 +921,15 @@ main > dl:not(.project-directory) dd {
   }
 
   .mobile-menu summary {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    display: grid;
+    place-items: center;
+    min-width: 44px;
     min-height: 44px;
-    padding: 0 10px;
     border: 1px solid var(--border-strong);
     background: var(--paper);
     color: var(--ink);
-    font: inherit;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
   }
 
   .mobile-menu summary::-webkit-details-marker {
