@@ -102,7 +102,6 @@ body {
   padding: 6px 8px;
   border: 2px solid transparent;
   background-color: transparent;
-  -webkit-tap-highlight-color: transparent;
   color: var(--ink-secondary);
   font-size: 0.92rem;
   font-weight: 500;
@@ -151,7 +150,6 @@ body {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
-  -webkit-tap-highlight-color: transparent;
 }
 
 .page-links a[rel="next"] {
@@ -295,6 +293,7 @@ ul, ol {
    ========================================================================== */
 a {
   color: var(--link);
+  -webkit-tap-highlight-color: transparent;
   text-decoration: underline;
   text-decoration-color: var(--link-underline);
   text-decoration-thickness: 1px;
