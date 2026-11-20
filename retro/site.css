@@ -317,7 +317,7 @@ a:hover {
 
 a:focus,
 button:focus,
-summary:focus,
+.mobile-menu summary:focus,
 a:focus-visible,
 button:focus-visible,
 input:focus-visible,
@@ -526,6 +526,11 @@ summary {
 summary:hover {
   color: #000000;
   text-decoration: underline;
+}
+
+.role-more > summary {
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 details[open] {
