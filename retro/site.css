@@ -947,7 +947,7 @@ main > dl:not(.project-directory) dd {
     overflow-y: auto;
     overscroll-behavior: contain;
     display: grid;
-    gap: 0;
+    gap: 8px;
     padding: 4px;
     border: 1px solid var(--border-strong);
     background: var(--paper);
