@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { isIP } from 'node:net';
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ipRateLimits = new Map();
@@ -59,6 +60,11 @@ export async function handleContact(request, fetchFn = fetch) {
   if (request.method !== 'POST') {
     return Response.json({ ok: false, message: 'Method not allowed.' }, { status: 405 });
   }
+
+  const visitorIp = process.env.VERCEL === '1'
+    ? request.headers.get('x-vercel-forwarded-for')?.trim() ?? ''
+    : '';
+  console.info('contact.submit', { ip: isIP(visitorIp) ? visitorIp : null });
 
   const origin = request.headers.get('origin');
   if (origin && origin !== new URL(request.url).origin) {
